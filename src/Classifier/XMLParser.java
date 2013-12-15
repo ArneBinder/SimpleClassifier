@@ -1,9 +1,6 @@
 package Classifier;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import Classifier.bean.Node;
 import org.xml.sax.Attributes;
@@ -17,11 +14,14 @@ public class XMLParser extends DefaultHandler {
 
 	private Stack<String> elements = new Stack<String>();
 	private List<Sentence> sentences = new ArrayList<Sentence>();
+    // [parent, label, child]
+    private List<String[]> secedges = new LinkedList<String[]>();
 
 	private Sentence curSentence = null;
 	private Node curNt = null;
 	private Frame curFrame = null;
 	private String curFEName = "";
+    private Node curTerminal = null;
 
 	@Override
 	public void startElement(String uri, String localName, String qName,
@@ -47,20 +47,27 @@ public class XMLParser extends DefaultHandler {
 				curSentence = new Sentence(attributes.getValue("id"));
 			}
 
-			if (localName.equals("t") && topElement.equals("graph")) {
+            if(localName.equals("secedge") && topElement.equals("t")){
+                String[] secedge = {attributes.getValue("idref"), attributes.getValue("label"), curTerminal.getId()};
+                secedges.add(secedge);
+            }
 
-				Node t = new Node(attributes.getValue("id"));
-				Map<String, String> attrMap = t.getAttributes();
+			if (localName.equals("t") && topElement.equals("graph")) {
+                elements.push(localName);
+				curTerminal = new Node(attributes.getValue("id"));
+				Map<String, String> attrMap = curTerminal.getAttributes();
 
 				for (int i = 0; i < attributes.getLength(); i++) {
 					attrMap.put(attributes.getLocalName(i),
 							attributes.getValue(i));
 				}
 
-				t.setAttributes(attrMap);
+				curTerminal.setAttributes(attrMap);
 
-				curSentence.addTerminal(t);
+				//curSentence.addTerminal(curTerminal);
 			}
+
+
 
 			if (localName.equals("nt") && topElement.equals("graph")) {
 				elements.push(localName);
@@ -113,7 +120,11 @@ public class XMLParser extends DefaultHandler {
 			elements.pop();
 
 			if (localName.equals("s")) {
-				getSentences().add(curSentence);
+                for(String[] secEdge: secedges){
+				    curSentence.addSecEdge(secEdge);
+                }
+                secedges = new LinkedList<String[]>();
+                getSentences().add(curSentence);
 				curSentence = null;
 			}
 
@@ -121,6 +132,11 @@ public class XMLParser extends DefaultHandler {
 				curSentence.addNonterminal(curNt);
 				curNt = null;
 			}
+
+            if (localName.equals("t")) {
+                curSentence.addTerminal(curTerminal);
+                curTerminal = null;
+            }
 
 			if (localName.equals("frame")) {
 				curSentence.addFrame(curFrame);

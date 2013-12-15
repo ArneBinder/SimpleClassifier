@@ -2,6 +2,7 @@ package Classifier.bean;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class Node {
 	private String headIDref = null;
 	//idref > label
 	private Map<String, String> edges = new HashMap<String, String>();
-	private String parentIDref = "";
+	private List<String> parentIDrefs = new ArrayList<String>(1);
 	private int firstWordPos;
 	private int lastWordPos;
 	private String[] pathFromRoot;
@@ -78,12 +79,12 @@ public class Node {
 		this.firstWordPos = firstWordPos;
 	}
 
-	public String getParentIDref() {
-		return parentIDref;
+	public String getParentIDref(int index) {
+		return parentIDrefs.get(index);
 	}
 
-	public void setParentIDref(String parentIDref) {
-		this.parentIDref = parentIDref;
+	public void addParentIDref(String parentIDref) {
+		this.parentIDrefs.add(parentIDref);
 	}
 
 	public void addEdge(String idref, String label) {

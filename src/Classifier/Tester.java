@@ -8,7 +8,7 @@ import java.io.File;
 public class Tester {
     public static void main(String[] args) throws Exception {
         if (args.length < 4) {
-            System.out.println("three arguments needed.");
+            System.out.println("4 arguments needed.");
             return;
         }
         Corpus corpus = new Corpus();
@@ -29,27 +29,27 @@ public class Tester {
         model.writeModelToFile(args[2]);
         System.out.println("done.");
 
-        System.out.println("read model from file: " + args[2]);
-        Model model2 = new Model(corpus.getFeatureExtractor());
-        model2.readModelFromFile(args[2]);
-        System.out.println("done.");
-
-        Corpus corpus2 = new Corpus();
-        System.out.println("read corpus from file: " + args[3]);
-        corpus2.parseFile(args[3]);
-        System.out.println("done.");
-
-        System.out.println("delete annotation from corpus");
-        corpus2.deleteAnnotation();
-        System.out.println("done.");
-
-        System.out.println("annotate corpus");
-        corpus2.annotateCorpus(model2);
-        System.out.println("done.");
-
-        System.out.println("write corpus to file: " + args[1]);
-        corpus2.writeCorpusToFile(args[1]);
-        System.out.println("done.");
+//        System.out.println("read model from file: " + args[2]);
+//        Model model2 = new Model(corpus.getFeatureExtractor());
+//        model2.readModelFromFile(args[2]);
+//        System.out.println("done.");
+//
+//        Corpus corpus2 = new Corpus();
+//        System.out.println("read corpus from file: " + args[3]);
+//        corpus2.parseFile(args[3]);
+//        System.out.println("done.");
+//
+//        System.out.println("delete annotation from corpus");
+//        corpus2.deleteAnnotation();
+//        System.out.println("done.");
+//
+//        System.out.println("annotate corpus");
+//        corpus2.annotateCorpus(model2);
+//        System.out.println("done.");
+//
+//        System.out.println("write corpus to file: " + args[1]);
+//        corpus2.writeCorpusToFile(args[1]);
+//        System.out.println("done.");
 
     }
 

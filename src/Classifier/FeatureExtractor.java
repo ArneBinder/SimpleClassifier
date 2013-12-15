@@ -12,8 +12,12 @@ public class FeatureExtractor {
 	private Sentence sentence = null;
     private static Map<String, List<String>> headPosTags;
     private static Map<String, List<String>> headEdges;
+    private static String[] phrasalCategories = {"AA","AP","AVP","CAC", "CAVP", "CCP","CH","CNP","CO","CPP","CS","CVP","CVZ","DL","ISU","MPN","MTA","NM","NP","PP","QL","S","VP","VZ"};
+
+
 
     static{
+
         // TODO: "contains" is bad.. Create abstracted version for np/vp > change contains to equal (e.g. tree bank hierarchy)
         // TODO: Replace ~ !!!
         headPosTags = new HashMap<String, List<String>>();
@@ -21,6 +25,10 @@ public class FeatureExtractor {
         headPosTags.put("NP", Arrays.asList("NE", "NN", "PDS", "PIS", "PPOSS", "PRELS", "PWS", "NP"));
         headPosTags.put("PP", Arrays.asList("APPR", "APPRART","APPO"));
         headPosTags.put("PN", Arrays.asList("NP"));
+        String[] temp =  new String[phrasalCategories.length+1];
+        System.arraycopy(phrasalCategories,0,temp,0,phrasalCategories.length);
+        temp[temp.length-1] = "ADV";
+        headPosTags.put("AVP", Arrays.asList(temp));
         headPosTags.put("DL", new ArrayList<String>()); // alle erlaubt!
         headPosTags.put("CAC", Arrays.asList("KON"));
         headPosTags.put("CAP", Arrays.asList("KON"));
@@ -32,6 +40,8 @@ public class FeatureExtractor {
         headPosTags.put("CS", Arrays.asList("KON"));
         headPosTags.put("CVP", Arrays.asList("KON"));
         headPosTags.put("CVZ", Arrays.asList("KON"));
+        headPosTags.put("NM", Arrays.asList("CARD"));
+        headPosTags.put("VZ", Arrays.asList("PTKZU"));//workaround for incorrect annotated s5240_525
 
 
 
@@ -39,6 +49,7 @@ public class FeatureExtractor {
         headEdges.put("S", Arrays.asList("MO"));
         headEdges.put("NP", Arrays.asList("NK"));
         headEdges.put("PN", Arrays.asList("PNC"));
+        headEdges.put("AVP", Arrays.asList("RE", "AVP")); //workaround: s12479_503
         headEdges.put("PP", Arrays.asList("MO", "AC"));
         headEdges.put("DL", Arrays.asList("DH"));
         headEdges.put("CAC", Arrays.asList("CD"));
@@ -51,6 +62,8 @@ public class FeatureExtractor {
         headEdges.put("CS", Arrays.asList("CD"));
         headEdges.put("CVP", Arrays.asList("CD"));
         headEdges.put("CVZ", Arrays.asList("CD"));
+        headEdges.put("NM", Arrays.asList("NMC"));
+        headEdges.put("VZ", Arrays.asList("PM")); //workaround for incorrect annotated s5240_525
     }
 
 	public List<String> backOffFeature(String concatenatedFeature) {
@@ -273,7 +286,7 @@ public class FeatureExtractor {
             parentIdRef = pathFromRoot.get(pathFromRoot.size() - 1);
         curNode.setPathFromRoot(pathFromRoot.toArray(new String[pathFromRoot.size()]));
         if (pathFromRoot.size() > 0)
-            curNode.setParentIDref(parentIdRef);
+            curNode.addParentIDref(parentIdRef);
 
         Map.Entry<Integer, Integer> lastFirstIDref;
 
