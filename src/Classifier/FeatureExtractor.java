@@ -49,7 +49,7 @@ public class FeatureExtractor {
         headEdges.put("S", Arrays.asList("MO"));
         headEdges.put("NP", Arrays.asList("NK"));
         headEdges.put("PN", Arrays.asList("PNC"));
-        headEdges.put("AVP", Arrays.asList("RE", "AVP")); //workaround: s12479_503
+        headEdges.put("AVP", Arrays.asList("RE", "AVC")); //workaround: s12479_503
         headEdges.put("PP", Arrays.asList("MO", "AC"));
         headEdges.put("DL", Arrays.asList("DH"));
         headEdges.put("CAC", Arrays.asList("CD"));
@@ -354,6 +354,10 @@ public class FeatureExtractor {
                             if (curHeadEdges.contains(edge.getValue()) && (curHeadPosTags.contains(sentence.getNode(edge.getKey()).getCategory()) || (curHeadPosTags.size()==0))) {
                                 newIdRefs.add(edge.getKey());
                             }
+                        }
+
+                        if(newIdRefs.isEmpty()){
+
                         }
 
                     } else {

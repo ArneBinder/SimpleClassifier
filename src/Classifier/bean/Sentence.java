@@ -32,7 +32,7 @@ public class Sentence {
             getNode(secEdge[0]).addEdge(secEdge[2], secEdge[1]);
 
         } catch (Exception e) {
-            System.out.println("ERROR: could not add second edge from iderf: "+secEdge[0]+" to idref: "+secEdge[2]+" with label: "+secEdge[1]);
+            System.out.println("ERROR: could not add second edge from iderf: " + secEdge[0] + " to idref: " + secEdge[2] + " with label: " + secEdge[1]);
         }
     }
 
@@ -50,21 +50,32 @@ public class Sentence {
 
     //TODO: report to the others: targets can be nonTerminals too!!! --> solution (already implemented): take head  (kriechen.xml)
     public void setTargets(List<String> targetIdRefs) throws Exception {
-        if (targetIdRefs.size() > 2 || targetIdRefs.size() == 0) {
+        if (targetIdRefs.size() == 0) {
             throw new Exception(
-                    "Wir k�nnen nicht mit mehr als 2 TargetIDRefs umgehen. Sorry!");
+                    "No targets for sentenceID: " + getId()+" to add.");
         }
+        if (targetIdRefs.size() > 2) {
+            Set<String> parentIDrefs = new HashSet<String>();
+            for (String targetIDref : targetIdRefs) {
+                parentIDrefs.add(getNode(targetIDref).getParentIDref(0));
+
+            }
+            if (parentIDrefs.size() <= 2) {
+                targets = new ArrayList<Node>(3);
+                for (String parentIdRef : parentIDrefs) {
+                    targets.add(getNode(getNode(parentIdRef).getHeadIDref()));
+                }
+            } else {
+                throw new Exception(
+                        "Wir k�nnen nicht mit mehr als 2 TargetIDRefs umgehen. Sorry! sentenceID: " + getId());
+            }
+
+        }
+
         targets = new ArrayList<Node>(3);
         for (String targetIdRef : targetIdRefs) {
             targets.add(getNode(targetIdRef));
         }
-//			if(terminals.containsKey(targetIdRef)){
-//				targets.add(terminals.get(targetIdRef));
-//			//}else if(nonterminals.containsKey(targetIdRefs)){
-//			//	targets.add(nonterminals.get(targetIdRef));
-//			}else
-//				throw new Exception("targetIdRef:"+targetIdRef+" of TargetIdList: "+targetIdRefs+" not found in Terminals");
-//		}
     }
 
     public void addTerminal(Node t) {
