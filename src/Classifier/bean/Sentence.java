@@ -34,6 +34,10 @@ public class Sentence {
         return rootIDref;
     }
 
+    public boolean containsNode(String idRef){
+        return terminals.containsKey(idRef) || nonterminals.containsKey(idRef);
+    }
+
     public void addSecEdge(String[] secEdge) {
         try {
             getNode(secEdge[0]).addEdge(secEdge[2], secEdge[1]);
@@ -48,7 +52,7 @@ public class Sentence {
             return terminals.get(idRef);
         else if (nonterminals.containsKey(idRef))
             return nonterminals.get(idRef);
-        else throw new Exception("idRef: " + idRef + " not in Sentence");
+        else throw new Exception("idRef: " + idRef + " not in Sentence: "+getId());
     }
 
     public List<Node> getTargets() {
@@ -104,6 +108,17 @@ public class Sentence {
     }
 
     public void addFrame(Frame frame) {
+        for(List<String> fes: frame.getFrameElements().values()){
+            for(String feID: fes){
+                if(!containsNode(feID))
+                    return;
+            }
+        }
+        for(String targetID: frame.getTargetIDs()){
+            if(!containsNode(targetID))
+                return;
+        }
+
         getFrames().add(frame);
     }
 

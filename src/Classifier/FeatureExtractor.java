@@ -8,27 +8,29 @@ import Classifier.bean.Sentence;
 
 public class FeatureExtractor {
 
-	public static final List<String> usedFeatures = Arrays.asList("target", "synCat", "position", "path", "target" + FeatureVector.getSplitChar() + "synCat", "head");
-	private Sentence sentence = null;
+    public static final List<String> usedFeatures = Arrays.asList("target", "synCat", "position", "path", "target" + FeatureVector.getSplitChar() + "synCat", "head");
+    private Sentence sentence = null;
     private static Map<String, List<String>> headPosTags;
     private static Map<String, List<String>> headEdges;
-    private static String[] phrasalCategories = {"AA","AP","AVP","CAC", "CAVP", "CCP","CH","CNP","CO","CPP","CS","CVP","CVZ","DL","ISU","MPN","MTA","NM","NP","PP","QL","S","VP","VZ"};
+    private static String[] phrasalCategories = {"AA", "AP", "AVP", "CAC", "CAVP", "CCP", "CH", "CNP", "CO", "CPP", "CS", "CVP", "CVZ", "DL", "ISU", "MPN", "MTA", "NM", "NP", "PP", "QL", "S", "VP", "VZ"};
 
+    private static String[] addToPhrasalCat(String cat) {
+        String[] temp = new String[phrasalCategories.length + 1];
+        System.arraycopy(phrasalCategories, 0, temp, 0, phrasalCategories.length);
+        temp[temp.length - 1] = cat;
+        return temp;
+    }
 
-
-    static{
+    static {
 
         // TODO: "contains" is bad.. Create abstracted version for np/vp > change contains to equal (e.g. tree bank hierarchy)
         // TODO: Replace ~ !!!
         headPosTags = new HashMap<String, List<String>>();
         headPosTags.put("S", new ArrayList<String>());
         headPosTags.put("NP", Arrays.asList("NE", "NN", "PDS", "PIS", "PPOSS", "PRELS", "PWS", "NP"));
-        headPosTags.put("PP", Arrays.asList("APPR", "APPRART","APPO"));
+        headPosTags.put("PP", Arrays.asList("APPR", "APPRART", "APPO"));
         headPosTags.put("PN", Arrays.asList("NP"));
-        String[] temp =  new String[phrasalCategories.length+1];
-        System.arraycopy(phrasalCategories,0,temp,0,phrasalCategories.length);
-        temp[temp.length-1] = "ADV";
-        headPosTags.put("AVP", Arrays.asList(temp));
+        headPosTags.put("AVP", Arrays.asList(addToPhrasalCat("ADV")));
         headPosTags.put("DL", new ArrayList<String>()); // alle erlaubt!
         headPosTags.put("CAC", Arrays.asList("KON"));
         headPosTags.put("CAP", Arrays.asList("KON"));
@@ -38,12 +40,13 @@ public class FeatureExtractor {
         headPosTags.put("CO", Arrays.asList("KON"));
         headPosTags.put("CPP", Arrays.asList("KON"));
         headPosTags.put("CS", new ArrayList<String>());//TODO: fix workaround (s778_507)// Arrays.asList("KON"));
-        headPosTags.put("CVP", Arrays.asList("KON"));
+        headPosTags.put("CVP", Arrays.asList(addToPhrasalCat("KON"))); //TODO: fix workaround (s6057_512)
         headPosTags.put("CVZ", Arrays.asList("KON"));
-        headPosTags.put("NM", Arrays.asList("CARD"));
+        headPosTags.put("NM", Arrays.asList("CARD", "NN"));
         headPosTags.put("VZ", Arrays.asList("PTKZU"));//workaround for incorrect annotated s5240_525
-
-
+        headPosTags.put("CH", new ArrayList<String>());
+        headPosTags.put("VP", Arrays.asList("PTKVZ"));
+        headPosTags.put("ISU", Arrays.asList("$."));
 
         headEdges = new HashMap<String, List<String>>();
         headEdges.put("S", Arrays.asList("MO"));
@@ -60,108 +63,111 @@ public class FeatureExtractor {
         headEdges.put("CO", Arrays.asList("CD"));
         headEdges.put("CPP", Arrays.asList("CD"));
         headEdges.put("CS", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s778_507)
-        headEdges.put("CVP", Arrays.asList("CD"));
+        headEdges.put("CVP", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s6057_512)
         headEdges.put("CVZ", Arrays.asList("CD"));
         headEdges.put("NM", Arrays.asList("NMC"));
         headEdges.put("VZ", Arrays.asList("PM")); //workaround for incorrect annotated s5240_525
+        headEdges.put("CH", new ArrayList<String>());
+        headEdges.put("VP", Arrays.asList("SVP"));
+        headEdges.put("ISU", Arrays.asList("UC"));
     }
 
-	public List<String> backOffFeature(String concatenatedFeature) {
-		List<String> result = new LinkedList<String>();
+    public List<String> backOffFeature(String concatenatedFeature) {
+        List<String> result = new LinkedList<String>();
 
-		// starting rule
-		if (concatenatedFeature.equals("")) {
-			result.add("target" + FeatureVector.getSplitChar() + "synCat");
-			result.add("position");
-			result.add("path");
-			result.add("head");
-		}
+        // starting rule
+        if (concatenatedFeature.equals("")) {
+            result.add("target" + FeatureVector.getSplitChar() + "synCat");
+            result.add("position");
+            result.add("path");
+            result.add("head");
+        }
 
-		if (concatenatedFeature.equals("target" + FeatureVector.getSplitChar()
-				+ "synCat")) {
-			result.add("target");
-			result.add("synCat");
-		}
+        if (concatenatedFeature.equals("target" + FeatureVector.getSplitChar()
+                + "synCat")) {
+            result.add("target");
+            result.add("synCat");
+        }
 
-		// TODO complete rule set @ P17 @ Jurafsky
+        // TODO complete rule set @ P17 @ Jurafsky
 
-		return result;
-	}
+        return result;
+    }
 
-	public List<String> getUsedFeatures() {
-		return usedFeatures;
-	}
+    public List<String> getUsedFeatures() {
+        return usedFeatures;
+    }
 
-	public void setSentence(Sentence s)  throws Exception {
-		this.sentence = s;
+    public void setSentence(Sentence s) throws Exception {
+        this.sentence = s;
         enrichInformation();
-	}
+    }
 
-	public FeatureVector extract(String idref)
-			throws Exception {
-		FeatureVector fv = new FeatureVector();
+    public FeatureVector extract(String idref)
+            throws Exception {
+        FeatureVector fv = new FeatureVector();
 
-		fv.addFeature("target", extractTarget());
-		fv.addFeature("synCat", extractSyntacticalCategory(idref));
-		fv.addFeature("position", extractPosition(idref));
-		fv.addFeature("path", extractPath(idref));
-		fv.addFeature("head", extractHead(idref));
+        fv.addFeature("target", extractTarget());
+        fv.addFeature("synCat", extractSyntacticalCategory(idref));
+        fv.addFeature("position", extractPosition(idref));
+        fv.addFeature("path", extractPath(idref));
+        fv.addFeature("head", extractHead(idref));
 
-		return fv;
-	}
+        return fv;
+    }
 
-	private String extractHead(String idref) throws Exception {
-		String headIDref = sentence.getNode(idref).getHeadIDref();
-		if (headIDref != null)
-			return sentence.getNode(headIDref).getAttributes().get("lemma");
-		return "null";
-	}
+    private String extractHead(String idref) throws Exception {
+        String headIDref = sentence.getNode(idref).getHeadIDref();
+        if (headIDref != null)
+            return sentence.getNode(headIDref).getAttributes().get("lemma");
+        return "null";
+    }
 
-	private String extractPath(String idref)
-			throws Exception {
+    private String extractPath(String idref)
+            throws Exception {
 
-		String path = "";
+        String path = "";
 
-		//TODO: use only first target??
-		String[] targetIdPath = sentence.getTargets().get(0).getPathFromRoot();
-		String[] ownIdPath = sentence.getNode(idref).getPathFromRoot();
+        //TODO: use only first target??
+        String[] targetIdPath = sentence.getTargets().get(0).getPathFromRoot();
+        String[] ownIdPath = sentence.getNode(idref).getPathFromRoot();
 
-		if (sentence.getTargets().get(0).getId().equals(idref)) {
-			path = "TARGET";
-		} else {
-			int i = 0;
-			while (i < targetIdPath.length && i < ownIdPath.length && targetIdPath[i].equals(ownIdPath[i])) {
-				i++;
-			}
+        if (sentence.getTargets().get(0).getId().equals(idref)) {
+            path = "TARGET";
+        } else {
+            int i = 0;
+            while (i < targetIdPath.length && i < ownIdPath.length && targetIdPath[i].equals(ownIdPath[i])) {
+                i++;
+            }
 
-			for (int j = ownIdPath.length - 1; j >= i; j--) {
+            for (int j = ownIdPath.length - 1; j >= i; j--) {
 
-				path += sentence.getNode(ownIdPath[j]).getCategory() + "+";
-			}
-			// nimm die wurzel des subtrees nur mit rein, wenn idref nicht auf (global) root zeigt. sonst fuege Kategorie manuell ein...
-			if (i == 0)
-				path += "VROOT";
-			else{
-				path += sentence.getNode(targetIdPath[i - 1]).getCategory();
-			}
-
-
-			for (int j = i; j < targetIdPath.length; j++) {
-				path += "-" + sentence.getNode(targetIdPath[j]).getCategory();
-			}
-
-		}
-
-		//System.out.println(sentence.getTargets().get(0).getId() + ", " + idref + ": " + path);
-		return path;
-	}
+                path += sentence.getNode(ownIdPath[j]).getCategory() + "+";
+            }
+            // nimm die wurzel des subtrees nur mit rein, wenn idref nicht auf (global) root zeigt. sonst fuege Kategorie manuell ein...
+            if (i == 0)
+                path += "VROOT";
+            else {
+                path += sentence.getNode(targetIdPath[i - 1]).getCategory();
+            }
 
 
-	private String extractPosition(String idref)
-			throws Exception {
+            for (int j = i; j < targetIdPath.length; j++) {
+                path += "-" + sentence.getNode(targetIdPath[j]).getCategory();
+            }
 
-		String position = "";
-		
+        }
+
+        //System.out.println(sentence.getTargets().get(0).getId() + ", " + idref + ": " + path);
+        return path;
+    }
+
+
+    private String extractPosition(String idref)
+            throws Exception {
+
+        String position = "";
+
 		/*
 		 * Possible cases: 
 		 * 0 - idref in front of the separated target 1 - idref
@@ -169,109 +175,109 @@ public class FeatureExtractor {
 		 * target 
 		 * 3 - idref behind the single / separated target
 		 */
-		int firstTargetNumber = 0;
-		int seconTargetdNumber = 0;
-		int idRefNumber = 0;
+        int firstTargetNumber = 0;
+        int seconTargetdNumber = 0;
+        int idRefNumber = 0;
 
-		// get positions of targets
-		if (sentence.getTargets().size() == 2) {
-			firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
-			seconTargetdNumber = sentence.getTargets().get(1).getFirstWordPos();
-		} else {
-			firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
-		}
+        // get positions of targets
+        if (sentence.getTargets().size() == 2) {
+            firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
+            seconTargetdNumber = sentence.getTargets().get(1).getFirstWordPos();
+        } else {
+            firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
+        }
 
-		// get position of given idref
-		if (sentence.getTerminals().containsKey(idref)) {
-			idRefNumber = sentence.getTerminals().get(idref).getFirstWordPos();
-			//idRefNumber = Integer.parseInt(idref.split("_")[1]);
-		} else {
-			idRefNumber = sentence.getNonterminals().get(idref).getFirstWordPos();
-			//idRefNumber = Integer.parseInt(getFirstTerminalOfNonTerminal(idref).split("_")[0]);
-		}
+        // get position of given idref
+        if (sentence.getTerminals().containsKey(idref)) {
+            idRefNumber = sentence.getTerminals().get(idref).getFirstWordPos();
+            //idRefNumber = Integer.parseInt(idref.split("_")[1]);
+        } else {
+            idRefNumber = sentence.getNonterminals().get(idref).getFirstWordPos();
+            //idRefNumber = Integer.parseInt(getFirstTerminalOfNonTerminal(idref).split("_")[0]);
+        }
 
-		// apply position rules
-		if (seconTargetdNumber == 0) {
-			if (idRefNumber < firstTargetNumber) {
-				position = "2";
-			} else {
-				position = "3";
-			}
-		} else {
-			if (idRefNumber < firstTargetNumber) {
-				position = "0";
-			} else if (idRefNumber < seconTargetdNumber) {
-				position = "1";
-			} else {
-				position = "3";
-			}
-		}
+        // apply position rules
+        if (seconTargetdNumber == 0) {
+            if (idRefNumber < firstTargetNumber) {
+                position = "2";
+            } else {
+                position = "3";
+            }
+        } else {
+            if (idRefNumber < firstTargetNumber) {
+                position = "0";
+            } else if (idRefNumber < seconTargetdNumber) {
+                position = "1";
+            } else {
+                position = "3";
+            }
+        }
 
-		if (position.isEmpty()) {
-			throw new Exception("The position could not be determined!");
-		}
+        if (position.isEmpty()) {
+            throw new Exception("The position could not be determined!");
+        }
 
-		return position;
-	}
-
-
-	/**
-	 * For a terminal: Pos-tag For a non-terminal: ConstituentenName
-	 *
-	 * @param idref
-	 * @return
-	 * @throws Exception
-	 */
-	private String extractSyntacticalCategory(String idref) throws Exception {
-		return sentence.getNode(idref).getCategory();
-	}
-
-	private String extractTarget() throws Exception {
-
-		String targetLemma = "";
-
-		if (sentence.getTargets().size() == 2) {
-
-			int firstNumber = sentence.getTargets().get(0).getFirstWordPos();//Integer.parseInt(firstTargetIDRef.split("_")[1]);
-			int secondNumber = sentence.getTargets().get(1).getFirstWordPos();// Integer.parseInt(secondTargetIDRef.split("_")[1]);
-
-			if (Math.abs(firstNumber - secondNumber) == 1) {
-
-				if (firstNumber > secondNumber) {
-					targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
-					//targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
-				} else {
-					targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
-					//targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
-				}
-			} else {
-
-				if (firstNumber > secondNumber) {
-					targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
-					//targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
-				} else {
-					targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
-					//targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
-				}
-			}
-
-		} else {
-			String targetIDRef = sentence.getTargets().get(0).getId();
-
-			if (sentence.getTerminals().containsKey(targetIDRef)) {
-				targetLemma = sentence.getTerminals().get(targetIDRef).getAttributes().get("lemma");
-			} else {
-				String headIDref = sentence.getNode(targetIDRef).getHeadIDref();
-				if (headIDref != null)
-					targetLemma = sentence.getTerminals().get(headIDref).getAttributes().get("lemma");
-				else
-					throw new Exception("Das TargetIDRef ist kein Terminal bzw. hat kein HeadWord!");
-			}
-		}
+        return position;
+    }
 
 
-		return targetLemma;
-	}
+    /**
+     * For a terminal: Pos-tag For a non-terminal: ConstituentenName
+     *
+     * @param idref
+     * @return
+     * @throws Exception
+     */
+    private String extractSyntacticalCategory(String idref) throws Exception {
+        return sentence.getNode(idref).getCategory();
+    }
+
+    private String extractTarget() throws Exception {
+
+        String targetLemma = "";
+
+        if (sentence.getTargets().size() == 2) {
+
+            int firstNumber = sentence.getTargets().get(0).getFirstWordPos();//Integer.parseInt(firstTargetIDRef.split("_")[1]);
+            int secondNumber = sentence.getTargets().get(1).getFirstWordPos();// Integer.parseInt(secondTargetIDRef.split("_")[1]);
+
+            if (Math.abs(firstNumber - secondNumber) == 1) {
+
+                if (firstNumber > secondNumber) {
+                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
+                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
+                } else {
+                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
+                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
+                }
+            } else {
+
+                if (firstNumber > secondNumber) {
+                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
+                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
+                } else {
+                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
+                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
+                }
+            }
+
+        } else {
+            String targetIDRef = sentence.getTargets().get(0).getId();
+
+            if (sentence.getTerminals().containsKey(targetIDRef)) {
+                targetLemma = sentence.getTerminals().get(targetIDRef).getAttributes().get("lemma");
+            } else {
+                String headIDref = sentence.getNode(targetIDRef).getHeadIDref();
+                if (headIDref != null)
+                    targetLemma = sentence.getTerminals().get(headIDref).getAttributes().get("lemma");
+                else
+                    throw new Exception("Das TargetIDRef ist kein Terminal bzw. hat kein HeadWord!");
+            }
+        }
+
+
+        return targetLemma;
+    }
 
 
     private Map.Entry<Integer, Integer> traverseTree(String curIDRef, ArrayList<String> pathFromRoot) throws Exception {
@@ -322,8 +328,8 @@ public class FeatureExtractor {
     public Node calculateHeadWord(List<String> idrefs) throws Exception {
         Collections.sort(idrefs);
         //if(idrefs.contains("s21270_1"))
-          //  System.out.println("test");
-        if(idrefs.get(0).equals(sentence.getRootIDref()) && !sentence.getNode(sentence.getRootIDref()).isTerminal())
+        //  System.out.println("test");
+        if (idrefs.get(0).equals(sentence.getRootIDref()) && !sentence.getNode(sentence.getRootIDref()).isTerminal())
             return null;
         Node curNode;
         List<String> newIdRefs = new ArrayList<String>(40);
@@ -352,22 +358,17 @@ public class FeatureExtractor {
                         List<String> curHeadEdges = headEdges.get(curCat);
                         List<String> curHeadPosTags = headPosTags.get(curCat);
                         for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
-                            if (curHeadEdges.contains(edge.getValue()) && (curHeadPosTags.contains(sentence.getNode(edge.getKey()).getCategory()) || (curHeadPosTags.size()==0))) {
+                            if (curHeadEdges.contains(edge.getValue()) && (curHeadPosTags.contains(sentence.getNode(edge.getKey()).getCategory()) || (curHeadPosTags.size() == 0))) {
                                 newIdRefs.add(edge.getKey());
                             }
                         }
-
-                        if(newIdRefs.isEmpty()){
-
-                        }
-
                     } else {
                         throw new Exception("no head-edge or no head-pos-tag for category " + curCat + " (for idref: " + curNode.getId() + ")");
                     }
                 }
             }
         }
-        if (newIdRefs.isEmpty()){
+        if (newIdRefs.isEmpty()) {
             // TODO: Throw
             //throw new Exception("no head word found for: "+idrefs);
             return null;
