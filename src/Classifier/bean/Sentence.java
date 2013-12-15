@@ -23,6 +23,13 @@ public class Sentence {
         this.setId(id);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null)
+            return false;
+        return ((Sentence) obj).getId().equals(getId());
+    }
+
     public String getRootIDref() {
         return rootIDref;
     }
@@ -50,15 +57,24 @@ public class Sentence {
 
     //TODO: report to the others: targets can be nonTerminals too!!! --> solution (already implemented): take head  (kriechen.xml)
     public void setTargets(List<String> targetIdRefs) throws Exception {
+        //if(getId().equals("s38580"))
+          //  System.out.println("test");
         if (targetIdRefs.size() == 0) {
+            //System.out.println("test");
             throw new Exception(
-                    "No targets for sentenceID: " + getId()+" to add.");
+                    "No targets for sentenceID: " + getId() + " to add.");
         }
         if (targetIdRefs.size() > 2) {
             Set<String> parentIDrefs = new HashSet<String>();
             for (String targetIDref : targetIdRefs) {
                 parentIDrefs.add(getNode(targetIDref).getParentIDref(0));
 
+            }
+            //TODO: fix this part to flatten the tree of targets: if deleted in wrong order, it become decomposed instead of collapsing to the root (of target-subtree) parent constituent (example: Bank_s38580_f1 here it works, but not in general)
+            for (Iterator<String> iter = parentIDrefs.iterator(); iter.hasNext();){
+                String parentIDref = iter.next();
+                if(parentIDrefs.contains(getNode(parentIDref).getParentIDref(0)))
+                    iter.remove();
             }
             if (parentIDrefs.size() <= 2) {
                 targets = new ArrayList<Node>(3);
@@ -67,14 +83,15 @@ public class Sentence {
                 }
             } else {
                 throw new Exception(
-                        "Wir k�nnen nicht mit mehr als 2 TargetIDRefs umgehen. Sorry! sentenceID: " + getId());
+                        "Wir k�nnen nicht mit mehr als 2 TargetIDRefs umgehen. Sorry! sentenceID: " + getId()+" "+targetIdRefs);
             }
 
-        }
+        } else {
 
-        targets = new ArrayList<Node>(3);
-        for (String targetIdRef : targetIdRefs) {
-            targets.add(getNode(targetIdRef));
+            targets = new ArrayList<Node>(3);
+            for (String targetIdRef : targetIdRefs) {
+                targets.add(getNode(targetIdRef));
+            }
         }
     }
 

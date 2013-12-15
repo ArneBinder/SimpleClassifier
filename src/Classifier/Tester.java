@@ -19,7 +19,7 @@ public class Tester {
             System.out.println("file: " + file.getName());
             corpus.parseFile(file.getAbsolutePath());
         }
-        System.out.println("done.");
+        System.out.println("done. "+corpus.getSentenceCount()+" sentences read.");
 
         System.out.println("train model");
         Model model = corpus.trainModel();

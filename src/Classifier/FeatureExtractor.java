@@ -37,7 +37,7 @@ public class FeatureExtractor {
         headPosTags.put("CNP", Arrays.asList("KON"));
         headPosTags.put("CO", Arrays.asList("KON"));
         headPosTags.put("CPP", Arrays.asList("KON"));
-        headPosTags.put("CS", Arrays.asList("KON"));
+        headPosTags.put("CS", new ArrayList<String>());//TODO: fix workaround (s778_507)// Arrays.asList("KON"));
         headPosTags.put("CVP", Arrays.asList("KON"));
         headPosTags.put("CVZ", Arrays.asList("KON"));
         headPosTags.put("NM", Arrays.asList("CARD"));
@@ -59,7 +59,7 @@ public class FeatureExtractor {
         headEdges.put("CNP", Arrays.asList("CD"));
         headEdges.put("CO", Arrays.asList("CD"));
         headEdges.put("CPP", Arrays.asList("CD"));
-        headEdges.put("CS", Arrays.asList("CD"));
+        headEdges.put("CS", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s778_507)
         headEdges.put("CVP", Arrays.asList("CD"));
         headEdges.put("CVZ", Arrays.asList("CD"));
         headEdges.put("NM", Arrays.asList("NMC"));
@@ -321,8 +321,9 @@ public class FeatureExtractor {
 
     public Node calculateHeadWord(List<String> idrefs) throws Exception {
         Collections.sort(idrefs);
-
-        if(idrefs.get(0).equals(sentence.getRootIDref()))
+        //if(idrefs.contains("s21270_1"))
+          //  System.out.println("test");
+        if(idrefs.get(0).equals(sentence.getRootIDref()) && !sentence.getNode(sentence.getRootIDref()).isTerminal())
             return null;
         Node curNode;
         List<String> newIdRefs = new ArrayList<String>(40);
@@ -368,6 +369,7 @@ public class FeatureExtractor {
         }
         if (newIdRefs.isEmpty()){
             // TODO: Throw
+            //throw new Exception("no head word found for: "+idrefs);
             return null;
         }
         return calculateHeadWord(newIdRefs);

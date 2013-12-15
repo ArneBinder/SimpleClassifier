@@ -20,162 +20,193 @@ import Classifier.bean.Sentence;
  * Created by Arne on 09.12.13.
  */
 public class Corpus {
-	private List<Sentence> sentences;
-	private FeatureExtractor featureExtractor;
+    private List<Sentence> sentences;
+    private FeatureExtractor featureExtractor;
 
-	public FeatureExtractor getFeatureExtractor() {
-		return featureExtractor;
-	}
+    public FeatureExtractor getFeatureExtractor() {
+        return featureExtractor;
+    }
 
-	public Corpus() {
-		featureExtractor = new FeatureExtractor();
+    public Corpus() {
+        featureExtractor = new FeatureExtractor();
         sentences = new LinkedList<Sentence>();
-	}
+    }
 
-	public Model trainModel() throws Exception {
-		Model model = new Model(featureExtractor);
-		List<String> frameElementIDRefs;
-		List<String> targetHeads;
-		for (Sentence sentence : sentences) {
+    public int getSentenceCount() {
+        return sentences.size();
+    }
 
-			//sentence.enrichInformation();
+    public Sentence getSentence(String id) {
+        for (Sentence sentence : sentences) {
+            if (sentence.getId().equals(id))
+                return sentence;
+        }
+        return null;
+    }
 
-			featureExtractor.setSentence(sentence);
-            //featureExtractor.enrichInformation();
+    public Model trainModel() throws Exception {
+        Model model = new Model(featureExtractor);
+        List<String> frameElementIDRefs;
+        List<String> targetHeads;
+        int allreadyProcessed = 0;
+        for (Sentence sentence : sentences) {
+            try {
+                //sentence.enrichInformation();
 
-			// process FrameElements
-			frameElementIDRefs = new ArrayList<String>();
-			for (Frame currentFrame : sentence.getFrames()) {
-				model.addTargetWord(currentFrame.getName(), currentFrame.getTargetLemma());
-				targetHeads = new LinkedList<String>();
-				for(String curTargetIDref: currentFrame.getTargetIDs()){
-					targetHeads.add(sentence.getNode(curTargetIDref).getHeadIDref());
-				}
-				sentence.setTargets(targetHeads);
-				for (Entry<String, List<String>> frameElement : currentFrame.getFrameElements().entrySet()) {
-					String frameElementName = frameElement.getKey(); // = role
+                featureExtractor.setSentence(sentence);
+                //featureExtractor.enrichInformation();
 
-					// get first idref only.. hopefully, there is only one
-					String frameElementIDRef = frameElement.getValue().get(0);
+                // process FrameElements
+                frameElementIDRefs = new ArrayList<String>();
+                for (Frame currentFrame : sentence.getFrames()) {
+                    model.addTargetWord(currentFrame.getName(), currentFrame.getTargetLemma());
+                    targetHeads = new LinkedList<String>();
+                    for (String curTargetIDref : currentFrame.getTargetIDs()) {
+                        String headIDref = sentence.getNode(curTargetIDref).getHeadIDref();
+                        if (headIDref != null)
+                            targetHeads.add(sentence.getNode(curTargetIDref).getHeadIDref());
+                    }
+                    sentence.setTargets(targetHeads);
+                    for (Entry<String, List<String>> frameElement : currentFrame.getFrameElements().entrySet()) {
+                        String frameElementName = frameElement.getKey(); // = role
 
-					FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
-					model.addFeatureVector(frameElementName, feFeatureVector);
-					frameElementIDRefs.add(frameElementIDRef);
-				}
+                        // get first idref only.. hopefully, there is only one
+                        String frameElementIDRef = frameElement.getValue().get(0);
 
-				// process all terminal elements
-				FeatureVector currentVector;
-				for (String id : sentence.getTerminals().keySet()) {
-					if (!frameElementIDRefs.contains(id)) {
-						currentVector = featureExtractor.extract(id);
-						model.addFeatureVector(currentVector);
-					}
-				}
+                        FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
+                        model.addFeatureVector(frameElementName, feFeatureVector);
+                        frameElementIDRefs.add(frameElementIDRef);
+                    }
 
-				// process all nonterminal elements
-				for (String id : sentence.getNonterminals().keySet()) {
-					if (!frameElementIDRefs.contains(id)) {
-						currentVector = featureExtractor.extract(id);
-						model.addFeatureVector(currentVector);
-					}
-				}
-			}
-		}
-		
-		model.calculateProbabilities();
-		
-		return model;
-	}
+                    // process all terminal elements
+                    FeatureVector currentVector;
+                    for (String id : sentence.getTerminals().keySet()) {
+                        if (!frameElementIDRefs.contains(id)) {
+                            currentVector = featureExtractor.extract(id);
+                            model.addFeatureVector(currentVector);
+                        }
+                    }
 
-	public void annotateCorpus(Model model) throws Exception {
-		
-		FeatureVector featureVector = null;
-		Frame annotationFrame = new Frame("annotationID", "annotatedFrameElements");
+                    // process all nonterminal elements
+                    for (String id : sentence.getNonterminals().keySet()) {
+                        if (!frameElementIDRefs.contains(id)) {
+                            currentVector = featureExtractor.extract(id);
+                            model.addFeatureVector(currentVector);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("allreadyProcessed: " + allreadyProcessed);
+                throw e;
+            }
+            allreadyProcessed++;
+        }
 
-		Entry<String, Double> assignedRoleWithProbability;
-		for (Sentence sentence : sentences) {
+        model.calculateProbabilities();
 
-			//sentence.enrichInformation();
+        return model;
+    }
 
-			featureExtractor.setSentence(sentence);
-			
-			for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model
-					.getTargetLemmata().keySet())) {
+    public void annotateCorpus(Model model) throws Exception {
 
-				sentence.setTargets(targetLemmaIDRefs);
-				// classify all terminals
-				for (Node terminal : sentence.getTerminals().values()) {
-					featureVector = featureExtractor.extract(terminal.getId());
-					
-					assignedRoleWithProbability = model.classify(featureVector);
-					annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId()+":"+assignedRoleWithProbability.getValue());
-				}
+        FeatureVector featureVector = null;
+        Frame annotationFrame = new Frame("annotationID", "annotatedFrameElements");
 
-				// classify all terminals
-				for (Node nonTerminal : sentence.getNonterminals()
-						.values()) {
-					featureVector = featureExtractor.extract(nonTerminal.getId());
-					
-					assignedRoleWithProbability = model.classify(featureVector);
-					annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId()+":"+assignedRoleWithProbability.getValue());
-				}
-			}
-			
-			sentence.addFrame(annotationFrame);
-		}
-	}
+        Entry<String, Double> assignedRoleWithProbability;
 
-	public void deleteAnnotation() {
-		for (Sentence sentence : sentences) {
-			sentence.deleteAnnotation();
-		}
-	}
+        for (Sentence sentence : sentences) {
 
-	public void writeCorpusToFile(String fileName) throws Exception{
-		BufferedWriter out = new BufferedWriter(new FileWriter(new File(fileName)));
-		out.write("<?xml version='1.0' encoding='UTF-8'?>");
-		out.write("\n<corpus corpusname=\"tagged-corpus\">");
-		out.write("\n\t<head>");
-		out.write("\n\t</head>");
-		out.write("\n\t<body>");
-		for(Sentence sentence: sentences){
-			out.write(sentence.toString());
-		}
-		out.write("\n\t</body>");
-		out.write("\n</corpus>");
-		out.close();
-	}
+            //sentence.enrichInformation();
 
-	public void parseFile(String fileName) throws Exception {
+            featureExtractor.setSentence(sentence);
 
-		// InputSource inputSource = null;
-		File file = new File(fileName);
-		if (!file.exists() || !file.isFile()) {
-			throw new Exception(
-					"Given corpus file does not exist or is no file!");
-		}
-		try {
-			InputSource inputSource = new InputSource(new BufferedReader(
-					new FileReader(fileName)));
+            for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model
+                    .getTargetLemmata().keySet())) {
 
-			XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+                sentence.setTargets(targetLemmaIDRefs);
+                // classify all terminals
+                for (Node terminal : sentence.getTerminals().values()) {
+                    featureVector = featureExtractor.extract(terminal.getId());
 
-			XMLParser contentHandler = new XMLParser();
-			xmlReader.setContentHandler(contentHandler);
+                    assignedRoleWithProbability = model.classify(featureVector);
+                    annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":" + assignedRoleWithProbability.getValue());
+                }
 
-			xmlReader.parse(inputSource);
+                // classify all terminals
+                for (Node nonTerminal : sentence.getNonterminals()
+                        .values()) {
+                    featureVector = featureExtractor.extract(nonTerminal.getId());
 
-			this.sentences.addAll(contentHandler.getSentences());
+                    assignedRoleWithProbability = model.classify(featureVector);
+                    annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
+                }
+            }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+            sentence.addFrame(annotationFrame);
+        }
+    }
 
-	public void printSentences() {
-		for (Sentence sentence : sentences) {
-			System.out.println(sentence.toString());
-		}
-	}
+    public void deleteAnnotation() {
+        for (Sentence sentence : sentences) {
+            sentence.deleteAnnotation();
+        }
+    }
+
+    public void writeCorpusToFile(String fileName) throws Exception {
+        BufferedWriter out = new BufferedWriter(new FileWriter(new File(fileName)));
+        out.write("<?xml version='1.0' encoding='UTF-8'?>");
+        out.write("\n<corpus corpusname=\"tagged-corpus\">");
+        out.write("\n\t<head>");
+        out.write("\n\t</head>");
+        out.write("\n\t<body>");
+        for (Sentence sentence : sentences) {
+            out.write(sentence.toString());
+        }
+        out.write("\n\t</body>");
+        out.write("\n</corpus>");
+        out.close();
+    }
+
+    public void parseFile(String fileName) throws Exception {
+
+        // InputSource inputSource = null;
+        File file = new File(fileName);
+        if (!file.exists() || !file.isFile()) {
+            throw new Exception(
+                    "Given corpus file does not exist or is no file!");
+        }
+        try {
+            InputSource inputSource = new InputSource(new BufferedReader(
+                    new FileReader(fileName)));
+
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+
+            XMLParser contentHandler = new XMLParser();
+            xmlReader.setContentHandler(contentHandler);
+
+            xmlReader.parse(inputSource);
+
+            //if sentence is already in corpus --> just add frames TODO: test!
+            for (Sentence NewSentence : contentHandler.getSentences()) {
+                if (sentences.contains(NewSentence)) {
+                    Sentence sentenceInCorpus = getSentence(NewSentence.getId());
+                    for (Frame frame : NewSentence.getFrames()) {
+                        sentenceInCorpus.addFrame(frame);
+                    }
+                } else {
+                    sentences.add(NewSentence);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void printSentences() {
+        for (Sentence sentence : sentences) {
+            System.out.println(sentence.toString());
+        }
+    }
 
 }
