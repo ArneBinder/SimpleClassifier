@@ -120,6 +120,7 @@ public class Corpus {
 
             featureExtractor.setSentence(sentence);
 
+            //TODO: Problem bei mehrfachvorkommen eines TargetLemmas!!!
             for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model
                     .getTargetLemmata().keySet())) {
 
