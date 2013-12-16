@@ -2,12 +2,14 @@ package Classifier;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import Classifier.bean.Node;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
@@ -60,13 +62,15 @@ public class Corpus {
                 frameElementIDRefs = new ArrayList<String>();
                 for (Frame currentFrame : sentence.getFrames()) {
                     model.addTargetWord(currentFrame.getName(), currentFrame.getTargetLemma());
-                    targetHeads = new LinkedList<String>();
-                    for (String curTargetIDref : currentFrame.getTargetIDs()) {
-                        String headIDref = sentence.getNode(curTargetIDref).getHeadIDref();
-                        if (headIDref != null)
-                            targetHeads.add(sentence.getNode(curTargetIDref).getHeadIDref());
-                    }
-                    sentence.setTargets(targetHeads);
+                    
+                    // TODO: wieso targetHead?
+//                    targetHeads = new LinkedList<String>();
+//                    for (String curTargetIDref : currentFrame.getTargetIDs()) {
+//                        String headIDref = sentence.getNode(curTargetIDref).getHeadIDref();
+//                        if (headIDref != null)
+//                            targetHeads.add(sentence.getNode(curTargetIDref).getHeadIDref());
+//                    }
+                    sentence.setTargets(currentFrame.getTargetIDs());
                     for (Entry<String, List<String>> frameElement : currentFrame.getFrameElements().entrySet()) {
                         String frameElementName = frameElement.getKey(); // = role
 
@@ -110,43 +114,46 @@ public class Corpus {
     public void annotateCorpus(Model model) throws Exception {
 
         FeatureVector featureVector = null;
-        Frame annotationFrame = new Frame("annotationID", "annotatedFrameElements");
+        Frame annotationFrame;
 
         Entry<String, Double> assignedRoleWithProbability;
 
         for (Sentence sentence : sentences) {
 
-            //sentence.enrichInformation();
-
             featureExtractor.setSentence(sentence);
 
-            //TODO: Problem bei mehrfachvorkommen eines TargetLemmas!!!
             for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model
                     .getTargetLemmata().keySet())) {
+        	
+        	for (String targetLemmaIDRef : targetLemmaIDRefs) {
+        	    String targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
+        	    annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
 
-                sentence.setTargets(targetLemmaIDRefs);
-                // classify all terminals
-                for (Node terminal : sentence.getTerminals().values()) {
-                    featureVector = featureExtractor.extract(terminal.getId());
+        	    sentence.setTargets(Arrays.asList(new String[]{targetLemmaIDRef}));
+        	    // classify all terminals
+        	    for (Node terminal : sentence.getTerminals().values()) {
+        		featureVector = featureExtractor.extract(terminal.getId());
+        		
+        		assignedRoleWithProbability = model.classify(featureVector);
+        		annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":" + assignedRoleWithProbability.getValue());
+        	    }
+        	    
+        	    // classify all terminals
+        	    for (Node nonTerminal : sentence.getNonterminals()
+        		    .values()) {
+        		if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
+        		    
+        		    featureVector = featureExtractor.extract(nonTerminal.getId());
+        		    
+        		    assignedRoleWithProbability = model.classify(featureVector);
+        		    annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
+        		}
+        	    } // for
+        	    annotationFrame.setTargetLemma(targetLemma);
+        	    sentence.addFrame(annotationFrame);
+		} // for targetLemmaIdRef
+            } // for targetLemmaIdRefs
 
-                    assignedRoleWithProbability = model.classify(featureVector);
-                    annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":" + assignedRoleWithProbability.getValue());
-                }
-
-                // classify all terminals
-                for (Node nonTerminal : sentence.getNonterminals()
-                        .values()) {
-                    if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
-
-                        featureVector = featureExtractor.extract(nonTerminal.getId());
-
-                        assignedRoleWithProbability = model.classify(featureVector);
-                        annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
-                    }
-                }
-            }
-
-            sentence.addFrame(annotationFrame);
         }
     }
 

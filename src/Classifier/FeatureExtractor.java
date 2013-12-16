@@ -27,7 +27,7 @@ public class FeatureExtractor {
         // TODO: Replace ~ !!!
         headPosTags = new HashMap<String, List<String>>();
         headPosTags.put("S", new ArrayList<String>());
-        headPosTags.put("NP", Arrays.asList("NE", "NN", "PDS", "PIS", "PPOSS", "PRELS", "PWS", "NP"));
+        headPosTags.put("NP", Arrays.asList("NE", "NN", "PDS", "PIS", "PPOSS", "PRELS", "PWS", "NP", "PN", "CS"));
         headPosTags.put("PP", Arrays.asList("APPR", "APPRART", "APPO"));
         headPosTags.put("PN", Arrays.asList("NP"));
         headPosTags.put("AVP", Arrays.asList(addToPhrasalCat("ADV")));
@@ -51,8 +51,8 @@ public class FeatureExtractor {
         headPosTags.put("AP", Arrays.asList("PP"));
 
         headEdges = new HashMap<String, List<String>>();
-        headEdges.put("S", Arrays.asList("MO"));
-        headEdges.put("NP", Arrays.asList("NK"));
+        headEdges.put("S", Arrays.asList("MO", "OC", "SB"));
+        headEdges.put("NP", Arrays.asList("NK", "RE"));
         headEdges.put("PN", Arrays.asList("PNC"));
         headEdges.put("AVP", Arrays.asList("RE", "AVC")); //workaround: s12479_503
         headEdges.put("PP", Arrays.asList("MO", "AC"));
@@ -151,7 +151,7 @@ public class FeatureExtractor {
             int[] indices = sentence.calculateRootOfSubtree(idRefs);
             String[] ownIdPath = sentence.getNode(idref).getPathFromRoot(indices[1]);
             String[] targetIdPath = sentence.getTarget().getPathFromRoot(indices[2]);
-            //TODO: weiter aendern...
+            //TODO: check if correct...
 
             int i = indices[0];//0;
             //while (i < targetIdPath.length && i < ownIdPath.length && targetIdPath[i].equals(ownIdPath[i])) {
@@ -162,6 +162,7 @@ public class FeatureExtractor {
 
                 path += sentence.getNode(ownIdPath[j]).getCategory() + "+";
             }
+            
             // nimm die wurzel des subtrees nur mit rein, wenn idref nicht auf (global) root zeigt. sonst fuege Kategorie manuell ein...
             if (i == 0)
                 path += "VROOT";
@@ -274,50 +275,15 @@ public class FeatureExtractor {
         String targetLemma = "";
         targetLemma = sentence.getNode(sentence.getTarget().getHeadIDref()).getAttributes().get("lemma");
 
-//        if (sentence.getTargets().size() == 2) {
-//
-//            int firstNumber = sentence.getTargets().get(0).getFirstWordPos();//Integer.parseInt(firstTargetIDRef.split("_")[1]);
-//            int secondNumber = sentence.getTargets().get(1).getFirstWordPos();// Integer.parseInt(secondTargetIDRef.split("_")[1]);
-//
-//            if (Math.abs(firstNumber - secondNumber) == 1) {
-//
-//                if (firstNumber > secondNumber) {
-//                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
-//                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
-//                } else {
-//                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
-//                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
-//                }
-//            } else {
-//
-//                if (firstNumber > secondNumber) {
-//                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
-//                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
-//                } else {
-//                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
-//                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
-//                }
-//            }
-//
-//        } else {
-//            String targetIDRef = sentence.getTargets().get(0).getId();
-//
-//            if (sentence.getTerminals().containsKey(targetIDRef)) {
-//                targetLemma = sentence.getTerminals().get(targetIDRef).getAttributes().get("lemma");
-//            } else {
-//                String headIDref = sentence.getNode(targetIDRef).getHeadIDref();
-//                if (headIDref != null)
-//                    targetLemma = sentence.getTerminals().get(headIDref).getAttributes().get("lemma");
-//                else
-//                    throw new Exception("Das TargetIDRef ist kein Terminal bzw. hat kein HeadWord!");
-//            }
-//        }
-
-
         return targetLemma;
     }
 
-
+    // sets following values of all Nodes:
+    //  - parent
+    //  - pathFromRoot
+    //  - firstWordPos
+    //  - lastWordPos
+    //  - headIDref
     private Map.Entry<Integer, Integer> traverseTree(String curIDRef, ArrayList<String> pathFromRoot) throws Exception {
         String parentIdRef = "";
         Node curNode = sentence.getNode(curIDRef);
@@ -359,7 +325,13 @@ public class FeatureExtractor {
     }
 
     private int getPosFromID(String idRef) {
-        String[] temp = idRef.split("_");
+	String[] temp = new String[0];
+	try {
+	    temp = idRef.split("_");
+	    
+	} catch (Exception e) {
+	    System.out.println(e.toString());
+	}
         return Integer.parseInt(temp[temp.length - 1]);
     }
 

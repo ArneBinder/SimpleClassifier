@@ -22,6 +22,7 @@ public class Model {
 	// FeatureType > [ FeatureValue > [ Role > Probability]]
 	private Map<String, Map<String, Map<String, Double>>> probabilities = new HashMap<String, Map<String, Map<String, Double>>>();
 
+	// TargetLemma > FrameName 
 	private Map<String, List<String>> targetLemmata = new HashMap<String, List<String>>();
 	private List<String> roles = new ArrayList<String>();
 
@@ -31,10 +32,6 @@ public class Model {
 		roles.addAll(dummyRole);
 		this.featureExtractor = featureExtractor;
 	}
-
-	//public String getDummyRole() {
-	//	return dummyRole;
-	//}
 
 	public Map<String, List<String>> getTargetLemmata() {
 		return targetLemmata;

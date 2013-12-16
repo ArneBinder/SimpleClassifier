@@ -62,48 +62,62 @@ public class Sentence {
 
     // smallest subtree, which contains all idRefs
     // returns: [depth, indexOfPathFromRoot_0, indexOfPathFromRoot_1, indexOfPathFromRoot_2, ... ]
+    // -> indexOfPathFromRoot for each idref (ordered!),
     public int[] calculateRootOfSubtree(List<String> idRefs) throws Exception {
-        //idref > pathsFromRoot > pathFromRoot
+        //idref Index > pathsFromRoot Index > pathFromRoot Path
         String[][][] pathsFromRoot = new String[idRefs.size()][][];
-        int i = 0;
-        for (String idRef : idRefs) {
-            pathsFromRoot[i] = new String[getNode(idRef).getPathsFromRoot().size()][];
-            int j = 0;
+        
+        String idRef;
+        for (int idRefIndex = 0; idRefIndex < idRefs.size(); idRefIndex++) {
+	    idRef = idRefs.get(idRefIndex);
+	    pathsFromRoot[idRefIndex] = new String[getNode(idRef).getPathsFromRoot().size()][];
+	    int rootPathIndex = 0;
             for (String[] pathFromRoot : getNode(idRef).getPathsFromRoot()) {
-                pathsFromRoot[i][j] = pathFromRoot;
-                j++;
+                pathsFromRoot[idRefIndex][rootPathIndex] = pathFromRoot;
+                rootPathIndex++;
             }
         }
+        
+        String curIDref;
+        
+        boolean abort = false;
         boolean found = true;
         int[] result = new int[idRefs.size() + 1];
+
         //depth,indices of pathsFromRoot
         int curDepth = 0;
-        while (found) {
+        while (found && !abort) {
             found = false;
             result = new int[idRefs.size() + 1];
             result[0] = curDepth;
-            String curIDref;// = pathsFromRoot[0][0][curDepth];
             int[] pathIndex = new int[idRefs.size()];
-            //int curIDindex = 0;
 
             int countPointer = 0;
 
-            while (!found && result[idRefs.size()] < pathsFromRoot[idRefs.size() - 1].length) {
+            while (!found && !abort) {
                 if (valueExists(result, pathsFromRoot)) {
                     curIDref = pathsFromRoot[0][result[1]][curDepth];
                     found = true;
                     for (int idIndex = 1; found && idIndex < idRefs.size(); idIndex++) {
-                        if (!curIDref.equals(pathsFromRoot[idIndex][result[idIndex]][curDepth])) {
+                        if (!curIDref.equals(pathsFromRoot[idIndex][result[idIndex+1]][curDepth])) {
                             found = false;
+                            break;
                         }
                     }
                 }
+                
                 if (!found) {
                     result[countPointer + 1]++;
                     while (result[countPointer + 1] == pathsFromRoot[countPointer].length) {
                         result[countPointer + 1] = 0;
                         countPointer++;
-                        result[countPointer + 1]++;
+                        
+                        if(countPointer == idRefs.size()){
+                            abort = true;
+                            break;
+                        }else{
+                            result[countPointer + 1]++;
+                        }
                     }
                     countPointer = 0;
                 }
@@ -112,8 +126,13 @@ public class Sentence {
             if (found)
                 curDepth++;
         }
+        if(result[0] > 0){
+            result[0]--;
+        }else{
+            throw new Exception("Could not calculate common path for passed idrefs (VROOT not in path)");
+        }
 
-        return result;//pathsFromRoot[0][0][curDepth-1];
+        return result;
     }
 
     private boolean valueExists(int[] values, String[][][] pathsFromRoot) {
@@ -159,12 +178,15 @@ public class Sentence {
     }
 
     public void addFrame(Frame frame) {
+	String[] idRefParts;
         for (List<String> fes : frame.getFrameElements().values()) {
             for (String feID : fes) {
-                if (!containsNode(feID))
+        	idRefParts = feID.split(":");
+                if (!containsNode(idRefParts[0]))
                     return;
             }
         }
+        
         for (String targetID : frame.getTargetIDs()) {
             if (!containsNode(targetID))
                 return;
@@ -176,15 +198,6 @@ public class Sentence {
     public void setRootID(String rootID) {
         this.rootIDref = rootID;
     }
-
-
-    // sets following values of all Nodes:
-    //  - parent
-    //  - pathFromRoot
-    //  - firstWordPos
-    //  - lastWordPos
-    //  - headIDref
-
 
     public List<List<String>> extractTargetIDRefs(Set<String> targetLemmata) {
         List<List<String>> result = new LinkedList<List<String>>();
