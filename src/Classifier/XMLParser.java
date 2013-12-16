@@ -18,10 +18,10 @@ public class XMLParser extends DefaultHandler {
     private List<String[]> secedges = new LinkedList<String[]>();
 
 	private Sentence curSentence = null;
-	private Node curNt = null;
+	private Node curNode = null;
 	private Frame curFrame = null;
 	private String curFEName = "";
-    private Node curTerminal = null;
+    //private Node curTerminal = null;
 
 	@Override
 	public void startElement(String uri, String localName, String qName,
@@ -47,22 +47,23 @@ public class XMLParser extends DefaultHandler {
 				curSentence = new Sentence(attributes.getValue("id"));
 			}
 
-            if(localName.equals("secedge") && topElement.equals("t")){
-                String[] secedge = {attributes.getValue("idref"), attributes.getValue("label"), curTerminal.getId()};
+            if(localName.equals("secedge") && (topElement.equals("t") || topElement.equals("nt"))){
+                String[] secedge = {attributes.getValue("idref"), attributes.getValue("label"), curNode.getId()};
                 secedges.add(secedge);
             }
 
 			if (localName.equals("t") && topElement.equals("graph")) {
                 elements.push(localName);
-				curTerminal = new Node(attributes.getValue("id"));
-				Map<String, String> attrMap = curTerminal.getAttributes();
+                curNode = new Node(attributes.getValue("id"));
+                //TODO: warum? sind doch noch nicht gesetzt...
+				Map<String, String> attrMap = curNode.getAttributes();
 
 				for (int i = 0; i < attributes.getLength(); i++) {
 					attrMap.put(attributes.getLocalName(i),
 							attributes.getValue(i));
 				}
 
-				curTerminal.setAttributes(attrMap);
+                curNode.setAttributes(attrMap);
 
 				//curSentence.addTerminal(curTerminal);
 			}
@@ -71,13 +72,12 @@ public class XMLParser extends DefaultHandler {
 
 			if (localName.equals("nt") && topElement.equals("graph")) {
 				elements.push(localName);
-				curNt = new Node(attributes.getValue("id"),
-						attributes.getValue("cat"));
+				curNode = new Node(attributes.getValue("id"),	attributes.getValue("cat"));
 			}
 
 			if (localName.equals("edge") && topElement.equals("nt")) {
-				curNt.addEdge(attributes.getValue("idref"),
-						attributes.getValue("label"));
+				curNode.addEdge(attributes.getValue("idref"),
+                        attributes.getValue("label"));
 			}
 
 			if (localName.equals("frame") && topElement.equals("s")) {
@@ -129,13 +129,13 @@ public class XMLParser extends DefaultHandler {
 			}
 
 			if (localName.equals("nt")) {
-				curSentence.addNonterminal(curNt);
-				curNt = null;
+				curSentence.addNonterminal(curNode);
+				curNode = null;
 			}
 
             if (localName.equals("t")) {
-                curSentence.addTerminal(curTerminal);
-                curTerminal = null;
+                curSentence.addTerminal(curNode);
+                curNode = null;
             }
 
 			if (localName.equals("frame")) {

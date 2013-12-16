@@ -25,7 +25,7 @@ public class Sentence {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == null)
+        if (obj == null)
             return false;
         return ((Sentence) obj).getId().equals(getId());
     }
@@ -34,7 +34,7 @@ public class Sentence {
         return rootIDref;
     }
 
-    public boolean containsNode(String idRef){
+    public boolean containsNode(String idRef) {
         return terminals.containsKey(idRef) || nonterminals.containsKey(idRef);
     }
 
@@ -52,7 +52,7 @@ public class Sentence {
             return terminals.get(idRef);
         else if (nonterminals.containsKey(idRef))
             return nonterminals.get(idRef);
-        else throw new Exception("idRef: " + idRef + " not in Sentence: "+getId());
+        else throw new Exception("idRef: " + idRef + " not in Sentence: " + getId());
     }
 
     public List<Node> getTargets() {
@@ -62,7 +62,7 @@ public class Sentence {
     //TODO: report to the others: targets can be nonTerminals too!!! --> solution (already implemented): take head  (kriechen.xml)
     public void setTargets(List<String> targetIdRefs) throws Exception {
         //if(getId().equals("s38580"))
-          //  System.out.println("test");
+        //  System.out.println("test");
         if (targetIdRefs.size() == 0) {
             //System.out.println("test");
             throw new Exception(
@@ -74,20 +74,27 @@ public class Sentence {
                 parentIDrefs.add(getNode(targetIDref).getParentIDref(0));
 
             }
-            //TODO: fix this part to flatten the tree of targets: if deleted in wrong order, it become decomposed instead of collapsing to the root (of target-subtree) parent constituent (example: Bank_s38580_f1 here it works, but not in general)
-            for (Iterator<String> iter = parentIDrefs.iterator(); iter.hasNext();){
+            //TODO: fix this part to flatten the tree of targets: if deleted in wrong order, it becomes decomposed instead of collapsing to the root (of target-subtree) parent constituent (example: Bank_s38580_f1 here it works, but not in general)
+            for (Iterator<String> iter = parentIDrefs.iterator(); iter.hasNext(); ) {
                 String parentIDref = iter.next();
-                if(parentIDrefs.contains(getNode(parentIDref).getParentIDref(0)))
+                if (!parentIDref.equals(rootIDref) && parentIDrefs.contains(getNode(parentIDref).getParentIDref(0)))
                     iter.remove();
+
+
             }
             if (parentIDrefs.size() <= 2) {
                 targets = new ArrayList<Node>(3);
                 for (String parentIdRef : parentIDrefs) {
+                    try{
                     targets.add(getNode(getNode(parentIdRef).getHeadIDref()));
+                    }catch (Exception e){
+
+                        throw e;
+                    }
                 }
             } else {
                 throw new Exception(
-                        "Wir k�nnen nicht mit mehr als 2 TargetIDRefs umgehen. Sorry! sentenceID: " + getId()+" "+targetIdRefs);
+                        "Wir k�nnen nicht mit mehr als 2 TargetIDRefs umgehen. Sorry! sentenceID: " + getId() + " " + targetIdRefs);
             }
 
         } else {
@@ -108,14 +115,14 @@ public class Sentence {
     }
 
     public void addFrame(Frame frame) {
-        for(List<String> fes: frame.getFrameElements().values()){
-            for(String feID: fes){
-                if(!containsNode(feID))
+        for (List<String> fes : frame.getFrameElements().values()) {
+            for (String feID : fes) {
+                if (!containsNode(feID))
                     return;
             }
         }
-        for(String targetID: frame.getTargetIDs()){
-            if(!containsNode(targetID))
+        for (String targetID : frame.getTargetIDs()) {
+            if (!containsNode(targetID))
                 return;
         }
 

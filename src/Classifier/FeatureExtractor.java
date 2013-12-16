@@ -33,8 +33,8 @@ public class FeatureExtractor {
         headPosTags.put("AVP", Arrays.asList(addToPhrasalCat("ADV")));
         headPosTags.put("DL", new ArrayList<String>()); // alle erlaubt!
         headPosTags.put("CAC", Arrays.asList("KON"));
-        headPosTags.put("CAP", Arrays.asList("KON"));
-        headPosTags.put("CAVP", Arrays.asList("KON"));
+        headPosTags.put("CAP", Arrays.asList("KON", "APPR", "ADJA")); //TODO: check if APPR correct
+        headPosTags.put("CAVP", Arrays.asList("KON", "APPR"));
         headPosTags.put("CCP", Arrays.asList("KON"));
         headPosTags.put("CNP", Arrays.asList("KON"));
         headPosTags.put("CO", Arrays.asList("KON"));
@@ -47,6 +47,8 @@ public class FeatureExtractor {
         headPosTags.put("CH", new ArrayList<String>());
         headPosTags.put("VP", Arrays.asList("PTKVZ"));
         headPosTags.put("ISU", Arrays.asList("$."));
+        headPosTags.put("MTA", Arrays.asList("ADJA"));
+        headPosTags.put("AP", Arrays.asList("PP"));
 
         headEdges = new HashMap<String, List<String>>();
         headEdges.put("S", Arrays.asList("MO"));
@@ -56,7 +58,7 @@ public class FeatureExtractor {
         headEdges.put("PP", Arrays.asList("MO", "AC"));
         headEdges.put("DL", Arrays.asList("DH"));
         headEdges.put("CAC", Arrays.asList("CD"));
-        headEdges.put("CAP", Arrays.asList("CD"));
+        headEdges.put("CAP", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s45832_501)
         headEdges.put("CAVP", Arrays.asList("CD"));
         headEdges.put("CCP", Arrays.asList("CD"));
         headEdges.put("CNP", Arrays.asList("CD"));
@@ -70,6 +72,8 @@ public class FeatureExtractor {
         headEdges.put("CH", new ArrayList<String>());
         headEdges.put("VP", Arrays.asList("SVP"));
         headEdges.put("ISU", Arrays.asList("UC"));
+        headEdges.put("MTA", Arrays.asList("ADC"));
+        headEdges.put("AP", Arrays.asList("RE"));
     }
 
     public List<String> backOffFeature(String concatenatedFeature) {
@@ -329,7 +333,7 @@ public class FeatureExtractor {
         Collections.sort(idrefs);
         //if(idrefs.contains("s21270_1"))
         //  System.out.println("test");
-        if (idrefs.get(0).equals(sentence.getRootIDref()) && !sentence.getNode(sentence.getRootIDref()).isTerminal())
+        if (idrefs.get(0).equals(sentence.getRootIDref()) && !sentence.getNode(sentence.getRootIDref()).isTerminal() && sentence.getNode(sentence.getRootIDref()).getCategory().equals("VROOT"))
             return null;
         Node curNode;
         List<String> newIdRefs = new ArrayList<String>(40);
