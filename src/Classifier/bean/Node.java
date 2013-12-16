@@ -2,10 +2,7 @@ package Classifier.bean;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Arne on 11.12.13.
@@ -19,13 +16,15 @@ public class Node {
 	private List<String> parentIDrefs = new ArrayList<String>(1);
 	private int firstWordPos;
 	private int lastWordPos;
-	private String[] pathFromRoot;
+	private List<String[]> pathsFromRoot;
 	private Map<String, String> attributes = new HashMap<String, String>();
 
 	public Node(String id, String category) {
 		this.setId(id);
 		this.setCategory(category);
+        this.pathsFromRoot = new LinkedList<String[]>();
 	}
+
 
 	public String getHeadIDref() {
 		return headIDref;
@@ -36,6 +35,7 @@ public class Node {
 	}
 
 	public Node(String id) {
+        this.pathsFromRoot = new LinkedList<String[]>();
 		this.setId(id);
 	}
 
@@ -52,15 +52,26 @@ public class Node {
 		category = elements.get("pos");
 	}
 
-	public String[] getPathFromRoot() {
-		return pathFromRoot;
+	public List<String[]> getPathsFromRoot() {
+		return pathsFromRoot;
 	}
+    public String[] getPathFromRoot(int index) {
+        return pathsFromRoot.get(index);
+    }
 
-	public void setPathFromRoot(String[] pathFromRoot) {
-		this.pathFromRoot = new String[pathFromRoot.length];
-		for (int i = 0; i < pathFromRoot.length; i++) {
-			this.pathFromRoot[i] = pathFromRoot[i];
+	public void addPathFromRoot(List<String> pathFromRoot) throws Exception{
+		String[] newPathFromRoot = new String[pathFromRoot.size()];
+        int i=0;
+		for (String idRef: pathFromRoot) {
+            newPathFromRoot[i] = idRef;
+            i++;
 		}
+        try{
+        pathsFromRoot.add(newPathFromRoot);
+        }catch (Exception e){
+            System.out.println("TEST");
+            throw e;
+        }
 	}
 
 	public int getLastWordPos() {

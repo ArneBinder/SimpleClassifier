@@ -14,7 +14,8 @@ public class Sentence {
     private Map<String, Node> nonterminals = new HashMap<String, Node>();
 
     //
-    private List<Node> targets = new ArrayList<Node>(3);
+    //private List<Node> targets = new ArrayList<Node>(3);
+    private Node target;
 
     // list of frames
     private List<Frame> frames = new ArrayList<Frame>();
@@ -55,8 +56,77 @@ public class Sentence {
         else throw new Exception("idRef: " + idRef + " not in Sentence: " + getId());
     }
 
-    public List<Node> getTargets() {
-        return targets;
+    public Node getTarget() {
+        return target;
+    }
+
+    // smallest subtree, which contains all idRefs
+    // returns: [depth, indexOfPathFromRoot_0, indexOfPathFromRoot_1, indexOfPathFromRoot_2, ... ]
+    public int[] calculateRootOfSubtree(List<String> idRefs) throws Exception {
+        //idref > pathsFromRoot > pathFromRoot
+        String[][][] pathsFromRoot = new String[idRefs.size()][][];
+        int i = 0;
+        for (String idRef : idRefs) {
+            pathsFromRoot[i] = new String[getNode(idRef).getPathsFromRoot().size()][];
+            int j = 0;
+            for (String[] pathFromRoot : getNode(idRef).getPathsFromRoot()) {
+                pathsFromRoot[i][j] = pathFromRoot;
+                j++;
+            }
+        }
+        boolean found = true;
+        int[] result = new int[idRefs.size() + 1];
+        //depth,indices of pathsFromRoot
+        int curDepth = 0;
+        while (found) {
+            found = false;
+            result = new int[idRefs.size() + 1];
+            result[0] = curDepth;
+            String curIDref;// = pathsFromRoot[0][0][curDepth];
+            int[] pathIndex = new int[idRefs.size()];
+            //int curIDindex = 0;
+
+            int countPointer = 0;
+
+            while (!found && result[idRefs.size()] < pathsFromRoot[idRefs.size() - 1].length) {
+                if (valueExists(result, pathsFromRoot)) {
+                    curIDref = pathsFromRoot[0][result[1]][curDepth];
+                    found = true;
+                    for (int idIndex = 1; found && idIndex < idRefs.size(); idIndex++) {
+                        if (!curIDref.equals(pathsFromRoot[idIndex][result[idIndex]][curDepth])) {
+                            found = false;
+                        }
+                    }
+                }
+                if (!found) {
+                    result[countPointer + 1]++;
+                    while (result[countPointer + 1] == pathsFromRoot[countPointer].length) {
+                        result[countPointer + 1] = 0;
+                        countPointer++;
+                        result[countPointer + 1]++;
+                    }
+                    countPointer = 0;
+                }
+            }
+
+            if (found)
+                curDepth++;
+        }
+
+        return result;//pathsFromRoot[0][0][curDepth-1];
+    }
+
+    private boolean valueExists(int[] values, String[][][] pathsFromRoot) {
+        for (int i = 0; i < values.length - 1; i++) {
+            if (!(pathsFromRoot[i].length > values[i + 1])) {
+                return false;
+            } else {
+                if (!(pathsFromRoot[i][values[i + 1]].length > values[0])) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     //TODO: report to the others: targets can be nonTerminals too!!! --> solution (already implemented): take head  (kriechen.xml)
@@ -68,42 +138,16 @@ public class Sentence {
             throw new Exception(
                     "No targets for sentenceID: " + getId() + " to add.");
         }
-        if (targetIdRefs.size() > 2) {
-            Set<String> parentIDrefs = new HashSet<String>();
-            for (String targetIDref : targetIdRefs) {
-                parentIDrefs.add(getNode(targetIDref).getParentIDref(0));
 
-            }
-            //TODO: fix this part to flatten the tree of targets: if deleted in wrong order, it becomes decomposed instead of collapsing to the root (of target-subtree) parent constituent (example: Bank_s38580_f1 here it works, but not in general)
-            for (Iterator<String> iter = parentIDrefs.iterator(); iter.hasNext(); ) {
-                String parentIDref = iter.next();
-                if (!parentIDref.equals(rootIDref) && parentIDrefs.contains(getNode(parentIDref).getParentIDref(0)))
-                    iter.remove();
-
-
-            }
-            if (parentIDrefs.size() <= 2) {
-                targets = new ArrayList<Node>(3);
-                for (String parentIdRef : parentIDrefs) {
-                    try{
-                    targets.add(getNode(getNode(parentIdRef).getHeadIDref()));
-                    }catch (Exception e){
-
-                        throw e;
-                    }
-                }
-            } else {
-                throw new Exception(
-                        "Wir k�nnen nicht mit mehr als 2 TargetIDRefs umgehen. Sorry! sentenceID: " + getId() + " " + targetIdRefs);
-            }
+        if (targetIdRefs.size() > 1) {
+            int[] indices = calculateRootOfSubtree(targetIdRefs);
+            target = getNode(getNode(targetIdRefs.get(0)).getPathsFromRoot().get(indices[1])[indices[0]]);
 
         } else {
-
-            targets = new ArrayList<Node>(3);
-            for (String targetIdRef : targetIdRefs) {
-                targets.add(getNode(targetIdRef));
-            }
+            target = getNode(targetIdRefs.get(0));
         }
+
+
     }
 
     public void addTerminal(Node t) {

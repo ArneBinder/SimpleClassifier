@@ -89,7 +89,7 @@ public class Corpus {
 
                     // process all nonterminal elements
                     for (String id : sentence.getNonterminals().keySet()) {
-                        if (!frameElementIDRefs.contains(id)) {
+                        if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id)) {
                             currentVector = featureExtractor.extract(id);
                             model.addFeatureVector(currentVector);
                         }
@@ -136,10 +136,13 @@ public class Corpus {
                 // classify all terminals
                 for (Node nonTerminal : sentence.getNonterminals()
                         .values()) {
-                    featureVector = featureExtractor.extract(nonTerminal.getId());
+                    if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
 
-                    assignedRoleWithProbability = model.classify(featureVector);
-                    annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
+                        featureVector = featureExtractor.extract(nonTerminal.getId());
+
+                        assignedRoleWithProbability = model.classify(featureVector);
+                        annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
+                    }
                 }
             }
 

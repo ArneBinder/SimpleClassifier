@@ -127,22 +127,36 @@ public class FeatureExtractor {
         return "null";
     }
 
+
+
+
+
+
     private String extractPath(String idref)
             throws Exception {
 
         String path = "";
 
         //TODO: use only first target??
-        String[] targetIdPath = sentence.getTargets().get(0).getPathFromRoot();
-        String[] ownIdPath = sentence.getNode(idref).getPathFromRoot();
 
-        if (sentence.getTargets().get(0).getId().equals(idref)) {
+
+
+
+        if (sentence.getTarget().getId().equals(idref)) {
             path = "TARGET";
         } else {
-            int i = 0;
-            while (i < targetIdPath.length && i < ownIdPath.length && targetIdPath[i].equals(ownIdPath[i])) {
-                i++;
-            }
+            List<String> idRefs = new ArrayList<String>(2);
+            idRefs.add(idref);
+            idRefs.add(sentence.getTarget().getId());
+            int[] indices = sentence.calculateRootOfSubtree(idRefs);
+            String[] ownIdPath = sentence.getNode(idref).getPathFromRoot(indices[1]);
+            String[] targetIdPath = sentence.getTarget().getPathFromRoot(indices[2]);
+            //TODO: weiter aendern...
+
+            int i = indices[0];//0;
+            //while (i < targetIdPath.length && i < ownIdPath.length && targetIdPath[i].equals(ownIdPath[i])) {
+            //    i++;
+            //}
 
             for (int j = ownIdPath.length - 1; j >= i; j--) {
 
@@ -173,55 +187,74 @@ public class FeatureExtractor {
         String position = "";
 
 		/*
-		 * Possible cases: 
+         * Possible cases:
 		 * 0 - idref in front of the separated target 1 - idref
 		 * inbetween of the separated target 2 - idref in front of a single
 		 * target 
 		 * 3 - idref behind the single / separated target
 		 */
-        int firstTargetNumber = 0;
-        int seconTargetdNumber = 0;
-        int idRefNumber = 0;
+        int targetFirstPos = sentence.getTarget().getFirstWordPos();
+        int targetLastPos = sentence.getTarget().getLastWordPos();
+        int ownPos = getPosFromID(sentence.getNode(idref).getHeadIDref());
 
-        // get positions of targets
-        if (sentence.getTargets().size() == 2) {
-            firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
-            seconTargetdNumber = sentence.getTargets().get(1).getFirstWordPos();
-        } else {
-            firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
-        }
 
-        // get position of given idref
-        if (sentence.getTerminals().containsKey(idref)) {
-            idRefNumber = sentence.getTerminals().get(idref).getFirstWordPos();
-            //idRefNumber = Integer.parseInt(idref.split("_")[1]);
-        } else {
-            idRefNumber = sentence.getNonterminals().get(idref).getFirstWordPos();
-            //idRefNumber = Integer.parseInt(getFirstTerminalOfNonTerminal(idref).split("_")[0]);
-        }
-
-        // apply position rules
-        if (seconTargetdNumber == 0) {
-            if (idRefNumber < firstTargetNumber) {
-                position = "2";
-            } else {
-                position = "3";
-            }
-        } else {
-            if (idRefNumber < firstTargetNumber) {
-                position = "0";
-            } else if (idRefNumber < seconTargetdNumber) {
-                position = "1";
-            } else {
-                position = "3";
-            }
-        }
+        if(targetFirstPos!=targetLastPos && ownPos <=targetFirstPos)
+            return "0";
+        if(targetFirstPos!=targetLastPos && ownPos <=targetLastPos)
+            return "1";
+        if(targetFirstPos==targetLastPos && ownPos <=targetLastPos)
+            return "2";
+        if(ownPos >= targetLastPos)
+            return "3";
 
         if (position.isEmpty()) {
             throw new Exception("The position could not be determined!");
         }
+        return "";
 
-        return position;
+//        int firstTargetNumber = 0;
+//        int seconTargetdNumber = 0;
+//        int idRefNumber = 0;
+//
+//        // get positions of targets
+//        if (sentence.getTargets().size() == 2) {
+//            firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
+//            seconTargetdNumber = sentence.getTargets().get(1).getFirstWordPos();
+//        } else {
+//            firstTargetNumber = sentence.getTargets().get(0).getFirstWordPos();
+//        }
+//
+//        // get position of given idref
+//        if (sentence.getTerminals().containsKey(idref)) {
+//            idRefNumber = sentence.getTerminals().get(idref).getFirstWordPos();
+//            //idRefNumber = Integer.parseInt(idref.split("_")[1]);
+//        } else {
+//            idRefNumber = sentence.getNonterminals().get(idref).getFirstWordPos();
+//            //idRefNumber = Integer.parseInt(getFirstTerminalOfNonTerminal(idref).split("_")[0]);
+//        }
+//
+//        // apply position rules
+//        if (seconTargetdNumber == 0) {
+//            if (idRefNumber < firstTargetNumber) {
+//                position = "2";
+//            } else {
+//                position = "3";
+//            }
+//        } else {
+//            if (idRefNumber < firstTargetNumber) {
+//                position = "0";
+//            } else if (idRefNumber < seconTargetdNumber) {
+//                position = "1";
+//            } else {
+//                position = "3";
+//            }
+//        }
+//
+//        if (position.isEmpty()) {
+//            throw new Exception("The position could not be determined!");
+//        }
+//
+//        return position;
     }
 
 
@@ -239,45 +272,46 @@ public class FeatureExtractor {
     private String extractTarget() throws Exception {
 
         String targetLemma = "";
+        targetLemma = sentence.getNode(sentence.getTarget().getHeadIDref()).getAttributes().get("lemma");
 
-        if (sentence.getTargets().size() == 2) {
-
-            int firstNumber = sentence.getTargets().get(0).getFirstWordPos();//Integer.parseInt(firstTargetIDRef.split("_")[1]);
-            int secondNumber = sentence.getTargets().get(1).getFirstWordPos();// Integer.parseInt(secondTargetIDRef.split("_")[1]);
-
-            if (Math.abs(firstNumber - secondNumber) == 1) {
-
-                if (firstNumber > secondNumber) {
-                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
-                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
-                } else {
-                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
-                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
-                }
-            } else {
-
-                if (firstNumber > secondNumber) {
-                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
-                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
-                } else {
-                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
-                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
-                }
-            }
-
-        } else {
-            String targetIDRef = sentence.getTargets().get(0).getId();
-
-            if (sentence.getTerminals().containsKey(targetIDRef)) {
-                targetLemma = sentence.getTerminals().get(targetIDRef).getAttributes().get("lemma");
-            } else {
-                String headIDref = sentence.getNode(targetIDRef).getHeadIDref();
-                if (headIDref != null)
-                    targetLemma = sentence.getTerminals().get(headIDref).getAttributes().get("lemma");
-                else
-                    throw new Exception("Das TargetIDRef ist kein Terminal bzw. hat kein HeadWord!");
-            }
-        }
+//        if (sentence.getTargets().size() == 2) {
+//
+//            int firstNumber = sentence.getTargets().get(0).getFirstWordPos();//Integer.parseInt(firstTargetIDRef.split("_")[1]);
+//            int secondNumber = sentence.getTargets().get(1).getFirstWordPos();// Integer.parseInt(secondTargetIDRef.split("_")[1]);
+//
+//            if (Math.abs(firstNumber - secondNumber) == 1) {
+//
+//                if (firstNumber > secondNumber) {
+//                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
+//                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
+//                } else {
+//                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
+//                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
+//                }
+//            } else {
+//
+//                if (firstNumber > secondNumber) {
+//                    targetLemma = sentence.getTargets().get(0).getAttributes().get("lemma") + sentence.getTargets().get(1).getAttributes().get("lemma");
+//                    //targetLemma = sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma");
+//                } else {
+//                    targetLemma = sentence.getTargets().get(1).getAttributes().get("lemma") + sentence.getTargets().get(0).getAttributes().get("lemma");
+//                    //targetLemma = sentence.getTerminals().get(secondTargetIDRef).getAttributes().get("lemma") + sentence.getTerminals().get(firstTargetIDRef).getAttributes().get("lemma");
+//                }
+//            }
+//
+//        } else {
+//            String targetIDRef = sentence.getTargets().get(0).getId();
+//
+//            if (sentence.getTerminals().containsKey(targetIDRef)) {
+//                targetLemma = sentence.getTerminals().get(targetIDRef).getAttributes().get("lemma");
+//            } else {
+//                String headIDref = sentence.getNode(targetIDRef).getHeadIDref();
+//                if (headIDref != null)
+//                    targetLemma = sentence.getTerminals().get(headIDref).getAttributes().get("lemma");
+//                else
+//                    throw new Exception("Das TargetIDRef ist kein Terminal bzw. hat kein HeadWord!");
+//            }
+//        }
 
 
         return targetLemma;
@@ -294,7 +328,7 @@ public class FeatureExtractor {
         }
         if (pathFromRoot.size() > 0)
             parentIdRef = pathFromRoot.get(pathFromRoot.size() - 1);
-        curNode.setPathFromRoot(pathFromRoot.toArray(new String[pathFromRoot.size()]));
+        curNode.addPathFromRoot(pathFromRoot);
         if (pathFromRoot.size() > 0)
             curNode.addParentIDref(parentIdRef);
 
