@@ -23,6 +23,7 @@ import Classifier.bean.Sentence;
  */
 public class Corpus {
     private List<Sentence> sentences;
+    //public BufferedWriter dout;
     private FeatureExtractor featureExtractor;
 
     public FeatureExtractor getFeatureExtractor() {
@@ -30,6 +31,11 @@ public class Corpus {
     }
 
     public Corpus() {
+//        try{
+//        dout= new BufferedWriter(new FileWriter(new File("dummy.txt")));
+//        }catch (Exception e){
+//
+//        }
         featureExtractor = new FeatureExtractor();
         sentences = new LinkedList<Sentence>();
     }
@@ -48,6 +54,7 @@ public class Corpus {
 
     public Model trainModel() throws Exception {
         Model model = new Model(featureExtractor);
+
         List<String> frameElementIDRefs;
         List<String> targetHeads;
         int allreadyProcessed = 0;
@@ -56,6 +63,10 @@ public class Corpus {
                 //sentence.enrichInformation();
 
                 featureExtractor.setSentence(sentence);
+               // if(!featureExtractor.dummy.equals("")){
+                //dout.write(featureExtractor.dummy);
+                //System.out.println(featureExtractor.dummy);
+                //}
                 //featureExtractor.enrichInformation();
 
                 // process FrameElements
@@ -99,13 +110,14 @@ public class Corpus {
                         }
                     }
                 }
+
             } catch (Exception e) {
                 System.out.println("allreadyProcessed: " + allreadyProcessed);
                 throw e;
             }
             allreadyProcessed++;
         }
-
+        //dout.close();
         model.calculateProbabilities();
 
         return model;
