@@ -1,8 +1,5 @@
 package Classifier;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.*;
 
 import Classifier.bean.FeatureVector;
@@ -12,7 +9,9 @@ import Classifier.bean.Sentence;
 public class FeatureExtractor {
 
     private static class HeadRules {
-        Map<String, Map<String, Set<String>>> headRules = new HashMap<String, Map<String, Set<String>>>();
+        //smaler value --> higher priority!!!
+        int priority = 0;
+        Map<String, Map<String,Map<String, Integer>>> headRules = new HashMap<String, Map<String, Map<String, Integer>>>();
 
         public void addRule(List<String> categories, String edgeLabel, String childCategory) {
             addRule(categories, Arrays.asList(new String[]{edgeLabel}), Arrays.asList(new String[]{childCategory}));
@@ -27,17 +26,18 @@ public class FeatureExtractor {
         }
 
         public void addRule(String category, String edgeLabel, String childCategory) {
-            addRule(category, edgeLabel);
-            headRules.get(category).get(edgeLabel).add(childCategory);
+            if (!headRules.containsKey(category)) {
+                headRules.put(category, new HashMap<String, Map<String, Integer>>());
+            }
+            if (!headRules.get(category).containsKey(edgeLabel)) {
+                headRules.get(category).put(edgeLabel, new HashMap<String, Integer>());
+            }
+            headRules.get(category).get(edgeLabel).put(childCategory, priority++);
+
         }
 
         public void addRule(String category, String edgeLabel) {
-            if (!headRules.containsKey(category)) {
-                headRules.put(category, new HashMap<String, Set<String>>());
-            }
-            if (!headRules.get(category).containsKey(edgeLabel)) {
-                headRules.get(category).put(edgeLabel, new HashSet<String>());
-            }
+            addRule(category,  edgeLabel, "");
         }
 
         public void addRule(List<String> categories, List<String> edgeLabels, List<String> childCategories) {
@@ -54,12 +54,14 @@ public class FeatureExtractor {
             }
         }
 
-        public boolean allowedHeadEdge(String category, String edgeLabel, String childCategory) {
-            return (headRules.containsKey(category) && headRules.get(category).containsKey(edgeLabel) && (headRules.get(category).get(edgeLabel).isEmpty() || headRules.get(category).get(edgeLabel).contains(childCategory)));
-        }
-
-        public boolean headRuleIsDefined(String category){
-            return headRules.containsKey(category);
+        public int getHeadRulePriority(String category, String edgeLabel, String childCategory) {
+            if(!headRules.containsKey(category) || !headRules.get(category).containsKey(edgeLabel))
+                return Integer.MAX_VALUE;
+            if(headRules.get(category).get(edgeLabel).containsKey(""))
+                return headRules.get(category).get(edgeLabel).get("");
+            if(headRules.get(category).get(edgeLabel).containsKey(childCategory))
+                return headRules.get(category).get(edgeLabel).get(childCategory);
+           return Integer.MAX_VALUE;
         }
     }
 
@@ -356,21 +358,26 @@ public class FeatureExtractor {
                     }
                 } else {
                     String curCat = curNode.getCategory();
-                    if (headRules.headRuleIsDefined(curCat)){//headEdges.containsKey(curCat) && headPosTags.containsKey(curCat)) {
-                        //List<String> curHeadEdges = headEdges.get(curCat);
-                        //List<String> curHeadPosTags = headPosTags.get(curCat);
-                        for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
-                            String curEdge = edge.getValue();
-                            String curChildCat = sentence.getNode(edge.getKey()).getCategory();
-                            //if(curHeadEdges.contains(curEdge))
-                            //    System.out.println("TEST2");
-                            //if(curHeadPosTags.contains(curChildCat))
-                            //    System.out.println("TEST3");
-                            //if (curHeadEdges.contains(curEdge) && (curHeadPosTags.contains(curChildCat) || (curHeadPosTags.size() == 0))) {
-                            if(headRules.allowedHeadEdge(curCat,curEdge,curChildCat)){
-                                newIdRefs.add(edge.getKey());
-                            }
-                        }
+                    String directHead = chooseHeadChild(curCat,curNode.getEdges());
+                    if(directHead!=null){
+                        newIdRefs.add(directHead);
+                    //}
+//                    if (headRules.headRuleIsDefined(curCat)){//headEdges.containsKey(curCat) && headPosTags.containsKey(curCat)) {
+//                        //List<String> curHeadEdges = headEdges.get(curCat);
+//                        //List<String> curHeadPosTags = headPosTags.get(curCat);
+//
+//                        for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
+//                            String curEdge = edge.getValue();
+//                            String curChildCat = sentence.getNode(edge.getKey()).getCategory();
+//                            //if(curHeadEdges.contains(curEdge))
+//                            //    System.out.println("TEST2");
+//                            //if(curHeadPosTags.contains(curChildCat))
+//                            //    System.out.println("TEST3");
+//                            //if (curHeadEdges.contains(curEdge) && (curHeadPosTags.contains(curChildCat) || (curHeadPosTags.size() == 0))) {
+//                            if(headRules.allowedHeadEdge(curCat,curEdge,curChildCat)){
+//                                newIdRefs.add(edge.getKey());
+//                            }
+//                        }
                     } else {
                         throw new Exception("no head-edge or no head-pos-tag for category " + curCat + " (for idref: " + curNode.getId() + ")");
                     }
@@ -394,6 +401,21 @@ public class FeatureExtractor {
             return null;
         }
         return calculateHeadWord(newIdRefs);
+    }
+
+    private String chooseHeadChild(String parentCategory, Map<String, String> edges) throws Exception{
+        //smaller is better!
+        int bestEdgeQuality = Integer.MAX_VALUE;
+        String bestChildRef = null;
+        int curEdgeQuality;
+        for (Map.Entry<String, String> edge : edges.entrySet()){
+            curEdgeQuality = headRules.getHeadRulePriority(parentCategory, edge.getValue(), sentence.getNode(edge.getKey()).getCategory());
+            if(bestEdgeQuality > curEdgeQuality){
+                 bestEdgeQuality = curEdgeQuality;
+                bestChildRef = edge.getKey();
+            }
+        }
+        return bestChildRef;
     }
 
     public void enrichInformation() throws Exception {
