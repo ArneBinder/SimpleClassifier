@@ -95,14 +95,15 @@ public class FeatureExtractor {
         headRules.addRule("NM", Arrays.asList("NMC"), Arrays.asList("CARD", "NN"));
         headRules.addRule(Arrays.asList("AP", "PP", "NP"), Arrays.asList("RE"),  new ArrayList<String>());
         //headRules.addRule(Arrays.asList("CAC", "CAP", "CAVP","CCP","CNP","CO","CPP","CS","CVP","CVZ"), Arrays.asList("CD"), Arrays.asList(addToPhrasalCat("KON")));
-        headRules.addRule("CAP", Arrays.asList("CJ"), Arrays.asList("CPP", "PP","CARD", "ADJA", "ADJD", "AP"));
-        headRules.addRule("CAVP", Arrays.asList("CJ"), Arrays.asList("AVP", "ADV"));
+        headRules.addRule("CAP", Arrays.asList("CJ"), Arrays.asList("CPP", "PP","CARD", "ADJA", "ADJD", "AP", "NN", "NM", "PIAT"));
+        headRules.addRule("CAVP", Arrays.asList("CJ"), Arrays.asList("AVP", "ADV", "PWAV"));
         headRules.addRule("CCP", Arrays.asList("CJ"), Arrays.asList("CP", "KOUS"));
         headRules.addRule("CNP", Arrays.asList("CJ"), Arrays.asList("NP", "PN", "NN", "NE", "CARD"));
         headRules.addRule("CPP", Arrays.asList("CJ"), Arrays.asList("CPP", "PP"));
         headRules.addRule("CS", Arrays.asList("CJ"), Arrays.asList("S"));
         headRules.addRule("CVP", Arrays.asList("CJ"), Arrays.asList("VP"));
         headRules.addRule("CVZ", Arrays.asList("CJ"), Arrays.asList("VZ"));
+        headRules.addRule("CAC", Arrays.asList("CJ"), Arrays.asList("APPR"));
         headRules.addRule("CO", Arrays.asList("CJ"), new ArrayList<String>());
 
         headRules.addRule("NP", Arrays.asList("CM"), Arrays.asList("KOKOM"));
@@ -111,6 +112,102 @@ public class FeatureExtractor {
 
 
 
+
+        headRules.addRule("AP", "MO", "PP");
+        headRules.addRule("AVP", "MO", "ADV");
+        headRules.addRule("AVP", "CC", "S");
+        headRules.addRule("AVP", "CM", "KOKOM"); //s22498_21
+        headRules.addRule("AVP","CC","S"); //s121_5
+        headRules.addRule("AVP", "RE", "PN"); //s9397_505
+        headRules.addRule("AVP", "MO", "ADV"); //s4427_2
+        headRules.addRule("CH", "UC", "FM"); //s38695_21
+        headRules.addRule("CH", "UC", "NE"); //s5384_5
+        headRules.addRule("CH", "OC", "PN"); //s23054_507
+        headRules.addRule("CNP", "CJ", "CNP"); //s39395_505
+        headRules.addRule("CNP", "NK", "NE"); //s44566_12
+        headRules.addRule("CNP", "CJ", "PTKANT"); //s7097_13
+        headRules.addRule("CNP", "CJ", "PIS"); //s7097_42
+        headRules.addRule("CNP", "CJ", "TRUNC"); //s6056_16
+        headRules.addRule("CNP", "CJ", "FM"); //s18292_38
+        headRules.addRule("CNP", "CJ", "PPER"); //s24726_25
+        headRules.addRule("CS", "CJ", "CS"); //s5614_516
+        headRules.addRule("CVP", "CJ", "VVPP"); //s3693_29
+        headRules.addRule("CVP", "CJ", "VVINF"); //s35976_7
+        headRules.addRule("CVP", "CJ", "VZ"); //s33265_506
+        headRules.addRule("ISU", "UC", "$."); //s10077_17
+        headRules.addRule("ISU", "UC", "ADV"); //s7097_7
+        headRules.addRule("ISU", "UC", "KOKOM"); //s36167_26
+        headRules.addRule("MTA", "ADC", "NE"); //s37131_4
+        headRules.addRule("MTA", "ADC", "ADJA"); //s36037_10
+        headRules.addRule("NP", "NK", "FM"); //s15343_25
+        headRules.addRule("NP", "NK", "PIAT"); //s33529_5
+        headRules.addRule("NP", "NK", "CH"); //s38695_502
+        headRules.addRule("NP", "NK", "ISU"); //s7097_500
+        headRules.addRule("NP", "PH", "PPER"); //s45389_11
+        headRules.addRule("NP", "NK", "PIAT"); //s8142_23
+        headRules.addRule("NP", "NK", "CAP"); //s34758_502
+        //TODO: s39166_507 has wrong annotation (category)!! has to be AVP instead of NP
+        headRules.addRule("NP", "NK", "ADV"); //s34870_29
+        headRules.addRule("NP", "NK", "S"); //s5387_508
+        headRules.addRule("PN", "PNC", "FM"); //s22611_4
+
+
+        //TODO: check these... (look up idrefs)
+//        headRules.addRule("PN", "PNC", "TRUNC"); //s36594_18
+//        headRules.addRule("PN", "PNC", "CARD"); //s39912_2
+//        headRules.addRule("PN", "PNC", "PP"); //s21687_502
+//        headRules.addRule("PN", "PNC", "VP"); //s21923_501
+//        headRules.addRule("PN", "PNC", "S"); //s25449_504
+//        headRules.addRule("PN", "PNC", "XY"); //s989_16
+//        headRules.addRule("PN", "PNC", "PN"); //s12711_504
+//        headRules.addRule("PN", "PNC", "CO"); //s26293_510
+//        headRules.addRule("PN", "PNC", "AVP"); //s23394_504
+//        headRules.addRule("PN", "PNC", "CAP"); //s26269_502
+//        headRules.addRule("PP", "AC", "PROAV"); //s40876_1
+//        headRules.addRule("PP", "AC", "APZR"); //s40876_2
+//        headRules.addRule("PP", "AC", "CAC"); //s5285_500
+//        headRules.addRule("PP", "NK", "NN"); //s5285_6
+//        headRules.addRule("PP", "NK", "ART"); //s6826_36
+//        headRules.addRule("PP", "AG", "NP"); //s2090_504
+//        headRules.addRule("PP", "MNR", "PP"); //s17706_506
+//        headRules.addRule("PP", "NK", "CARD"); //s17706_27
+//        headRules.addRule("PP", "RC", "S"); //s11874_509
+//        headRules.addRule("PP", "NK", "CPP"); //s50227_508
+//        headRules.addRule("PP", "MNR", "ADV"); //s22280_28
+//        headRules.addRule("PP", "MO", "PP"); //s23557_500
+//        headRules.addRule("PP", "NK", "NE"); //s1236_16
+//        headRules.addRule("PP", "CM", "KOKOM"); //s23274_14
+//        headRules.addRule("PP", "MO", "ADV"); //s34060_27
+//        headRules.addRule("PP", "AC", "KOKOM"); //s363_16
+//        headRules.addRule("PP", "AG", "NN"); //s363_19
+//        headRules.addRule("PP", "AC", "PP"); //s5372_500
+//        headRules.addRule("S", "PD", "NP"); //s19893_508
+//        headRules.addRule("S", "PD", "ADJD"); //s28274_23
+//        headRules.addRule("S", "CP", "KOUS"); //s28274_22
+//        headRules.addRule("S", "JU", "KON"); //s24517_1
+//        headRules.addRule("S", "OA", "NP"); //s12321_505
+//        headRules.addRule("S", "OA", "NN"); //s31182_4
+//        headRules.addRule("S", "SVP", "PTKVZ"); //s31182_5
+//        headRules.addRule("S", "NG", "PTKNEG"); //s14210_17
+//        headRules.addRule("S", "PD", "CAP"); //s11402_505
+//        headRules.addRule("S", "DM", "PTKANT"); //s35505_2
+//        headRules.addRule("S", "VO", "NN"); //s10772_9
+//        headRules.addRule("S", "PD", "VVPP"); //s9241_17
+//        headRules.addRule("VP", "MO", "PP"); //s6057_502
+//        headRules.addRule("VP", "SVP", "PTKVZ"); //s6057_14
+//        headRules.addRule("VP", "OC", "CVP"); //s13992_512
+//        headRules.addRule("VP", "MO", "S"); //s13992_511
+//        headRules.addRule("VP", "OC", "VVPP"); //s8981_15
+//        headRules.addRule("VP", "OC", "VP"); //s36315_509
+//        headRules.addRule("VP", "CM", "KOKOM"); //s25578_6
+//        headRules.addRule("VP", "MO", "ADV"); //s26673_31
+//        headRules.addRule("VP", "OA", "NP"); //s121_505
+//        headRules.addRule("VP", "NG", "PTKNEG"); //s121_25
+//        headRules.addRule("VP", "PD", "NP"); //s46300_503
+//        headRules.addRule("VP", "CM", "VVPP"); //s4305_10
+//        headRules.addRule("VP", "MO", "ADJD"); //s4305_4
+//        headRules.addRule("VP", "MO", "VVPP"); //s2398_38
+//        headRules.addRule("VP", "OP", "PP"); //s2398_506
     }
 
     public static final List<String> usedFeatures = Arrays.asList("target", "synCat", "position", "path", "path" + FeatureVector.getSplitChar() + "synCat", "head");
