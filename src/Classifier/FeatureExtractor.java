@@ -10,9 +10,10 @@ public class FeatureExtractor {
 
     public static final List<String> usedFeatures = Arrays.asList("target", "synCat", "position", "path", "target" + FeatureVector.getSplitChar() + "synCat", "head");
     private Sentence sentence = null;
-    private static Map<String, List<String>> headPosTags;
-    private static Map<String, List<String>> headEdges;
+    //private static Map<String, List<String>> headPosTags;
+    //private static Map<String, List<String>> headEdges;
     private static String[] phrasalCategories = {"AA", "AP", "AVP", "CAC", "CAVP", "CCP", "CH", "CNP", "CO", "CPP", "CS", "CVP", "CVZ", "DL", "ISU", "MPN", "MTA", "NM", "NP", "PP", "QL", "S", "VP", "VZ"};
+    private static HeadRules headRules;
 
     private static String[] addToPhrasalCat(String cat) {
         String[] temp = new String[phrasalCategories.length + 1];
@@ -21,59 +22,127 @@ public class FeatureExtractor {
         return temp;
     }
 
+    private static class HeadRules {
+        Map<String, Map<String, Set<String>>> headRules = new HashMap<String, Map<String, Set<String>>>();
+
+        public void addRule(List<String> categories, String edgeLabel, String childCategory) {
+            addRule(categories, Arrays.asList(new String[]{edgeLabel}), Arrays.asList(new String[]{childCategory}));
+        }
+
+        public void addRule(String categories, String edgeLabel, List<String> childCategories) {
+            addRule(Arrays.asList(new String[]{categories}), Arrays.asList(new String[]{edgeLabel}), childCategories);
+        }
+
+        public void addRule(String category, List<String> edgeLabels, List<String> childCategories) {
+            addRule(Arrays.asList(new String[]{category}), edgeLabels, childCategories);
+        }
+
+        public void addRule(String category, String edgeLabel, String childCategory) {
+            addRule(category, edgeLabel);
+            headRules.get(category).get(edgeLabel).add(childCategory);
+        }
+
+        public void addRule(String category, String edgeLabel) {
+            if (!headRules.containsKey(category)) {
+                headRules.put(category, new HashMap<String, Set<String>>());
+            }
+            if (!headRules.get(category).containsKey(edgeLabel)) {
+                headRules.get(category).put(edgeLabel, new HashSet<String>());
+            }
+        }
+
+        public void addRule(List<String> categories, List<String> edgeLabels, List<String> childCategories) {
+            for (String category : categories) {
+                for (String edgeLabel : edgeLabels) {
+                    if (childCategories.isEmpty()) {
+                        addRule(category, edgeLabel);
+                    } else {
+                        for (String childCategory : childCategories) {
+                            addRule(category, edgeLabel, childCategory);
+                        }
+                    }
+                }
+            }
+        }
+
+        public boolean allowedHeadEdge(String category, String edgeLabel, String childCategory) {
+            return (headRules.containsKey(category) && headRules.get(category).containsKey(edgeLabel) && (headRules.get(category).get(edgeLabel).isEmpty() || headRules.get(category).get(edgeLabel).contains(childCategory)));
+        }
+
+        public boolean headRuleIsDefined(String category){
+            return headRules.containsKey(category);
+        }
+    }
+
     static {
+
+        headRules = new HeadRules();
+        headRules.addRule("S", Arrays.asList("MO", "OC", "SB"), new ArrayList<String>());
+        headRules.addRule("NP", Arrays.asList("NK"), Arrays.asList("NE", "NN", "PDS", "PIS", "PPOSS", "PRELS", "PWS", "NP", "PN", "CS", "PPER", "CVP"));
+        headRules.addRule("NP", Arrays.asList("RE"), Arrays.asList("CS", "CVP"));
+        headRules.addRule("PP", Arrays.asList("MO", "AC"), Arrays.asList("APPR", "APPRART", "APPO"));
+        headRules.addRule("PN", Arrays.asList("PNC"), Arrays.asList("NP", "NN", "NE"));
+        headRules.addRule("AVP", Arrays.asList("RE", "AVC"), Arrays.asList(addToPhrasalCat("ADV")));
+        headRules.addRule("DL", Arrays.asList("DH"), new ArrayList<String>());
+        headRules.addRule("NM", Arrays.asList("NMC"), Arrays.asList("CARD", "NN"));
+        headRules.addRule(Arrays.asList("AP", "PP", "NP"), Arrays.asList("RE"),  new ArrayList<String>());
+        headRules.addRule(Arrays.asList("CAC", "CAP", "CAVP","CCP","CNP","CO","CPP","CS","CVP","CVZ"), Arrays.asList("CD"), Arrays.asList(addToPhrasalCat("KON")));
+        headRules.addRule("CS", Arrays.asList("CJ"), Arrays.asList("S"));
+        headRules.addRule("VZ", Arrays.asList("PM"), Arrays.asList("PTKZU"));
+        headRules.addRule("CH", Arrays.asList(""), new ArrayList<String>());
+
 
         // TODO: "contains" is bad.. Create abstracted version for np/vp > change contains to equal (e.g. tree bank hierarchy)
         // TODO: Replace ~ !!!
-        headPosTags = new HashMap<String, List<String>>();
-        headPosTags.put("S", new ArrayList<String>());
-        headPosTags.put("NP", Arrays.asList("NE", "NN", "PDS", "PIS", "PPOSS", "PRELS", "PWS", "NP", "PN", "CS"));
-        headPosTags.put("PP", Arrays.asList("APPR", "APPRART", "APPO"));
-        headPosTags.put("PN", Arrays.asList("NP"));
-        headPosTags.put("AVP", Arrays.asList(addToPhrasalCat("ADV")));
-        headPosTags.put("DL", new ArrayList<String>()); // alle erlaubt!
-        headPosTags.put("CAC", Arrays.asList("KON"));
-        headPosTags.put("CAP", Arrays.asList("KON", "APPR", "ADJA")); //TODO: check if APPR correct
-        headPosTags.put("CAVP", Arrays.asList("KON", "APPR"));
-        headPosTags.put("CCP", Arrays.asList("KON"));
-        headPosTags.put("CNP", Arrays.asList("KON"));
-        headPosTags.put("CO", Arrays.asList("KON"));
-        headPosTags.put("CPP", Arrays.asList("KON"));
-        headPosTags.put("CS", new ArrayList<String>());//TODO: fix workaround (s778_507)// Arrays.asList("KON"));
-        headPosTags.put("CVP", Arrays.asList(addToPhrasalCat("KON"))); //TODO: fix workaround (s6057_512)
-        headPosTags.put("CVZ", Arrays.asList("KON"));
-        headPosTags.put("NM", Arrays.asList("CARD", "NN"));
-        headPosTags.put("VZ", Arrays.asList("PTKZU"));//workaround for incorrect annotated s5240_525
-        headPosTags.put("CH", new ArrayList<String>());
-        headPosTags.put("VP", Arrays.asList("PTKVZ"));
-        headPosTags.put("ISU", Arrays.asList("$."));
-        headPosTags.put("MTA", Arrays.asList("ADJA"));
-        headPosTags.put("AP", Arrays.asList("PP"));
+        //headPosTags = new HashMap<String, List<String>>();
+        //headPosTags.put("S", new ArrayList<String>());
+        //headPosTags.put("NP", Arrays.asList("NE", "NN", "PDS", "PIS", "PPOSS", "PRELS", "PWS", "NP", "PN", "CS", "PPER", "CVP"));
+        //headPosTags.put("PP", Arrays.asList("APPR", "APPRART", "APPO"));
+        //headPosTags.put("PN", Arrays.asList("NP", "NN", "NE"));
+        //headPosTags.put("AVP", Arrays.asList(addToPhrasalCat("ADV")));
+        //headPosTags.put("DL", new ArrayList<String>()); // alle erlaubt!
+        //headPosTags.put("CAC", Arrays.asList("KON"));
+        //headPosTags.put("CAP", Arrays.asList("KON", "APPR", "ADJA")); //TODO: check if APPR correct
+        //headPosTags.put("CAVP", Arrays.asList("KON", "APPR"));
+        //headPosTags.put("CCP", Arrays.asList("KON"));
+        //headPosTags.put("CNP", Arrays.asList("KON"));
+        //headPosTags.put("CO", Arrays.asList("KON"));
+        //headPosTags.put("CPP", Arrays.asList("KON"));
+        //headPosTags.put("CS", new ArrayList<String>());//TODO: fix workaround (s778_507)// Arrays.asList("KON"));
+        //headPosTags.put("CVP", Arrays.asList(addToPhrasalCat("KON"))); //TODO: fix workaround (s6057_512)
+        //headPosTags.put("CVZ", Arrays.asList("KON"));
+        //headPosTags.put("NM", Arrays.asList("CARD", "NN"));
+        //headPosTags.put("VZ", Arrays.asList("PTKZU"));//workaround for incorrect annotated s5240_525
+        //headPosTags.put("CH", new ArrayList<String>());
+        //headPosTags.put("VP", Arrays.asList("PTKVZ"));
+        //headPosTags.put("ISU", Arrays.asList("$."));
+        //headPosTags.put("MTA", Arrays.asList("ADJA"));
+        //headPosTags.put("AP", Arrays.asList("PP"));
 
-        headEdges = new HashMap<String, List<String>>();
-        headEdges.put("S", Arrays.asList("MO", "OC", "SB"));
-        headEdges.put("NP", Arrays.asList("NK", "RE"));
-        headEdges.put("PN", Arrays.asList("PNC"));
-        headEdges.put("AVP", Arrays.asList("RE", "AVC")); //workaround: s12479_503
-        headEdges.put("PP", Arrays.asList("MO", "AC"));
-        headEdges.put("DL", Arrays.asList("DH"));
-        headEdges.put("CAC", Arrays.asList("CD"));
-        headEdges.put("CAP", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s45832_501)
-        headEdges.put("CAVP", Arrays.asList("CD"));
-        headEdges.put("CCP", Arrays.asList("CD"));
-        headEdges.put("CNP", Arrays.asList("CD"));
-        headEdges.put("CO", Arrays.asList("CD"));
-        headEdges.put("CPP", Arrays.asList("CD"));
-        headEdges.put("CS", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s778_507)
-        headEdges.put("CVP", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s6057_512)
-        headEdges.put("CVZ", Arrays.asList("CD"));
-        headEdges.put("NM", Arrays.asList("NMC"));
-        headEdges.put("VZ", Arrays.asList("PM")); //workaround for incorrect annotated s5240_525
-        headEdges.put("CH", new ArrayList<String>());
-        headEdges.put("VP", Arrays.asList("SVP"));
-        headEdges.put("ISU", Arrays.asList("UC"));
-        headEdges.put("MTA", Arrays.asList("ADC"));
-        headEdges.put("AP", Arrays.asList("RE"));
+        //headEdges = new HashMap<String, List<String>>();
+        //headEdges.put("S", Arrays.asList("MO", "OC", "SB"));
+        //headEdges.put("NP", Arrays.asList("NK", "RE"));
+        //headEdges.put("PN", Arrays.asList("PNC"));
+        //headEdges.put("AVP", Arrays.asList("RE", "AVC")); //workaround: s12479_503
+        //headEdges.put("PP", Arrays.asList("MO", "AC"));
+        //headEdges.put("DL", Arrays.asList("DH"));
+        //headEdges.put("CAC", Arrays.asList("CD"));
+        //headEdges.put("CAP", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s45832_501)
+        //headEdges.put("CAVP", Arrays.asList("CD"));
+        //headEdges.put("CCP", Arrays.asList("CD"));
+        //headEdges.put("CNP", Arrays.asList("CD"));
+        //headEdges.put("CO", Arrays.asList("CD"));
+        //headEdges.put("CPP", Arrays.asList("CD"));
+        //headEdges.put("CS", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s778_507)
+        //headEdges.put("CVP", Arrays.asList("CD", "CJ")); //TODO: fix workaround (s6057_512)
+        //headEdges.put("CVZ", Arrays.asList("CD"));
+        //headEdges.put("NM", Arrays.asList("NMC"));
+        //headEdges.put("VZ", Arrays.asList("PM")); //workaround for incorrect annotated s5240_525
+        //headEdges.put("CH", new ArrayList<String>());
+        //headEdges.put("VP", Arrays.asList("SVP"));
+        //headEdges.put("ISU", Arrays.asList("UC"));
+        //headEdges.put("MTA", Arrays.asList("ADC"));
+        //headEdges.put("AP", Arrays.asList("RE"));
     }
 
     public List<String> backOffFeature(String concatenatedFeature) {
@@ -128,18 +197,12 @@ public class FeatureExtractor {
     }
 
 
-
-
-
-
     private String extractPath(String idref)
             throws Exception {
 
         String path = "";
 
         //TODO: use only first target??
-
-
 
 
         if (sentence.getTarget().getId().equals(idref)) {
@@ -162,7 +225,7 @@ public class FeatureExtractor {
 
                 path += sentence.getNode(ownIdPath[j]).getCategory() + "+";
             }
-            
+
             // nimm die wurzel des subtrees nur mit rein, wenn idref nicht auf (global) root zeigt. sonst fuege Kategorie manuell ein...
             if (i == 0)
                 path += "VROOT";
@@ -199,13 +262,13 @@ public class FeatureExtractor {
         int ownPos = getPosFromID(sentence.getNode(idref).getHeadIDref());
 
 
-        if(targetFirstPos!=targetLastPos && ownPos <=targetFirstPos)
+        if (targetFirstPos != targetLastPos && ownPos <= targetFirstPos)
             return "0";
-        if(targetFirstPos!=targetLastPos && ownPos <=targetLastPos)
+        if (targetFirstPos != targetLastPos && ownPos <= targetLastPos)
             return "1";
-        if(targetFirstPos==targetLastPos && ownPos <=targetLastPos)
+        if (targetFirstPos == targetLastPos && ownPos <= targetLastPos)
             return "2";
-        if(ownPos >= targetLastPos)
+        if (ownPos >= targetLastPos)
             return "3";
 
         if (position.isEmpty()) {
@@ -325,13 +388,13 @@ public class FeatureExtractor {
     }
 
     private int getPosFromID(String idRef) {
-	String[] temp = new String[0];
-	try {
-	    temp = idRef.split("_");
-	    
-	} catch (Exception e) {
-	    System.out.println(e.toString());
-	}
+        String[] temp = new String[0];
+        try {
+            temp = idRef.split("_");
+
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
         return Integer.parseInt(temp[temp.length - 1]);
     }
 
@@ -341,6 +404,10 @@ public class FeatureExtractor {
         //  System.out.println("test");
         if (idrefs.get(0).equals(sentence.getRootIDref()) && !sentence.getNode(sentence.getRootIDref()).isTerminal() && sentence.getNode(sentence.getRootIDref()).getCategory().equals("VROOT"))
             return null;
+
+        //if(idrefs.contains("s1005_504")){
+        //    System.out.println("TEST");
+        //}
         Node curNode;
         List<String> newIdRefs = new ArrayList<String>(40);
         for (String idref : idrefs) {
@@ -364,11 +431,18 @@ public class FeatureExtractor {
                     }
                 } else {
                     String curCat = curNode.getCategory();
-                    if (headEdges.containsKey(curCat) && headPosTags.containsKey(curCat)) {
-                        List<String> curHeadEdges = headEdges.get(curCat);
-                        List<String> curHeadPosTags = headPosTags.get(curCat);
+                    if (headRules.headRuleIsDefined(curCat)){//headEdges.containsKey(curCat) && headPosTags.containsKey(curCat)) {
+                        //List<String> curHeadEdges = headEdges.get(curCat);
+                        //List<String> curHeadPosTags = headPosTags.get(curCat);
                         for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
-                            if (curHeadEdges.contains(edge.getValue()) && (curHeadPosTags.contains(sentence.getNode(edge.getKey()).getCategory()) || (curHeadPosTags.size() == 0))) {
+                            String curEdge = edge.getValue();
+                            String curChildCat = sentence.getNode(edge.getKey()).getCategory();
+                            //if(curHeadEdges.contains(curEdge))
+                            //    System.out.println("TEST2");
+                            //if(curHeadPosTags.contains(curChildCat))
+                            //    System.out.println("TEST3");
+                            //if (curHeadEdges.contains(curEdge) && (curHeadPosTags.contains(curChildCat) || (curHeadPosTags.size() == 0))) {
+                            if(headRules.allowedHeadEdge(curCat,curEdge,curChildCat)){
                                 newIdRefs.add(edge.getKey());
                             }
                         }
@@ -379,6 +453,10 @@ public class FeatureExtractor {
             }
         }
         if (newIdRefs.isEmpty()) {
+            if (!idrefs.contains(sentence.getRootIDref())) {
+                //System.out.println(sentence);
+                throw new Exception("no head found for idrefs: " + idrefs);
+            }
             // TODO: Throw
             //throw new Exception("no head word found for: "+idrefs);
             return null;
