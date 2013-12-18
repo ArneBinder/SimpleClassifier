@@ -149,10 +149,11 @@ public class FeatureExtractor {
         //TODO: s39166_507 has wrong annotation (category)!! has to be AVP instead of NP
         headRules.addRule("NP", "NK", "ADV"); //s34870_29
         headRules.addRule("NP", "NK", "S"); //s5387_508
+        headRules.addRule("NP", "NK", "ART"); //s5387_508
         headRules.addRule("PN", "PNC", "FM"); //s22611_4
 
         //TODO: check these... (look up idrefs)
-        /*
+
         headRules.addRule("PN", "PNC", "TRUNC"); //s36594_18
         headRules.addRule("PN", "PNC", "CARD"); //s39912_2
         headRules.addRule("PN", "PNC", "PP"); //s21687_502
@@ -208,7 +209,7 @@ public class FeatureExtractor {
         headRules.addRule("VP", "MO", "ADJD"); //s4305_4
         headRules.addRule("VP", "MO", "VVPP"); //s2398_38
         headRules.addRule("VP", "OP", "PP"); //s2398_506
-        */
+
     }
 
     public static final List<String> usedFeatures = Arrays.asList("target", "synCat", "position", "path", "path" + FeatureVector.getSplitChar() + "synCat", "head");

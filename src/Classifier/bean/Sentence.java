@@ -66,20 +66,23 @@ public class Sentence {
     public int[] calculateRootOfSubtree(List<String> idRefs) throws Exception {
         //idref Index > pathsFromRoot Index > pathFromRoot Path
         String[][][] pathsFromRoot = new String[idRefs.size()][][];
-        
+
         String idRef;
         for (int idRefIndex = 0; idRefIndex < idRefs.size(); idRefIndex++) {
-	    idRef = idRefs.get(idRefIndex);
-	    pathsFromRoot[idRefIndex] = new String[getNode(idRef).getPathsFromRoot().size()][];
-	    int rootPathIndex = 0;
+            idRef = idRefs.get(idRefIndex);
+            pathsFromRoot[idRefIndex] = new String[getNode(idRef).getPathsFromRoot().size()][];
+            int rootPathIndex = 0;
             for (String[] pathFromRoot : getNode(idRef).getPathsFromRoot()) {
-                pathsFromRoot[idRefIndex][rootPathIndex] = pathFromRoot;
+                pathsFromRoot[idRefIndex][rootPathIndex] = new String[pathFromRoot.length+1];
+                System.arraycopy(pathFromRoot,0,pathsFromRoot[idRefIndex][rootPathIndex],0,pathFromRoot.length);
+                //pathsFromRoot[idRefIndex][rootPathIndex] = pathFromRoot;
+                pathsFromRoot[idRefIndex][rootPathIndex][pathFromRoot.length] = idRef;
                 rootPathIndex++;
             }
         }
-        
+
         String curIDref;
-        
+
         boolean abort = false;
         boolean found = true;
         int[] result = new int[idRefs.size() + 1];
@@ -99,23 +102,23 @@ public class Sentence {
                     curIDref = pathsFromRoot[0][result[1]][curDepth];
                     found = true;
                     for (int idIndex = 1; found && idIndex < idRefs.size(); idIndex++) {
-                        if (!curIDref.equals(pathsFromRoot[idIndex][result[idIndex+1]][curDepth])) {
+                        if (!curIDref.equals(pathsFromRoot[idIndex][result[idIndex + 1]][curDepth])) {
                             found = false;
                             break;
                         }
                     }
                 }
-                
+
                 if (!found) {
                     result[countPointer + 1]++;
                     while (result[countPointer + 1] == pathsFromRoot[countPointer].length) {
                         result[countPointer + 1] = 0;
                         countPointer++;
-                        
-                        if(countPointer == idRefs.size()){
+
+                        if (countPointer == idRefs.size()) {
                             abort = true;
                             break;
-                        }else{
+                        } else {
                             result[countPointer + 1]++;
                         }
                     }
@@ -126,9 +129,9 @@ public class Sentence {
             if (found)
                 curDepth++;
         }
-        if(result[0] > 0){
+        if (result[0] > 0) {
             result[0]--;
-        }else{
+        } else {
             throw new Exception("Could not calculate common path for passed idrefs (VROOT not in path)");
         }
 
@@ -178,15 +181,15 @@ public class Sentence {
     }
 
     public void addFrame(Frame frame) {
-	String[] idRefParts;
+        String[] idRefParts;
         for (List<String> fes : frame.getFrameElements().values()) {
             for (String feID : fes) {
-        	idRefParts = feID.split(":");
+                idRefParts = feID.split(":");
                 if (!containsNode(idRefParts[0]))
                     return;
             }
         }
-        
+
         for (String targetID : frame.getTargetIDs()) {
             if (!containsNode(targetID))
                 return;
