@@ -73,8 +73,8 @@ public class Sentence {
             pathsFromRoot[idRefIndex] = new String[getNode(idRef).getPathsFromRoot().size()][];
             int rootPathIndex = 0;
             for (String[] pathFromRoot : getNode(idRef).getPathsFromRoot()) {
-                pathsFromRoot[idRefIndex][rootPathIndex] = new String[pathFromRoot.length+1];
-                System.arraycopy(pathFromRoot,0,pathsFromRoot[idRefIndex][rootPathIndex],0,pathFromRoot.length);
+                pathsFromRoot[idRefIndex][rootPathIndex] = new String[pathFromRoot.length + 1];
+                System.arraycopy(pathFromRoot, 0, pathsFromRoot[idRefIndex][rootPathIndex], 0, pathFromRoot.length);
                 //pathsFromRoot[idRefIndex][rootPathIndex] = pathFromRoot;
                 pathsFromRoot[idRefIndex][rootPathIndex][pathFromRoot.length] = idRef;
                 rootPathIndex++;
@@ -163,7 +163,11 @@ public class Sentence {
 
         if (targetIdRefs.size() > 1) {
             int[] indices = calculateRootOfSubtree(targetIdRefs);
-            target = getNode(getNode(targetIdRefs.get(0)).getPathsFromRoot().get(indices[1])[indices[0]]);
+            try {
+                target = getNode(getNode(targetIdRefs.get(0)).getPathsFromRoot().get(indices[1])[indices[0]]);
+            } catch (ArrayIndexOutOfBoundsException e) { // if index to targetIdRefs.get(0) itself is returned as subTReeRoot (is on the path of the other target)...
+                target = getNode(targetIdRefs.get(0));
+            }
 
         } else {
             target = getNode(targetIdRefs.get(0));

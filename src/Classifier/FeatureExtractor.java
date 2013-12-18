@@ -11,7 +11,7 @@ public class FeatureExtractor {
     private static class HeadRules {
         //smaler value --> higher priority!!!
         int priority = 0;
-        Map<String, Map<String,Map<String, Integer>>> headRules = new HashMap<String, Map<String, Map<String, Integer>>>();
+        Map<String, Map<String, Map<String, Integer>>> headRules = new HashMap<String, Map<String, Map<String, Integer>>>();
 
         public void addRule(List<String> categories, String edgeLabel, String childCategory) {
             addRule(categories, Arrays.asList(new String[]{edgeLabel}), Arrays.asList(new String[]{childCategory}));
@@ -37,7 +37,7 @@ public class FeatureExtractor {
         }
 
         public void addRule(String category, String edgeLabel) {
-            addRule(category,  edgeLabel, "");
+            addRule(category, edgeLabel, "");
         }
 
         public void addRule(List<String> categories, List<String> edgeLabels, List<String> childCategories) {
@@ -55,13 +55,13 @@ public class FeatureExtractor {
         }
 
         public int getHeadRulePriority(String category, String edgeLabel, String childCategory) {
-            if(!headRules.containsKey(category) || !headRules.get(category).containsKey(edgeLabel))
+            if (!headRules.containsKey(category) || !headRules.get(category).containsKey(edgeLabel))
                 return Integer.MAX_VALUE;
-            if(headRules.get(category).get(edgeLabel).containsKey(""))
+            if (headRules.get(category).get(edgeLabel).containsKey(""))
                 return headRules.get(category).get(edgeLabel).get("");
-            if(headRules.get(category).get(edgeLabel).containsKey(childCategory))
+            if (headRules.get(category).get(edgeLabel).containsKey(childCategory))
                 return headRules.get(category).get(edgeLabel).get(childCategory);
-           return Integer.MAX_VALUE;
+            return Integer.MAX_VALUE;
         }
     }
 
@@ -86,16 +86,16 @@ public class FeatureExtractor {
         headRules.addRule("NP", Arrays.asList("NK"), Arrays.asList("ADJA", "AP")); //TODO: Preferenzliste wäre gut... (speziell für ADJA: sollte nach Noun-tags gewählt werden)
         headRules.addRule("NP", Arrays.asList("MO"), Arrays.asList("NP"));
         headRules.addRule("PN", Arrays.asList("PNC"), Arrays.asList("CNP"));
-        headRules.addRule("PP", Arrays.asList("MO", "AC"), Arrays.asList("APPR", "APPRART", "APPO","FM"));
+        headRules.addRule("PP", Arrays.asList("MO", "AC"), Arrays.asList("APPR", "APPRART", "APPO", "FM"));
         headRules.addRule("PP", Arrays.asList("NK"), Arrays.asList("ADJA"));
         headRules.addRule("PN", Arrays.asList("PNC"), Arrays.asList("NP", "NN", "NE"));
         headRules.addRule("AVP", Arrays.asList("RE", "AVC"), Arrays.asList(addToPhrasalCat("ADV")));
         headRules.addRule("AVP", Arrays.asList("MO"), Arrays.asList("AVP"));
         headRules.addRule("DL", Arrays.asList("DH"), new ArrayList<String>());
         headRules.addRule("NM", Arrays.asList("NMC"), Arrays.asList("CARD", "NN"));
-        headRules.addRule(Arrays.asList("AP", "PP", "NP"), Arrays.asList("RE"),  new ArrayList<String>());
+        headRules.addRule(Arrays.asList("AP", "PP", "NP"), Arrays.asList("RE"), new ArrayList<String>());
         //headRules.addRule(Arrays.asList("CAC", "CAP", "CAVP","CCP","CNP","CO","CPP","CS","CVP","CVZ"), Arrays.asList("CD"), Arrays.asList(addToPhrasalCat("KON")));
-        headRules.addRule("CAP", Arrays.asList("CJ"), Arrays.asList("CPP", "PP","CARD", "ADJA", "ADJD", "AP", "NN", "NM", "PIAT"));
+        headRules.addRule("CAP", Arrays.asList("CJ"), Arrays.asList("CPP", "PP", "CARD", "ADJA", "ADJD", "AP", "NN", "NM", "PIAT"));
         headRules.addRule("CAVP", Arrays.asList("CJ"), Arrays.asList("AVP", "ADV", "PWAV"));
         headRules.addRule("CCP", Arrays.asList("CJ"), Arrays.asList("CP", "KOUS"));
         headRules.addRule("CNP", Arrays.asList("CJ"), Arrays.asList("NP", "PN", "NN", "NE", "CARD"));
@@ -111,13 +111,11 @@ public class FeatureExtractor {
         headRules.addRule("CH", Arrays.asList(""), new ArrayList<String>());
 
 
-
-
         headRules.addRule("AP", "MO", "PP");
         headRules.addRule("AVP", "MO", "ADV");
         headRules.addRule("AVP", "CC", "S");
         headRules.addRule("AVP", "CM", "KOKOM"); //s22498_21
-        headRules.addRule("AVP","CC","S"); //s121_5
+        headRules.addRule("AVP", "CC", "S"); //s121_5
         headRules.addRule("AVP", "RE", "PN"); //s9397_505
         headRules.addRule("AVP", "MO", "ADV"); //s4427_2
         headRules.addRule("CH", "UC", "FM"); //s38695_21
@@ -151,6 +149,7 @@ public class FeatureExtractor {
         headRules.addRule("NP", "NK", "S"); //s5387_508
         headRules.addRule("NP", "NK", "ART"); //s5387_508
         headRules.addRule("PN", "PNC", "FM"); //s22611_4
+        headRules.addRule("CVP", "CJ", "VVFIN"); //s14032_500
 
         //TODO: check these... (look up idrefs)
 
@@ -442,7 +441,18 @@ public class FeatureExtractor {
                 curNode.setHeadIDref(curNode.getId());
                 return curNode;
             } else {
-                if (curNode.getEdges().values().contains("HD")) {
+                // if just one child --> take this is as head
+                if (curNode.getEdges().size() == 1) {
+                    for (String childIdRef : curNode.getEdges().keySet()) {
+                        Node curHead = calculateHeadWord(Arrays.asList(childIdRef));
+                        if (curHead != null) {
+                            curNode.setHeadIDref(curHead.getId());
+                            return curHead;
+                        } else {
+                            throw new Exception(" the sole child of the node (idref: " + idref + ") contains no head");
+                        }
+                    }
+                } else if (curNode.getEdges().values().contains("HD")) {
                     //find idref for HD-edge
                     for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
                         if (edge.getValue().equals("HD")) {
@@ -457,26 +467,9 @@ public class FeatureExtractor {
                     }
                 } else {
                     String curCat = curNode.getCategory();
-                    String directHead = chooseHeadChild(curCat,curNode.getEdges());
-                    if(directHead!=null){
+                    String directHead = chooseHeadChild(curCat, curNode.getEdges());
+                    if (directHead != null) {
                         newIdRefs.add(directHead);
-                    //}
-//                    if (headRules.headRuleIsDefined(curCat)){//headEdges.containsKey(curCat) && headPosTags.containsKey(curCat)) {
-//                        //List<String> curHeadEdges = headEdges.get(curCat);
-//                        //List<String> curHeadPosTags = headPosTags.get(curCat);
-//
-//                        for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
-//                            String curEdge = edge.getValue();
-//                            String curChildCat = sentence.getNode(edge.getKey()).getCategory();
-//                            //if(curHeadEdges.contains(curEdge))
-//                            //    System.out.println("TEST2");
-//                            //if(curHeadPosTags.contains(curChildCat))
-//                            //    System.out.println("TEST3");
-//                            //if (curHeadEdges.contains(curEdge) && (curHeadPosTags.contains(curChildCat) || (curHeadPosTags.size() == 0))) {
-//                            if(headRules.allowedHeadEdge(curCat,curEdge,curChildCat)){
-//                                newIdRefs.add(edge.getKey());
-//                            }
-//                        }
                     } else {
                         throw new Exception("no head-edge or no head-pos-tag for category " + curCat + " (for idref: " + curNode.getId() + ")");
                     }
@@ -485,15 +478,7 @@ public class FeatureExtractor {
         }
         if (newIdRefs.isEmpty()) {
             if (!idrefs.contains(sentence.getRootIDref())) {
-                //System.out.println(sentence);
-                /*for(String idref: idrefs){
-                    for (Map.Entry<String, String> edge : sentence.getNode(idref).getEdges().entrySet()) {
-                        String curEdge = edge.getValue();
-                        String curChildCat = sentence.getNode(edge.getKey()).getCategory();
-                        dummy+="\n"+sentence.getNode(idref).getCategory()+"\t"+curEdge+"\t"+curChildCat+"\t"+edge.getKey();
-                    }
-                }*/
-                throw new Exception("no head found for idrefs: " + idrefs + "\n"+sentence.getNode(idrefs.get(0)));
+                throw new Exception("no head found for idrefs: " + idrefs + "\n" + sentence.getNode(idrefs.get(0)));
             }
             // TODO: Throw
             //throw new Exception("no head word found for: "+idrefs);
@@ -502,15 +487,15 @@ public class FeatureExtractor {
         return calculateHeadWord(newIdRefs);
     }
 
-    private String chooseHeadChild(String parentCategory, Map<String, String> edges) throws Exception{
+    private String chooseHeadChild(String parentCategory, Map<String, String> edges) throws Exception {
         //smaller is better!
         int bestEdgeQuality = Integer.MAX_VALUE;
         String bestChildRef = null;
         int curEdgeQuality;
-        for (Map.Entry<String, String> edge : edges.entrySet()){
+        for (Map.Entry<String, String> edge : edges.entrySet()) {
             curEdgeQuality = headRules.getHeadRulePriority(parentCategory, edge.getValue(), sentence.getNode(edge.getKey()).getCategory());
-            if(bestEdgeQuality > curEdgeQuality){
-                 bestEdgeQuality = curEdgeQuality;
+            if (bestEdgeQuality > curEdgeQuality) {
+                bestEdgeQuality = curEdgeQuality;
                 bestChildRef = edge.getKey();
             }
         }
