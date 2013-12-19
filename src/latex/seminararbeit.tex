@@ -1,0 +1,197 @@
+\documentclass[12pt]{article}
+
+\usepackage{ucs}     % unicode 
+\usepackage[utf8]{inputenc}  % utf-8
+\usepackage[ngerman]{babel}  % new german spelling 
+\usepackage{graphicx}   % use graphics 
+\usepackage{fancyhdr}   % header and footer
+\usepackage{setspace}
+\usepackage{url}
+\usepackage[printonlyused]{acronym}
+\usepackage{a4wide}
+\usepackage{natbib}	% bibstyle 
+\usepackage[section]{placeins}	% \FloatBarrier
+
+\begin{document}
+
+
+\subsubsection{Was sind Rollen}
+\subsubsection{Motivation}
+\subsubsection{Frames}
+\subsubsection{Was ist SLR}
+ - grobe Problemdefinition
+
+Das Problem lässt sich untergliedern in..
+%list_Problem 
+Die Bestimmung des Frames, der durch den Satz realisiert wird
+Die Bestimmung der Frameelemente bzgl. des Frames
+Die Klassifizierung der Frameelemente
+
+
+Target
+
+\section{Hypothese}
+
+Im Zug unserer Arbeit wollen wir die Frage klären, ob zwischen syntaktischen
+Informationen und semantischen Rollen innerhalb eines Satzes eine Korrelation
+exisitiert.
+
+\subsection{Korpus}
+% Allgemeines zum Salsa
+
+Die Grundlage dieser Arbeit stellt das SALSA-Korpus \cite{rehbein_adding_2012}
+dar, ein Frame-semantisch annotiertes Korpus der deutschen Sprache. Dieses
+basiert auf dem TIGER-Corpus \cite{}, eine Treebank über deutsche
+Zeitungsartikel. Das SALSA-Corpus umfasst in seiner zweiten Version 648
+Prädikate mit insgesamt 36251 Sätzen.
+
+.. .. ..
+
+Jede atomare Konstituente innerhalb eines Satzes ist mit verschiedenen
+Informationen annotiert. Als Beispiel ist hier der POS-Tag, der Kasus, das Lemma
+sowie der Numerus und das Tempus zu nennen. 
+
+Das Korpus enthält nicht nur die Struktur des Konstituentenbaums sondern auch
+Sec-Edges, welche innerhalb des Baums noch auf andere Knoten verweisen. Somit handelt es sich
+genau genommen eher um einen Graphen, als um einen Baum.
+
+
+
+\subsection{Vorgehen}
+
+Bei unserer Herangehensweise folgen wir dem Ansatz von Jurafski et. al. \cite{},
+bei dem versucht wird, den verschiedenen Konstituenten eines Satzes
+semantische Rollen zuzuweisen. 
+
+
+Jurafski nimmt den ersten Schritt als gegeben an und konzentriert sich auf die
+Klassifizierung der Frame-Elemente. Aus Gründen der
+Komplexitätsreduzierung, haben wir uns dazu entschieden, Frames komplett zu
+ignorieren und die Frame-Elemente davon unabhängig zu klassifizieren.
+
+Ungeklärt ist bisher die Frage, ob wir bereits im Vorfeld wissen, welches die
+Frame-Elemente innerhalb eines Satzes sind oder ob jede Konstituente ein
+potentielles Frame-Element darstellt. Bezogen auf die letztere Variante könnte
+ein binärer, vorgeschalteter Klassifikator entscheiden, ob es sich bei einer
+gegebenen Konstituente um ein Frame-Element handelt. Weiterhin unbeantwortet ist
+die Frage, ob für jedes Prädikat ein eigener Klassifikator erstellt werden
+sollte oder ob ein globaler Klassifikator über alle Prädikat ebenfalls funktioniert.
+
+
+Auf was arbeiten wir?!??!?! Top20: Prädikate, Frames, Rollen, oder..
+
+
+Die Grundlage unserer Anwendung bildet der \textit{Naive Bayes}-Klassifikator. 
+..Smoothing, back off (regeln), Zukünftig: apriori wahrscheinlichkeit???
+ 
+\subsection{Features}
+
+Die Auswahl der genutzten Features hat sich ebenfalls an der Arbeit von Jurafsky
+et. al. orientiert. Für jede atomare sowie komplexe Konstituente werden sowohl
+lexikalische, als auch syntaktische Features genutzt.
+
+Als lexikalisches Feature nutzen wir das \texit{Kopfelement}, die atomare
+Konstituente, die den wichtigsten syntaktisch determinierenden Beitrag innerhalb einer
+komplexen Konstituente leistet. Außerdem leisten Kopfelemente den zur
+Problemlösung relevantesten semantischen Beitrag. Wir nutzen dafür die
+lemmatisierte Form des Wortes. Für atomare Konstituente wird
+vollständigskeitshalber die Konstituente selber als Kopfelement gesetzt.
+
+Anschließend muss das \texit{Target} bestimmt werden. Als Feature
+wird das Lemma des Kopfelements der Target-Konstituente genutzt.
+
+Als weiteres, syntaktisches Feature wird die \textit{syntaktische Kategorie} der
+Konstituenten ausgewertet. Für atomare Konstituenten entspricht die syntaktische
+Kategorie dem Part-of-Speech-Tag, für komplexe Konstituenten deren
+Phrasenkategorie. 
+Als weiteres Feature wird der \textit{Pfad} zwischen der betrachteten Konstituente und dem Target-Wort
+innerhalb des Konstituentenbaums extrahiert. Er setzt sich aus den verschiedenen
+Phrasenkategorien der zwischenliegenden komplexen Konstituenten zusammen.
+Zusätzlich werden die einzelnen Kategorien mit einem Richtungsmarker
+(absteigend oder aufsteigend im Baum) verknüpft.
+Das dritte syntaktische Feature stellt die \texit{Position} im Satz der
+betrachteten Konstituente bezüglich des Target-Words. Dabei wird der Head der Konstituente
+betrachtet. Dieser kann vor einem atomaren Target (0), vor einem komplexen
+Target (1), innerhalb eines komplexen targets (2) und nach einem Target (3)
+stehen.
+
+Neben den einzelnen Features werden zusätzlich noch Feature-Kombinationen
+genutzt. Momentan wird exemplarisch die Kombination aus Pfad und syntaktischer
+Kategorie verwendet. Zukünftig sollten auch die weiteren Features - sofern
+sinnvoll - miteinander kombiniert werden.
+
+Weiterhin wären folgende Features potentiell interessant:
+\begin{enumeration}
+\item Der Kasus der Kopfelementen der zu klassifizierenden Konstituenten sowie
+der Kasus des Targets,
+\item N-Gramme über den Pfad zum Root des Konstituentenbaums,
+\item Passiv der übergeordneten Verbalphrase (ja/nein).
+\end{enumeration}
+
+Generall ist zu überlegen, die Phrasenkategorien und POS-Tags zu abstrahieren.
+
+\subsection{Ablauf der Anwendung}
+
+Zuerst wird jeder eingelese Satz vorarbeitet und mit zusätzlichen Informationen
+angereicht. Hierunter fällt bspw. die Bestimmung der einzelnen Kopfelemente pro
+Konstituente sowie die Bestimmung aller möglichen Pfade zum Wurzelelement. Da im
+SALSA-Korpus nicht alle komplexen Konstituenten unbedingt ein Kopfelement
+enthalten, wird regelbasiert Baum-abwärts nach einem Kopfelement gesucht. Dabei
+werden die verschiedenen Bezeichner der Kanten sowie die Phrasenkategorien ausgewertet.
+Ist für eine Kind-Konstituente bereits ein Kopfelement bestimmt worden, wird
+dieses übernommen.
+
+Anschließend werden die Target-Konstituenten des Satzes bestimmt. Im
+Salsa-Korpus kann dies entweder einer atomaren Konstituente oder einer komplexen
+Konstituenten entsprechen. Letzteres ist der Fall, wenn das gegeben Target beim
+Lernen aus mehreren atomaren Konstituenten bestand (\glqq{}Er \uline{schlug} den
+Kopf \uline{ab}\grqq{}). Für diese wird die komplexe Konstituente bestimmt, die
+alle atomaren Konstituenten unmittelbar überdeckt. Von dessen Kopfelement wird
+das Lemma als Feature genutzt.
+
+Nach der Bestimung der Target-Konstituente, werden für alle Konstituenten die
+Features extrahiert. Das weitere Vorgehen unterscheidet sich beim Trainieren und
+Annotieren.
+
+Beim Trainieren werden die einzelnen Features und verschiedene
+Feature-Kombinationen sowohl im Bezug zu den im Satz gegebenen
+Rollen als auch alleinstehend gezählt. Nach der Verarbeitung aller Sätze werden die absoluten
+Feature-Häufigkeiten pro Rolle bezogen auf die Gesamt-Häufigkeit des Features
+normiert. Dieses Modell kann anschließend abgespeichert werden. Dadurch kann es
+später sowohl statische ausgewertet als auch zum Annotieren wiederverwendet
+werden.
+
+Beim Annotieren wird ein zuvor erstelltes Modell eingelesen und auf die
+verschiedenen vorverarbeiteten Sätze angewendet. Dabei wird über alle
+potentiellen Target-Konstituenten iteriert, da ein Satz mehrere Frames enthalten
+kann. Diese potentiellen Target-Konstituenten entsprechen den Konstituenten,
+deren Kopfelement eines der im Modell gelisteten Target-Lemmata entspricht.
+Anschließend werden alle Konstituenten in Bezug auf die verschiedenen
+Target-Konstituenten klassifiziert. Dabei werden die Feature(-Kombinationen) im
+Modell nachgeschlagen. Falls sie nicht existiert, wird für eine Kombination
+versucht, sie in ihre einzelnen Features zu zerlegen und das Produkt
+der Einzelwahrscheinlichkeiten genommen. Existiert ein einzelnes Features nicht, so
+wird das Smoothing mit einem vordefinierten Wert (0.000001) angewendet. Alle
+Wahrscheinlichkeiten werden logarithmiert verarbeitet. Die Rolle mit höchsten
+wahrscheinlichkeit wird anschließend der Konstituente zugewiesen.
+
+Das Ergebnis der Annotation wird anschließend ebenfalls in eine Datei
+geschrieben um für eine spätere Auswertung zur Verfügung zu stehen.
+
+\subsection{Auswertung}
+
+Die Auswertung der Annotation erfolgt über eine Kreuzvalidierung. Angestrebtes
+Ziel ist eine Aufteilung 90:10. Verglichen werden sollen hierbei nur die
+Konstituenten, welche im Ausgangskorpus Rollen besitzen. Hierbei ist zu
+überlegen, ob die Auswertung einer Teilannotation (im Falle komplexer Konstituenten)
+positiv gewertet wird oder ob strikt nach dem Prinzip \glqq{}wahr/falsch\grqq{}
+ausgewertet wird.
+
+%TODO:
+ - Was ist unser Linguistisches Ziel?
+ - Welche linguistische Diskussion kann man daraus ziehen?
+
+\bibliography{biblio}
+
+
+\end{document}
