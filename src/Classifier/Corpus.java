@@ -68,22 +68,22 @@ public class Corpus {
                     for (Entry<String, List<String>> frameElement : currentFrame.getFrameElements().entrySet()) {
                         String frameElementName = frameElement.getKey(); // = role
 
-                        // get first idref only.. hopefully, there is only one
                         int[] indices = sentence.calculateRootOfSubtree(frameElement.getValue());
                         String frameElementIDRef;
 
-                        if(sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1]).length > indices[0])
+                        if (sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1]).length > indices[0])
                             frameElementIDRef = sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1])[indices[0]];
                         else
                             frameElementIDRef = frameElement.getValue().get(0);
 
                         //frameElementIDRef = sentence.getNode(frameElementIDRef).getHeadIDref();
-                         //frameElement.getValue().get(0);
-
-                        FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
-                        feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
-                        model.addFeatureVector(feFeatureVector);
-                        frameElementIDRefs.add(frameElementIDRef);
+                        //frameElement.getValue().get(0);
+                        if (!frameElementIDRef.equals(sentence.getRootIDref())) {
+                            FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
+                            feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
+                            model.addFeatureVector(feFeatureVector);
+                            frameElementIDRefs.add(frameElementIDRef);
+                        }
                     }
 
                     // process all terminal elements
@@ -166,7 +166,7 @@ public class Corpus {
                             annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
                         }
                     } // for
-                    if(bestAnnotationProb < annotationProbability){
+                    if (bestAnnotationProb < annotationProbability) {
                         bestAnnotationProb = annotationProbability;
                         bestAnnotationFrame = annotationFrame;
                     }

@@ -311,6 +311,11 @@ public class FeatureExtractor {
             List<String> idRefs = new ArrayList<String>(2);
             idRefs.add(idref);
             idRefs.add(targetHeadIDref);
+            if(idref.equals("s28271_7")||(targetHeadIDref.equals("s28271_7"))){
+                //TODO: check this!
+                throw new Exception("check calc root for s28271_7 & s28271_8");
+
+            }
             int[] indices = sentence.calculateRootOfSubtree(idRefs);
             String[] ownIdPath = sentence.getNode(idref).getPathFromRoot(indices[1]);
             String[] targetIdPath = sentence.getNode(targetHeadIDref).getPathFromRoot(indices[2]);
@@ -328,7 +333,7 @@ public class FeatureExtractor {
             //    path += "VROOT";
             //else {
             path += sentence.getNode(targetIdPath[i]).getCategory();
-            //}
+
 
             for (int j = i + 1; j < targetIdPath.length; j++) {
                 path += "-" + sentence.getNode(targetIdPath[j]).getCategory();
@@ -443,9 +448,9 @@ public class FeatureExtractor {
         String[] temp = new String[0];
         try {
             temp = idRef.split("_");
-
+            Integer.parseInt(temp[temp.length - 1]);
         } catch (Exception e) {
-            System.out.println(e.toString());
+            System.out.println(idRef);
         }
         return Integer.parseInt(temp[temp.length - 1]);
     }
