@@ -208,7 +208,7 @@ public class FeatureExtractor {
         headRules.addRule("VP", "MO", "ADJD"); //s4305_4
         headRules.addRule("VP", "MO", "VVPP"); //s2398_38
         headRules.addRule("VP", "OP", "PP"); //s2398_506
-
+        headRules.addRule("NP", "MO", "ADV"); //s39166_507
 
         backOffRules.put("",
                 Arrays.asList(
@@ -311,11 +311,7 @@ public class FeatureExtractor {
             List<String> idRefs = new ArrayList<String>(2);
             idRefs.add(idref);
             idRefs.add(targetHeadIDref);
-            if(idref.equals("s28271_7")||(targetHeadIDref.equals("s28271_7"))){
-                //TODO: check this!
-                throw new Exception("check calc root for s28271_7 & s28271_8");
 
-            }
             int[] indices = sentence.calculateRootOfSubtree(idRefs);
             String[] ownIdPath = sentence.getNode(idref).getPathFromRoot(indices[1]);
             String[] targetIdPath = sentence.getNode(targetHeadIDref).getPathFromRoot(indices[2]);

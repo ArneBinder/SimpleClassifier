@@ -1,12 +1,14 @@
 package Classifier;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-
-import Classifier.bean.Node;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -14,7 +16,10 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import Classifier.bean.FeatureVector;
 import Classifier.bean.Frame;
+import Classifier.bean.Node;
 import Classifier.bean.Sentence;
+
+import com.google.gson.Gson;
 
 /**
  * Created by Arne on 09.12.13.
@@ -54,7 +59,6 @@ public class Corpus {
         Model model = new Model(featureExtractor);
 
         List<String> frameElementIDRefs;
-        List<String> targetHeads;
         int allreadyProcessed = 0;
         for (Sentence sentence : sentences) {
             try {
@@ -125,12 +129,16 @@ public class Corpus {
         FeatureVector featureVector = null;
         Frame annotationFrame;
 
+        Gson gson = new Gson();
+        String json;
+
         Entry<String, Double> assignedRoleWithProbability;
 
         for (Sentence sentence : sentences) {
 
             featureExtractor.setSentence(sentence);
-
+            System.out.println("Current sentence: " + sentence.getId());
+            
             //List<List<String>> test = sentence.extractTargetIDRefs(model.getTargetLemmata());
             double annotationProbability = 1.0;
             double bestAnnotationProb = 0;
@@ -168,12 +176,18 @@ public class Corpus {
                     } // for
                     if (bestAnnotationProb < annotationProbability) {
                         bestAnnotationProb = annotationProbability;
-                        bestAnnotationFrame = annotationFrame;
+                        
+                        // deep copy
+                        json = gson.toJson(annotationFrame);
+			bestAnnotationFrame = gson.fromJson(json, Frame.class);
                     }
                 } // for targetLemmaIdRef
             } // for targetLemmaIdRefs
 
-            sentence.addFrame(bestAnnotationFrame);
+            //no target word detected
+            if(bestAnnotationFrame != null){
+        	sentence.addFrame(bestAnnotationFrame);
+            }
         }
     }
 

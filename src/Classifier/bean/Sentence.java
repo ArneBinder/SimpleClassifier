@@ -85,24 +85,22 @@ public class Sentence {
 
         boolean abort = false;
         boolean found = true;
+        int[] indices = new int[idRefs.size() + 1];
         int[] result = new int[idRefs.size() + 1];
-
         //depth,indices of pathsFromRoot
         int curDepth = 0;
         while (found && !abort) {
             found = false;
-            result = new int[idRefs.size() + 1];
-            result[0] = curDepth;
-            int[] pathIndex = new int[idRefs.size()];
+            indices = new int[idRefs.size() + 1];
+            indices[0] = curDepth;
 
             int countPointer = 0;
-
             while (!found && !abort) {
-                if (valueExists(result, pathsFromRoot)) {
-                    curIDref = pathsFromRoot[0][result[1]][curDepth];
+                if (valueExists(indices, pathsFromRoot)) {
+                    curIDref = pathsFromRoot[0][indices[1]][curDepth];
                     found = true;
                     for (int idIndex = 1; found && idIndex < idRefs.size(); idIndex++) {
-                        if (!curIDref.equals(pathsFromRoot[idIndex][result[idIndex + 1]][curDepth])) {
+                        if (!curIDref.equals(pathsFromRoot[idIndex][indices[idIndex + 1]][curDepth])) {
                             found = false;
                             break;
                         }
@@ -110,27 +108,29 @@ public class Sentence {
                 }
 
                 if (!found) {
-                    result[countPointer + 1]++;
-                    while (result[countPointer + 1] == pathsFromRoot[countPointer].length) {
-                        result[countPointer + 1] = 0;
+                    indices[countPointer + 1]++;
+                    while (indices[countPointer + 1] == pathsFromRoot[countPointer].length) {
+                        indices[countPointer + 1] = 0;
                         countPointer++;
 
                         if (countPointer == idRefs.size()) {
                             abort = true;
                             break;
                         } else {
-                            result[countPointer + 1]++;
+                            indices[countPointer + 1]++;
                         }
                     }
                     countPointer = 0;
+                }else{
+                    System.arraycopy(indices, 0, result, 0, idRefs.size() + 1);
                 }
             }
 
             if (found)
                 curDepth++;
         }
-        if (result[0] > 0) {
-            result[0]--;
+        if (indices[0] > 0) {
+            //indices[0]--;
         } else {
             throw new Exception("Could not calculate common path for passed idrefs (VROOT not in path)");
         }
@@ -187,6 +187,9 @@ public class Sentence {
     }
 
     public void addFrame(Frame frame) {
+	if(frame == null){
+	    System.err.println("oh no! frame is null");
+	}
         String[] idRefParts;
         for (List<String> fes : frame.getFrameElements().values()) {
             for (String feID : fes) {
