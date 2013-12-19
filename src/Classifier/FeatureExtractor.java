@@ -66,11 +66,11 @@ public class FeatureExtractor {
     }
 
     private Sentence sentence = null;
-    //public String dummy = "";
-    //private static Map<String, List<String>> headPosTags;
-    //private static Map<String, List<String>> headEdges;
+    private static final String roleIdent = FeatureVector.getRoleTypeIdentifier();
+    private static final String splitChar = FeatureVector.getSplitChar();
     private static String[] phrasalCategories = {"AA", "AP", "AVP", "CAC", "CAVP", "CCP", "CH", "CNP", "CO", "CPP", "CS", "CVP", "CVZ", "DL", "ISU", "MPN", "MTA", "NM", "NP", "PP", "QL", "S", "VP", "VZ"};
     private static HeadRules headRules;
+    private static Map<String, List<String>> backOffRules = new HashMap<String, List<String>>();
 
     private static String[] addToPhrasalCat(String cat) {
         String[] temp = new String[phrasalCategories.length + 1];
@@ -209,11 +209,41 @@ public class FeatureExtractor {
         headRules.addRule("VP", "MO", "VVPP"); //s2398_38
         headRules.addRule("VP", "OP", "PP"); //s2398_506
 
+
+        backOffRules.put("",
+                Arrays.asList(
+                        roleIdent + splitChar + "target",
+                        roleIdent + splitChar + "position",
+                        roleIdent + splitChar + "path" + splitChar + "synCat",
+                        roleIdent + splitChar + "head"));
+        backOffRules.put(roleIdent + splitChar + "path" + splitChar + "synCat",
+                Arrays.asList(
+                        roleIdent + splitChar + "path",
+                        roleIdent + splitChar + "synCat"));
     }
 
-    public static final List<String> usedFeatures = Arrays.asList("target", "synCat", "position", "path", "path" + FeatureVector.getSplitChar() + "synCat", "head");
 
+    //used while training: in model.addFeatureVector and model.calculateRelativeFrequenciesPerRole
+    public static final List<String> usedFeatures = Arrays.asList(
+            roleIdent,
+            "target",
+            "synCat",
+            "position",
+            "path",
+            "path" + splitChar + "synCat",
+            "head",
+            roleIdent + splitChar + "target",
+            roleIdent + splitChar + "synCat",
+            roleIdent + splitChar + "position",
+            roleIdent + splitChar + "path",
+            roleIdent + splitChar + "path" + splitChar + "synCat",
+            roleIdent + splitChar + "head");
+
+    //used while classification: in model.classify and
     public List<String> backOffFeature(String concatenatedFeature) {
+        //System.out.println();
+        return backOffRules.get(concatenatedFeature);
+        /*
         List<String> result = new LinkedList<String>();
 
         // starting rule
@@ -232,6 +262,7 @@ public class FeatureExtractor {
         // TODO complete rule set @ P17 @ Jurafsky
 
         return result;
+        */
     }
 
     public List<String> getUsedFeatures() {
@@ -273,39 +304,35 @@ public class FeatureExtractor {
         //TODO: use only first target??
 
 
-        if (sentence.getTarget().getId().equals(idref)) {
+        String targetHeadIDref = sentence.getTarget().getHeadIDref();
+        if (targetHeadIDref.equals(idref)) {
             path = "TARGET";
         } else {
             List<String> idRefs = new ArrayList<String>(2);
             idRefs.add(idref);
-            idRefs.add(sentence.getTarget().getId());
+            idRefs.add(targetHeadIDref);
             int[] indices = sentence.calculateRootOfSubtree(idRefs);
             String[] ownIdPath = sentence.getNode(idref).getPathFromRoot(indices[1]);
-            String[] targetIdPath = sentence.getTarget().getPathFromRoot(indices[2]);
+            String[] targetIdPath = sentence.getNode(targetHeadIDref).getPathFromRoot(indices[2]);
             //TODO: check if correct...
 
             int i = indices[0];//0;
-            //while (i < targetIdPath.length && i < ownIdPath.length && targetIdPath[i].equals(ownIdPath[i])) {
-            //    i++;
-            //}
 
-            for (int j = ownIdPath.length - 1; j >= i; j--) {
+            for (int j = ownIdPath.length - 1; j > i; j--) {
 
                 path += sentence.getNode(ownIdPath[j]).getCategory() + "+";
             }
 
             // nimm die wurzel des subtrees nur mit rein, wenn idref nicht auf (global) root zeigt. sonst fuege Kategorie manuell ein...
-            if (i == 0)
-                path += "VROOT";
-            else {
-                path += sentence.getNode(targetIdPath[i - 1]).getCategory();
-            }
+            //if (i == 0)
+            //    path += "VROOT";
+            //else {
+            path += sentence.getNode(targetIdPath[i]).getCategory();
+            //}
 
-
-            for (int j = i; j < targetIdPath.length; j++) {
+            for (int j = i + 1; j < targetIdPath.length; j++) {
                 path += "-" + sentence.getNode(targetIdPath[j]).getCategory();
             }
-
         }
 
         //System.out.println(sentence.getTargets().get(0).getId() + ", " + idref + ": " + path);

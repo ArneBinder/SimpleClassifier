@@ -152,7 +152,7 @@ public class Sentence {
     }
 
     //TODO: report to the others: targets can be nonTerminals too!!! --> solution (already implemented): take head  (kriechen.xml)
-    public void setTargets(List<String> targetIdRefs) throws Exception {
+    public void setTarget(List<String> targetIdRefs) throws Exception {
         //if(getId().equals("s38580"))
         //  System.out.println("test");
         if (targetIdRefs.size() == 0) {
@@ -172,8 +172,10 @@ public class Sentence {
         } else {
             target = getNode(targetIdRefs.get(0));
         }
+    }
 
-
+    public void setTarget(String targetIdRef) throws Exception {
+        target = getNode(targetIdRef);
     }
 
     public void addTerminal(Node t) {
@@ -206,7 +208,7 @@ public class Sentence {
         this.rootIDref = rootID;
     }
 
-    public List<List<String>> extractTargetIDRefs(Set<String> targetLemmata) {
+    public List<List<String>> extractTargetIDRefs(Set<String> targetLemmata) throws Exception {
         List<List<String>> result = new LinkedList<List<String>>();
         List<String> extractTargetIDRefs;
 
@@ -223,12 +225,23 @@ public class Sentence {
         return result;
     }
 
-    public List<String> extractTargetIDRefs(String targetLemma) {
+    public List<String> extractTargetIDRefs(String targetLemma) throws Exception {
         List<String> targetIDRefs = null;
 
-        for (Node terminal : terminals.values()) {
+        for (Node nonterminal : nonterminals.values()) {
+            if (!nonterminal.getId().equals(rootIDref)) {
+                String headIdRef = nonterminal.getHeadIDref();
+                //System.out.println("XXX" + headIdRef + " " + nonterminal);
+                if (getNode(headIdRef).getAttributes().get("lemma").equals(targetLemma)) {
+                    if (targetIDRefs == null) {
+                        targetIDRefs = new LinkedList<String>();
+                    }
+                    targetIDRefs.add(nonterminal.getId());
+                }
+            }
+        }
 
-            // FIXME: Concatenate terminal lemmas trying to create the targetLemma
+        for (Node terminal : terminals.values()) {
             if (terminal.getAttributes().get("lemma").equals(targetLemma)) {
                 if (targetIDRefs == null) {
                     targetIDRefs = new LinkedList<String>();

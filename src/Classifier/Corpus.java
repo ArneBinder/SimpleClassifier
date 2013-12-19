@@ -2,10 +2,8 @@ package Classifier;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import Classifier.bean.Node;
@@ -60,36 +58,31 @@ public class Corpus {
         int allreadyProcessed = 0;
         for (Sentence sentence : sentences) {
             try {
-                //sentence.enrichInformation();
-
                 featureExtractor.setSentence(sentence);
-               // if(!featureExtractor.dummy.equals("")){
-                //dout.write(featureExtractor.dummy);
-                //System.out.println(featureExtractor.dummy);
-                //}
-                //featureExtractor.enrichInformation();
 
                 // process FrameElements
                 frameElementIDRefs = new ArrayList<String>();
                 for (Frame currentFrame : sentence.getFrames()) {
-                    model.addTargetWord(currentFrame.getName(), currentFrame.getTargetLemma());
-                    
-                    // TODO: wieso targetHead?
-//                    targetHeads = new LinkedList<String>();
-//                    for (String curTargetIDref : currentFrame.getTargetIDs()) {
-//                        String headIDref = sentence.getNode(curTargetIDref).getHeadIDref();
-//                        if (headIDref != null)
-//                            targetHeads.add(sentence.getNode(curTargetIDref).getHeadIDref());
-//                    }
-                    sentence.setTargets(currentFrame.getTargetIDs());
+
+                    sentence.setTarget(currentFrame.getTargetIDs());
                     for (Entry<String, List<String>> frameElement : currentFrame.getFrameElements().entrySet()) {
                         String frameElementName = frameElement.getKey(); // = role
 
                         // get first idref only.. hopefully, there is only one
-                        String frameElementIDRef = frameElement.getValue().get(0);
+                        int[] indices = sentence.calculateRootOfSubtree(frameElement.getValue());
+                        String frameElementIDRef;
+
+                        if(sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1]).length > indices[0])
+                            frameElementIDRef = sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1])[indices[0]];
+                        else
+                            frameElementIDRef = frameElement.getValue().get(0);
+
+                        //frameElementIDRef = sentence.getNode(frameElementIDRef).getHeadIDref();
+                         //frameElement.getValue().get(0);
 
                         FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
-                        model.addFeatureVector(frameElementName, feFeatureVector);
+                        feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
+                        model.addFeatureVector(feFeatureVector);
                         frameElementIDRefs.add(frameElementIDRef);
                     }
 
@@ -97,7 +90,9 @@ public class Corpus {
                     FeatureVector currentVector;
                     for (String id : sentence.getTerminals().keySet()) {
                         if (!frameElementIDRefs.contains(id)) {
+
                             currentVector = featureExtractor.extract(id);
+                            currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
                             model.addFeatureVector(currentVector);
                         }
                     }
@@ -105,20 +100,22 @@ public class Corpus {
                     // process all nonterminal elements
                     for (String id : sentence.getNonterminals().keySet()) {
                         if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id)) {
+
                             currentVector = featureExtractor.extract(id);
+                            currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
                             model.addFeatureVector(currentVector);
                         }
                     }
                 }
 
             } catch (Exception e) {
-                System.out.println("allreadyProcessed: " + allreadyProcessed);
+                System.out.println("alreadyProcessed: " + allreadyProcessed);
                 throw e;
             }
             allreadyProcessed++;
         }
         //dout.close();
-        model.calculateProbabilities();
+        model.calculateRelativeFrequenciesPerRole();
 
         return model;
     }
@@ -134,38 +131,49 @@ public class Corpus {
 
             featureExtractor.setSentence(sentence);
 
+            //List<List<String>> test = sentence.extractTargetIDRefs(model.getTargetLemmata());
+            double annotationProbability = 1.0;
+            double bestAnnotationProb = 0;
+            Frame bestAnnotationFrame = null;
             for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model
-                    .getTargetLemmata().keySet())) {
-        	
-        	for (String targetLemmaIDRef : targetLemmaIDRefs) {
-        	    String targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
-        	    annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
+                    .getTargetLemmata())) {
 
-        	    sentence.setTargets(Arrays.asList(new String[]{targetLemmaIDRef}));
-        	    // classify all terminals
-        	    for (Node terminal : sentence.getTerminals().values()) {
-        		featureVector = featureExtractor.extract(terminal.getId());
-        		
-        		assignedRoleWithProbability = model.classify(featureVector);
-        		annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":" + assignedRoleWithProbability.getValue());
-        	    }
-        	    
-        	    // classify all terminals
-        	    for (Node nonTerminal : sentence.getNonterminals()
-        		    .values()) {
-        		if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
-        		    
-        		    featureVector = featureExtractor.extract(nonTerminal.getId());
-        		    
-        		    assignedRoleWithProbability = model.classify(featureVector);
-        		    annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
-        		}
-        	    } // for
-        	    annotationFrame.setTargetLemma(targetLemma);
-        	    sentence.addFrame(annotationFrame);
-		} // for targetLemmaIdRef
+                for (String targetLemmaIDRef : targetLemmaIDRefs) {
+                    annotationProbability = 1.0;
+                    String targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
+                    annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
+                    annotationFrame.setTargetLemma(targetLemma);
+                    sentence.setTarget(targetLemmaIDRef);
+                    // classify all terminals
+                    for (Node terminal : sentence.getTerminals().values()) {
+
+                        featureVector = featureExtractor.extract(terminal.getId());
+
+                        assignedRoleWithProbability = model.classify(featureVector);
+                        annotationProbability *= assignedRoleWithProbability.getValue();
+                        annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":" + assignedRoleWithProbability.getValue());
+                    }
+
+                    // classify all terminals
+                    for (Node nonTerminal : sentence.getNonterminals()
+                            .values()) {
+                        if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
+
+                            featureVector = featureExtractor.extract(nonTerminal.getId());
+
+                            assignedRoleWithProbability = model.classify(featureVector);
+                            annotationProbability *= assignedRoleWithProbability.getValue();
+                            annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
+                        }
+                    } // for
+                    if(bestAnnotationProb < annotationProbability){
+                        bestAnnotationProb = annotationProbability;
+                        bestAnnotationFrame = annotationFrame;
+                    }
+                } // for targetLemmaIdRef
             } // for targetLemmaIdRefs
 
+            sentence.addFrame(bestAnnotationFrame);
         }
     }
 
@@ -230,6 +238,10 @@ public class Corpus {
         for (Sentence sentence : sentences) {
             System.out.println(sentence.toString());
         }
+    }
+
+    public static int myRandom(int low, int high) {
+        return (int) (Math.random() * (high - low) + low);
     }
 
 }

@@ -2,6 +2,7 @@ package Classifier.bean;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Arne on 09.12.13.
@@ -20,6 +21,10 @@ public class MultiSet<K> {
 			map.put(o,1);
 		}
 	}
+
+    public Set<Map.Entry<K, Integer>> entrySet(){
+        return map.entrySet();
+    }
 
 	public int get(K key){
 		if(map.containsKey(key))

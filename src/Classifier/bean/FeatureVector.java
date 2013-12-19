@@ -6,14 +6,19 @@ import java.util.Map;
 
 public class FeatureVector {
 
-	private static String splitChar = "#";
+	private static final String splitChar = "#";
+    private static final String roleTypeIdentifier = "role";
 	private Map<String, String> features = new HashMap<String, String>();
 
 	public static String getSplitChar() {
 		return splitChar;
 	}
 
-	public Map<String, String> getFilteredPowerSet(List<String> usedFeatures)
+    public static String getRoleTypeIdentifier() {
+        return roleTypeIdentifier;
+    }
+
+    public Map<String, String> getFilteredPowerSet(List<String> usedFeatures)
 			throws Exception {
 		Map<String, String> newFeatures = new HashMap<String, String>();
 		for (String usedFeature : usedFeatures) {
@@ -33,7 +38,7 @@ public class FeatureVector {
 				if (featureValue.isEmpty()) {
 					featureValue = features.get(singleFeatureType);
 				} else {
-					featureValue += "#" + features.get(singleFeatureType);
+					featureValue += splitChar + features.get(singleFeatureType);
 				}
 			} else {
 				throw new Exception("FeatureType: " + featureType
