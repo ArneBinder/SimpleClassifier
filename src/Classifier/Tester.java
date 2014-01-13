@@ -8,9 +8,10 @@ import java.io.File;
 public class Tester {
     public static void main(String[] args) throws Exception {
         if (args.length < 4) {
-            System.out.println("4 arguments needed.");
+            System.out.println("4 arguments (paths) needed: <separatedCorpusFolder> <singleCorpusFile> <modelFile> <annotatedFile>");
             return;
         }
+        
         Corpus corpus = new Corpus();
         System.out.println("read corpus from files in folder: " + args[0]);
         File f = new File(args[0]);

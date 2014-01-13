@@ -6,20 +6,17 @@ public class Sentence {
     private String id;
     private String rootIDref = null;
 
-
     // ID of t > t object
     private Map<String, Node> terminals = new HashMap<String, Node>();
-
     // ID of nt > nt object
     private Map<String, Node> nonterminals = new HashMap<String, Node>();
-
-    //
     //private List<Node> targets = new ArrayList<Node>(3);
     private Node target;
-
     // list of frames
     private List<Frame> frames = new ArrayList<Frame>();
 
+    
+    
     public Sentence(String id) {
         this.setId(id);
     }

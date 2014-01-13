@@ -54,6 +54,10 @@ public class Corpus {
         }
         return null;
     }
+    
+    public List<Sentence> getSentences() {
+	return sentences;
+    }
 
     public Model trainModel() throws Exception {
         Model model = new Model(featureExtractor);

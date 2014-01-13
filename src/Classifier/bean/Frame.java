@@ -16,7 +16,7 @@ public class Frame {
 	private String targetLemma = "";
 	private List<String> targetIDs = new ArrayList<String>();
 
-	// frame name > [idrefs]
+	// frameElement name > [idrefs]
 	private Map<String, List<String>> frameElements = new HashMap<String, List<String>>();
 
 	public Frame(String id, String name) {
