@@ -1,5 +1,5 @@
  # Rollen Annotieren vs Rollen ja/nein? Entscheidung: konkrete Rollen annotieren
- # ein Classifier für alle Prädikate ode separat? Entscheidung: einer für alle
+ # ein Classifier für alle Prädikate oder separat? Entscheidung: einer für alle
  - Grundkorpus auf 10 Rollen einschränken (--> neuen Korpus erstellen) [siehe gdrive/SRL/model-big_statistics.xlsx/roles]
  - apriori-wsk vs keine dummyRole?
  - Features:
