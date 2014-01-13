@@ -12,7 +12,7 @@ import java.util.Map.Entry;
  * Created by Arne on 09.12.13.
  */
 public class Model {
-    private List<String> dummyRoles = Arrays.asList("dummyRole1", "dummyRole2", "dummyRole3", "dummyRole4", "dummyRole5", "dummyRole6", "dummyRole7", "dummyRole8", "dummyRole9", "dummyRole10");//new ArrayList<String>();//"dummy";
+    private List<String> dummyRoles = Arrays.asList("dummyRole");//new ArrayList<String>();//"dummy";
     private double smoothingValue = Math.log(0.000001);
     private static final String modelOutSplitChar = "\t";
 

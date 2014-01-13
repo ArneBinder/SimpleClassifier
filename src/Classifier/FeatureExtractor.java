@@ -527,6 +527,9 @@ public class FeatureExtractor {
                 bestChildRef = edge.getKey();
             }
         }
+		//TODO: fix this hack!!!
+		if(bestChildRef==null)
+			return edges.keySet().iterator().next();
         return bestChildRef;
     }
 

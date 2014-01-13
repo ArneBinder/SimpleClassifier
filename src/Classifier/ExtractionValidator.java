@@ -56,7 +56,7 @@ public class ExtractionValidator {
 
     public ExtractionValidator(String originalCorpusPath, String annotatedCorpusPath, String resultFilePath) throws Exception {
 	originalCorpus.parseFile(new File(originalCorpusPath).getAbsolutePath());
-	originalCorpus.parseFile(new File(annotatedCorpusPath).getAbsolutePath());
+	annotatedCorpus.parseFile(new File(annotatedCorpusPath).getAbsolutePath());
 
 	resultFile = new File(resultFilePath);
     }
