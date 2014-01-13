@@ -18,7 +18,7 @@ public class Tester {
         File[] fileArray = f.listFiles();
         for (File file : fileArray) {
             System.out.println("file: " + file.getName());
-            corpus.parseFile(file.getAbsolutePath());
+            corpus.parseFile(file);
         }
         System.out.println("done. "+corpus.getSentenceCount()+" sentences added.");
 

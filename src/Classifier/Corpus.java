@@ -26,240 +26,270 @@ import com.google.gson.Gson;
  */
 public class Corpus {
     private List<Sentence> sentences;
-    //public BufferedWriter dout;
     private FeatureExtractor featureExtractor;
 
     public FeatureExtractor getFeatureExtractor() {
-        return featureExtractor;
+	return featureExtractor;
     }
 
     public Corpus() {
-//        try{
-//        dout= new BufferedWriter(new FileWriter(new File("dummy.txt")));
-//        }catch (Exception e){
-//
-//        }
-        featureExtractor = new FeatureExtractor();
-        sentences = new LinkedList<Sentence>();
+	featureExtractor = new FeatureExtractor();
+	sentences = new LinkedList<Sentence>();
+    }
+
+    public static Corpus[] splitCorpus(Corpus corpus, int splitCount) {
+	Corpus[] splittedCorpora = new Corpus[splitCount];
+
+	// initialize all corpora
+	for (int i = 0; i < splittedCorpora.length; i++) {
+	    splittedCorpora[i] = new Corpus();
+	}
+	
+	int counter = 0;
+	for (Sentence sentence : corpus.getSentences()) {
+	    splittedCorpora[counter].addSentence(sentence);
+	    counter = (counter+1) % splitCount;
+	}
+	
+	return splittedCorpora;
+    }
+    
+    public static Corpus mergeCorpora(Corpus[] corpora){
+	Corpus mergeCorpus = new Corpus();
+	
+	for (Corpus corpus : corpora) {
+	    if(corpus == null) continue;
+	    mergeCorpus.addSentences(corpus.getSentences());
+	}
+	
+	return mergeCorpus;
     }
 
     public int getSentenceCount() {
-        return sentences.size();
+	return sentences.size();
     }
 
     public Sentence getSentence(String id) {
-        for (Sentence sentence : sentences) {
-            if (sentence.getId().equals(id))
-                return sentence;
-        }
-        return null;
+	for (Sentence sentence : sentences) {
+	    if (sentence.getId().equals(id))
+		return sentence;
+	}
+	return null;
     }
-    
+
     public List<Sentence> getSentences() {
 	return sentences;
     }
+    
+    public void addSentence(Sentence sentence){
+	sentences.add(sentence);
+    }
+    
+    public void addSentences(List<Sentence> sentences){
+	this.sentences.addAll(sentences);
+    }
+    
 
     public Model trainModel() throws Exception {
-        Model model = new Model(featureExtractor);
+	Model model = new Model(featureExtractor);
 
-        List<String> frameElementIDRefs;
-        int allreadyProcessed = 0;
-        for (Sentence sentence : sentences) {
-            try {
-                featureExtractor.setSentence(sentence);
+	List<String> frameElementIDRefs;
+	int allreadyProcessed = 0;
+	for (Sentence sentence : sentences) {
+	    try {
+		featureExtractor.setSentence(sentence);
 
-                // process FrameElements
-                frameElementIDRefs = new ArrayList<String>();
-                for (Frame currentFrame : sentence.getFrames()) {
+		// process FrameElements
+		frameElementIDRefs = new ArrayList<String>();
+		for (Frame currentFrame : sentence.getFrames()) {
 
-                    sentence.setTarget(currentFrame.getTargetIDs());
-                    for (Entry<String, List<String>> frameElement : currentFrame.getFrameElements().entrySet()) {
-                        String frameElementName = frameElement.getKey(); // = role
+		    sentence.setTarget(currentFrame.getTargetIDs());
+		    for (Entry<String, List<String>> frameElement : currentFrame.getFrameElements().entrySet()) {
+			String frameElementName = frameElement.getKey(); // = role
 
-                        int[] indices = sentence.calculateRootOfSubtree(frameElement.getValue());
-                        String frameElementIDRef;
+			int[] indices = sentence.calculateRootOfSubtree(frameElement.getValue());
+			String frameElementIDRef;
 
-                        if (sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1]).length > indices[0])
-                            frameElementIDRef = sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1])[indices[0]];
-                        else
-                            frameElementIDRef = frameElement.getValue().get(0);
+			if (sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1]).length > indices[0])
+			    frameElementIDRef = sentence.getNode(frameElement.getValue().get(0)).getPathsFromRoot().get(indices[1])[indices[0]];
+			else
+			    frameElementIDRef = frameElement.getValue().get(0);
 
-                        //frameElementIDRef = sentence.getNode(frameElementIDRef).getHeadIDref();
-                        //frameElement.getValue().get(0);
-                        if (!frameElementIDRef.equals(sentence.getRootIDref())) {
-                            FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
-                            feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
-                            model.addFeatureVector(feFeatureVector);
-                            frameElementIDRefs.add(frameElementIDRef);
-                        }
-                    }
+			// frameElementIDRef = sentence.getNode(frameElementIDRef).getHeadIDref();
+			// frameElement.getValue().get(0);
+			if (!frameElementIDRef.equals(sentence.getRootIDref())) {
+			    FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
+			    feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
+			    model.addFeatureVector(feFeatureVector);
+			    frameElementIDRefs.add(frameElementIDRef);
+			}
+		    }
 
-                    // process all terminal elements
-                    FeatureVector currentVector;
-                    for (String id : sentence.getTerminals().keySet()) {
-                        if (!frameElementIDRefs.contains(id)) {
+		    // process all terminal elements
+		    FeatureVector currentVector;
+		    for (String id : sentence.getTerminals().keySet()) {
+			if (!frameElementIDRefs.contains(id)) {
 
-                            currentVector = featureExtractor.extract(id);
-                            currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
-                            model.addFeatureVector(currentVector);
-                        }
-                    }
+			    currentVector = featureExtractor.extract(id);
+			    currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
+				    model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
+			    model.addFeatureVector(currentVector);
+			}
+		    }
 
-                    // process all nonterminal elements
-                    for (String id : sentence.getNonterminals().keySet()) {
-                        if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id)) {
+		    // process all nonterminal elements
+		    for (String id : sentence.getNonterminals().keySet()) {
+			if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id)) {
 
-                            currentVector = featureExtractor.extract(id);
-                            currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
-                            model.addFeatureVector(currentVector);
-                        }
-                    }
-                }
+			    currentVector = featureExtractor.extract(id);
+			    currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
+				    model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
+			    model.addFeatureVector(currentVector);
+			}
+		    }
+		}
 
-            } catch (Exception e) {
-                System.out.println("alreadyProcessed: " + allreadyProcessed);
-                throw e;
-            }
-            allreadyProcessed++;
-        }
-        //dout.close();
-        model.calculateRelativeFrequenciesPerRole();
+	    } catch (Exception e) {
+		System.out.println("alreadyProcessed: " + allreadyProcessed);
+		throw e;
+	    }
+	    allreadyProcessed++;
+	}
+	// dout.close();
+	model.calculateRelativeFrequenciesPerRole();
 
-        return model;
+	return model;
     }
 
     public void annotateCorpus(Model model) throws Exception {
 
-        FeatureVector featureVector = null;
-        Frame annotationFrame;
+	FeatureVector featureVector = null;
+	Frame annotationFrame;
 
-        Gson gson = new Gson();
-        String json;
+	Gson gson = new Gson();
+	String json;
 
-        Entry<String, Double> assignedRoleWithProbability;
+	Entry<String, Double> assignedRoleWithProbability;
 
-        for (Sentence sentence : sentences) {
+	for (Sentence sentence : sentences) {
 
-            featureExtractor.setSentence(sentence);
-            System.out.println("Current sentence: " + sentence.getId());
-            
-            //List<List<String>> test = sentence.extractTargetIDRefs(model.getTargetLemmata());
-            double annotationProbability = 1.0;
-            double bestAnnotationProb = 0;
-            Frame bestAnnotationFrame = null;
-            for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model
-                    .getTargetLemmata())) {
+	    featureExtractor.setSentence(sentence);
+	    System.out.println("Current sentence: " + sentence.getId());
 
-                for (String targetLemmaIDRef : targetLemmaIDRefs) {
-                    annotationProbability = 1.0;
-                    String targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
-                    annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
-                    annotationFrame.setTargetLemma(targetLemma);
-                    sentence.setTarget(targetLemmaIDRef);
-                    // classify all terminals
-                    for (Node terminal : sentence.getTerminals().values()) {
+	    // List<List<String>> test = sentence.extractTargetIDRefs(model.getTargetLemmata());
+	    double annotationProbability = 1.0;
+	    double bestAnnotationProb = 0;
+	    Frame bestAnnotationFrame = null;
+	    for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model.getTargetLemmata())) {
 
-                        featureVector = featureExtractor.extract(terminal.getId());
+		for (String targetLemmaIDRef : targetLemmaIDRefs) {
+		    annotationProbability = 1.0;
+		    String targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
+		    annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
+		    annotationFrame.setTargetLemma(targetLemma);
+		    sentence.setTarget(targetLemmaIDRef);
+		    // classify all terminals
+		    for (Node terminal : sentence.getTerminals().values()) {
 
-                        assignedRoleWithProbability = model.classify(featureVector);
-                        annotationProbability *= assignedRoleWithProbability.getValue();
-                        annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":" + assignedRoleWithProbability.getValue());
-                    }
+			featureVector = featureExtractor.extract(terminal.getId());
 
-                    // classify all terminals
-                    for (Node nonTerminal : sentence.getNonterminals()
-                            .values()) {
-                        if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
+			assignedRoleWithProbability = model.classify(featureVector);
+			annotationProbability *= assignedRoleWithProbability.getValue();
+			annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":"
+				+ assignedRoleWithProbability.getValue());
+		    }
 
-                            featureVector = featureExtractor.extract(nonTerminal.getId());
+		    // classify all terminals
+		    for (Node nonTerminal : sentence.getNonterminals().values()) {
+			if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
 
-                            assignedRoleWithProbability = model.classify(featureVector);
-                            annotationProbability *= assignedRoleWithProbability.getValue();
-                            annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":" + assignedRoleWithProbability.getValue());
-                        }
-                    } // for
-                    if (bestAnnotationProb < annotationProbability) {
-                        bestAnnotationProb = annotationProbability;
-                        
-                        // deep copy
-                        json = gson.toJson(annotationFrame);
+			    featureVector = featureExtractor.extract(nonTerminal.getId());
+
+			    assignedRoleWithProbability = model.classify(featureVector);
+			    annotationProbability *= assignedRoleWithProbability.getValue();
+			    annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":"
+				    + assignedRoleWithProbability.getValue());
+			}
+		    } // for
+		    if (bestAnnotationProb < annotationProbability) {
+			bestAnnotationProb = annotationProbability;
+
+			// deep copy
+			json = gson.toJson(annotationFrame);
 			bestAnnotationFrame = gson.fromJson(json, Frame.class);
-                    }
-                } // for targetLemmaIdRef
-            } // for targetLemmaIdRefs
+		    }
+		} // for targetLemmaIdRef
+	    } // for targetLemmaIdRefs
 
-            //no target word detected
-            if(bestAnnotationFrame != null){
-        	sentence.addFrame(bestAnnotationFrame);
-            }
-        }
+	    // no target word detected
+	    if (bestAnnotationFrame != null) {
+		sentence.addFrame(bestAnnotationFrame);
+	    }
+	}
     }
 
     public void deleteAnnotation() {
-        for (Sentence sentence : sentences) {
-            sentence.deleteAnnotation();
-        }
+	for (Sentence sentence : sentences) {
+	    sentence.deleteAnnotation();
+	}
     }
 
     public void writeCorpusToFile(String fileName) throws Exception {
-        BufferedWriter out = new BufferedWriter(new FileWriter(new File(fileName)));
-        out.write("<?xml version='1.0' encoding='UTF-8'?>");
-        out.write("\n<corpus corpusname=\"tagged-corpus\">");
-        out.write("\n\t<head>");
-        out.write("\n\t</head>");
-        out.write("\n\t<body>");
-        for (Sentence sentence : sentences) {
-            out.write(sentence.toString());
-        }
-        out.write("\n\t</body>");
-        out.write("\n</corpus>");
-        out.close();
+	BufferedWriter out = new BufferedWriter(new FileWriter(new File(fileName)));
+	out.write("<?xml version='1.0' encoding='UTF-8'?>");
+	out.write("\n<corpus corpusname=\"tagged-corpus\">");
+	out.write("\n\t<head>");
+	out.write("\n\t</head>");
+	out.write("\n\t<body>");
+	for (Sentence sentence : sentences) {
+	    out.write(sentence.toString());
+	}
+	out.write("\n\t</body>");
+	out.write("\n</corpus>");
+	out.close();
     }
 
-    public void parseFile(String fileName) throws Exception {
+    public void parseFile(File file) throws Exception {
 
-        // InputSource inputSource = null;
-        File file = new File(fileName);
-        if (!file.exists() || !file.isFile()) {
-            throw new Exception(
-                    "Given corpus file does not exist or is no file!");
-        }
-        try {
-            InputSource inputSource = new InputSource(new BufferedReader(
-                    new FileReader(fileName)));
+	// InputSource inputSource = null;
+	if (!file.exists() || !file.isFile()) {
+	    throw new Exception("Given corpus file does not exist or is no file!");
+	}
+	try {
+	    InputSource inputSource = new InputSource(new BufferedReader(new FileReader(file)));
 
-            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+	    XMLReader xmlReader = XMLReaderFactory.createXMLReader();
 
-            XMLParser contentHandler = new XMLParser();
-            xmlReader.setContentHandler(contentHandler);
+	    XMLParser contentHandler = new XMLParser();
+	    xmlReader.setContentHandler(contentHandler);
 
-            xmlReader.parse(inputSource);
+	    xmlReader.parse(inputSource);
 
-            //if sentence is already in corpus --> just add frames TODO: test!
-            for (Sentence NewSentence : contentHandler.getSentences()) {
-                if (sentences.contains(NewSentence)) {
-                    Sentence sentenceInCorpus = getSentence(NewSentence.getId());
-                    for (Frame frame : NewSentence.getFrames()) {
-                        sentenceInCorpus.addFrame(frame);
-                    }
-                } else {
-                    sentences.add(NewSentence);
-                }
-            }
+	    // if sentence is already in corpus --> just add frames TODO: test!
+	    for (Sentence NewSentence : contentHandler.getSentences()) {
+		if (sentences.contains(NewSentence)) {
+		    Sentence sentenceInCorpus = getSentence(NewSentence.getId());
+		    for (Frame frame : NewSentence.getFrames()) {
+			sentenceInCorpus.addFrame(frame);
+		    }
+		} else {
+		    sentences.add(NewSentence);
+		}
+	    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
     }
 
     public void printSentences() {
-        for (Sentence sentence : sentences) {
-            System.out.println(sentence.toString());
-        }
+	for (Sentence sentence : sentences) {
+	    System.out.println(sentence.toString());
+	}
     }
 
     public static int myRandom(int low, int high) {
-        return (int) (Math.random() * (high - low) + low);
+	return (int) (Math.random() * (high - low) + low);
     }
 
 }
