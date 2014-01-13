@@ -2,11 +2,7 @@ package Classifier.bean;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Frame {
 
@@ -72,6 +68,20 @@ public class Frame {
 		}
 		list.add(idref);
 		frameElements.put(frameElementName, list);
+	}
+
+	public boolean filter(List<String> allowedFrameElements){
+		boolean result = false;
+
+		Iterator<String> iter = frameElements.keySet().iterator();
+		while (iter.hasNext()) {
+			if(allowedFrameElements.contains(iter.next())){
+				result = true;
+			}else{
+				iter.remove();
+			}
+		}
+		return result;
 	}
 
 	public String getId() {

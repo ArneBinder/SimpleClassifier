@@ -257,6 +257,20 @@ public class Sentence {
         frames = new ArrayList<Frame>();
     }
 
+	public boolean filter(List<String> allowedFrameElements){
+		boolean result = false;
+
+		Iterator<Frame> iter = frames.iterator();
+		while (iter.hasNext()) {
+			if(iter.next().filter(allowedFrameElements)){
+				result = true;
+			}else{
+				iter.remove();
+			}
+		}
+		return result;
+	}
+
     // get / set
 
     public Map<String, Node> getTerminals() {

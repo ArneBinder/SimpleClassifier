@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -287,6 +288,22 @@ public class Corpus {
 	    System.out.println(sentence.toString());
 	}
     }
+
+	public void filter(List<String> allowedFrameElements){
+		Iterator<Sentence> iter = sentences.iterator();
+		while (iter.hasNext()) {
+			if(!iter.next().filter(allowedFrameElements)){
+				iter.remove();
+			}
+		}
+
+
+		//for(Sentence sentence: sentences){
+		//	if(!sentence.filter(allowedFrameElements)){
+		//		sentences.remove(sentence);
+		//	}
+		//}
+	}
 
     public static int myRandom(int low, int high) {
 	return (int) (Math.random() * (high - low) + low);

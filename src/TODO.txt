@@ -1,15 +1,16 @@
  # Rollen Annotieren vs Rollen ja/nein? Entscheidung: konkrete Rollen annotieren
  # ein Classifier für alle Prädikate oder separat? Entscheidung: einer für alle
- - Grundkorpus auf 10 Rollen einschränken (--> neuen Korpus erstellen) [siehe gdrive/SRL/model-big_statistics.xlsx/roles]
- - apriori-wsk vs keine dummyRole?
- - Features:
+ # Grundkorpus auf 10 Rollen einschränken (--> neuen Korpus erstellen) [siehe gdrive/SRL/model-big_statistics.xlsx/roles]
+ - apriori-wsk vs keine dummyRole? ARNE
+ - Features: ARNE und ENRIQUE
     + Abstraktion der Phrasenkategorien und der POS-Tags möglich
     + sowie die Zusammenfassung verschiedener Pfad-Elemente
     + head: rules ausdünnen & evtl. Konstituenten ohne Head einführen und verwerfen
     +
- - Validator fertig stellen
- - validate: was werten wir aus?
- - Crossvalidator bauen
+ - Validator fertig stellen ARNE
+ # validate: was werten wir aus? ausschließlich single frameElements
+ # Crossvalidator bauen
+
 
 
 
