@@ -8,6 +8,7 @@
     + head: rules ausdünnen & evtl. Konstituenten ohne Head einführen und verwerfen
     +
  - Validator fertig stellen
+ - validate: was werten wir aus?
  - Crossvalidator bauen
 
 
