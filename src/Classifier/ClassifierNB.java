@@ -70,6 +70,7 @@ public class ClassifierNB {
 
 
     private void startClassifying(String modelFileName, String annotatedCorpusFileName) throws Exception {
+		double startTime = System.currentTimeMillis();
         Model model = new Model(corpus.getFeatureExtractor());
         System.out.print("read model from file: " + modelFileName + "... ");
         model.readModelFromFile(modelFileName);
@@ -79,7 +80,7 @@ public class ClassifierNB {
         System.out.println("done.");
         System.out.print("write annotated corpus to file: " + annotatedCorpusFileName + "... ");
         corpus.writeCorpusToFile(annotatedCorpusFileName);
-        System.out.println("done");
+        System.out.println("done. "+(startTime-System.currentTimeMillis())+" ms");
 
     }
 
