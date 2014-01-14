@@ -13,8 +13,8 @@ public class Frame {
 	private List<String> targetIDs = new ArrayList<String>();
 
 	// frameElement name > [idrefs]
-	private Map<String, List<String>> frameElements = new HashMap<String, List<String>>();
-	//private Set<FrameElement> frameElements = new HashSet<FrameElement>;
+	//private Map<String, List<String>> frameElements = new HashMap<String, List<String>>();
+	private Map<String, FrameElement> frameElements = new HashMap<String, FrameElement>();
 
 	public Frame(String id, String name) {
 		this.setId(id);
@@ -30,12 +30,8 @@ public class Frame {
 		}
 		result += "\n\t\t\t\t\t\t</target>";
 
-		for(Map.Entry<String,List<String>> frameElement: frameElements.entrySet()){
-			result += "\n\t\t\t\t\t\t<fe name=\""+StringEscapeUtils.escapeXml(frameElement.getKey())+"\">";
-			for(String idref: frameElement.getValue()){
-				result += "\n\t\t\t\t\t\t\t<fenode idref=\""+idref+"\"/>";
-			}
-			result += "\n\t\t\t\t\t\t</fe>";
+		for(FrameElement frameElement: frameElements.values()){
+			result += frameElement;
 		}
 
 		result += "\n\t\t\t\t\t</frame>";
@@ -46,9 +42,9 @@ public class Frame {
 	}
 
 
-	public Set<String> getFrameElementNames() {
-		return frameElements.keySet();
-	}
+	//public Set<String> getFrameElementNames() {
+	//	return frameElements.keySet();
+	//}
 
 	public void setTarget(String lemma) {
 		this.setTargetLemma(lemma);
@@ -58,17 +54,29 @@ public class Frame {
 		targetIDs.add(idref);
 	}
 
-	public void addFrameElement(String frameElementName) {
-		frameElements.put(frameElementName, new ArrayList<String>());
+	public void addFrameElement(FrameElement frameElement){
+		frameElements.put(frameElement.getName(),frameElement);
+	}
+
+	public void addNewFrameElement(String frameElementName) {
+		frameElements.put(frameElementName, new FrameElement(frameElementName));
 	}
 
 	public void addFrameElementWithIDRef(String frameElementName, String idref) {
-		List<String> list = getFrameElements().get(frameElementName);
-		if (list == null) {
-			list = new ArrayList<String>();
+		//TODO: check
+		FrameElement frameElement = frameElements.get(frameElementName);
+		if(frameElement==null){
+			frameElement = new FrameElement(frameElementName);
 		}
-		list.add(idref);
-		frameElements.put(frameElementName, list);
+		frameElement.addIdRef(idref);
+		frameElements.put(frameElementName, frameElement);
+
+		//List<String> list = getFrameElements().get(frameElementName);
+		//if (list == null) {
+		//	list = new ArrayList<String>();
+		//}
+		//list.add(idref);
+		//frameElements.put(frameElementName, list);
 	}
 
 	public boolean filter(List<String> allowedFrameElements){
@@ -117,12 +125,15 @@ public class Frame {
 		this.targetIDs = targetIDs;
 	}
 
-	public void setFrameElements(Map<String, List<String>> frameElements) {
-		this.frameElements = frameElements;
-	}
+	//public void setFrameElements(Map<String, List<String>> frameElements) {
+	//	this.frameElements = frameElements;
+	//}
 
-	public Map<String, List<String>> getFrameElements() {
-		return frameElements;
+	public Collection<FrameElement> getFrameElements() {
+		return frameElements.values();
+	}
+	public FrameElement getFrameElement(String frameElementName){
+		return frameElements.get(frameElementName);
 	}
 
 	//public List<String> getFrameElementIDrefs(String frameElement){ return frameElements.get(frameElement);	}

@@ -94,7 +94,7 @@ public class XMLParser extends DefaultHandler {
 			if (localName.equals("fe") && topElement.equals("frame")) {
 				elements.push(localName);
 				curFEName = attributes.getValue("name");
-				curFrame.addFrameElement(curFEName);
+				curFrame.addNewFrameElement(curFEName);
 			}
 
 			if (localName.equals("fenode") && topElement.equals("target")) {

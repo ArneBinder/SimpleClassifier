@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import Classifier.bean.FrameElement;
 import org.apache.commons.lang3.ArrayUtils;
 
 import Classifier.bean.Frame;
@@ -164,12 +165,12 @@ public class ExtractionValidator {
 				// TODO: compare
 				// check if all FEs are found...
 				for (Frame origFrame : originalFrames) {
-					for (Map.Entry<String, List<String>> origFrameElement : origFrame.getFrameElements().entrySet())
-						for (String origIDref : origFrameElement.getValue()) {
+					for (FrameElement origFrameElement : origFrame.getFrameElements())
+						for (String origIDref : origFrameElement.getIdrefs()) {
 							boolean foundFE = false;
 							for (Frame annotFrame : annotatedFrames) {
-								List<String> annotIDrefs = annotFrame.getFrameElements().get(origFrameElement.getKey());
-								if (annotIDrefs != null && annotIDrefs.contains(origIDref)) {
+								FrameElement matchingAnnotFE = annotFrame.getFrameElement(origFrameElement.getName());
+								if (matchingAnnotFE != null && matchingAnnotFE.getIdrefs().contains(origIDref)) {
 									foundFE = true;
 									break;
 								}
@@ -185,14 +186,14 @@ public class ExtractionValidator {
 
 				// check if all FEs which are found are correct...
 				for (Frame annotFrame : annotatedFrames) {
-					for (Map.Entry<String, List<String>> annotFrameElement : annotFrame.getFrameElements().entrySet())
+					for (FrameElement annotFrameElement : annotFrame.getFrameElements())
 						// shouldnt be a dummy...
-						if (!annotFrameElement.getKey().equals("dummyRole")) {
-							for (String annotIDref : annotFrameElement.getValue()) {
+						if (!annotFrameElement.getName().equals("dummyRole")) {
+							for (String annotIDref : annotFrameElement.getIdrefs()) {
 								boolean foundFE = false;
 								for (Frame origFrame : originalFrames) {
-									List<String> origIDrefs = origFrame.getFrameElements().get(annotFrameElement.getKey());
-									if (origIDrefs != null && origIDrefs.contains(annotIDref)) {
+									FrameElement matchingOrigFE = origFrame.getFrameElement(annotFrameElement.getName());
+									if (matchingOrigFE != null && matchingOrigFE.getIdrefs().contains(annotIDref)) {
 										foundFE = true;
 										break;
 									}
