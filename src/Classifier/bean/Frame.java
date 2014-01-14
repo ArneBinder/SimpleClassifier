@@ -14,6 +14,7 @@ public class Frame {
 
 	// frameElement name > [idrefs]
 	private Map<String, List<String>> frameElements = new HashMap<String, List<String>>();
+	//private Set<FrameElement> frameElements = new HashSet<FrameElement>;
 
 	public Frame(String id, String name) {
 		this.setId(id);
@@ -123,4 +124,6 @@ public class Frame {
 	public Map<String, List<String>> getFrameElements() {
 		return frameElements;
 	}
+
+	//public List<String> getFrameElementIDrefs(String frameElement){ return frameElements.get(frameElement);	}
 }

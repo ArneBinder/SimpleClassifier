@@ -22,6 +22,14 @@ public class MultiSet<K> {
 		}
 	}
 
+	public void add(K o, int value){
+		if(map.containsKey(o)){
+			map.put(o,map.get(o)+value);
+		}else{
+			map.put(o,value);
+		}
+	}
+
     public Set<Map.Entry<K, Integer>> entrySet(){
         return map.entrySet();
     }
@@ -31,5 +39,9 @@ public class MultiSet<K> {
 			return map.get(key);
 		else
 			return 0;
+	}
+
+	public Set<K> getSet(){
+		return map.keySet();
 	}
 }

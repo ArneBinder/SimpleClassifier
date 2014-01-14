@@ -12,7 +12,7 @@ import java.util.Map.Entry;
  * Created by Arne on 09.12.13.
  */
 public class Model {
-    private List<String> dummyRoles = Arrays.asList("dummyRole");//new ArrayList<String>();//"dummy";
+    private static List<String> dummyRoles = Arrays.asList("dummyRole1","dummyRole2","dummyRole3","dummyRole4","dummyRole5","dummyRole6","dummyRole7","dummyRole8","dummyRole9","dummyRole10");//new ArrayList<String>();//"dummy";
     private double smoothingValue = Math.log(0.000001);
     private static final String modelOutSplitChar = "\t";
 
@@ -33,13 +33,13 @@ public class Model {
         this.featureExtractor = featureExtractor;
     }
 
-    public List<String> getDummyRoles() {
+    public static List<String> getDummyRoles() {
         return dummyRoles;
     }
 
     public Set<String> getTargetLemmata() {
 
-        return featureValueRelativeRoleFrequency.get("target").keySet();
+        return featureValueFrequency.get("target").getSet();
     }
 /*
    public void addTargetWord(String frameName, String targetWord) {
@@ -249,6 +249,7 @@ public class Model {
         //read featureValueRelativeRoleFrequency
         in.readLine();
         featureValueRelativeRoleFrequency = new HashMap<String, Map<String, Double>>();
+		featureValueFrequency = new HashMap<String, MultiSet<String>>();
         String line = in.readLine();
         String[] lineParts;
         String[] lastLineParts = new String[2];
@@ -256,10 +257,11 @@ public class Model {
             lineParts = line.split(modelOutSplitChar);
             if (!lineParts[0].equals(lastLineParts[0])) {
                 featureValueRelativeRoleFrequency.put(lineParts[0], new HashMap<String, Double>());
+				featureValueFrequency.put(lineParts[0], new MultiSet<String>());
                 lastLineParts[0] = lineParts[0];
             }
             featureValueRelativeRoleFrequency.get(lineParts[0]).put(lineParts[1], Math.log(Double.parseDouble(lineParts[3])));
-
+			featureValueFrequency.get(lineParts[0]).add(lineParts[1], Integer.parseInt(lineParts[2]));
             line = in.readLine();
         }
         in.close();

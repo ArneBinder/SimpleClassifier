@@ -2,7 +2,7 @@ package Classifier.bean;
 
 import java.util.*;
 
-public class Sentence {
+public class Sentence implements Comparable<Sentence> {
     private String id;
     private String rootIDref = null;
 
@@ -27,6 +27,11 @@ public class Sentence {
             return false;
         return ((Sentence) obj).getId().equals(getId());
     }
+
+	@Override
+	public int compareTo(Sentence o) {
+		return id.compareTo(o.getId());
+	}
 
     public String getRootIDref() {
         return rootIDref;
