@@ -33,7 +33,11 @@ public class Model {
         this.featureExtractor = featureExtractor;
     }
 
-    public static List<String> getDummyRoles() {
+	public Map<String, MultiSet<String>> getFeatureValueFrequency() {
+		return featureValueFrequency;
+	}
+
+	public static List<String> getDummyRoles() {
         return dummyRoles;
     }
 
@@ -65,6 +69,7 @@ public class Model {
     public void addFeatureVector(FeatureVector featureVector) throws Exception {
         for (Entry<String, String> pair : featureVector.getFilteredPowerSet(featureExtractor.getUsedFeatures()).entrySet()) {
             incCount(pair.getKey(), pair.getValue());
+			incCount("all", "all");
         }
     }
 
