@@ -95,6 +95,7 @@ public class Corpus {
 		int allreadyProcessed = 0;
 		for (Sentence sentence : sentences) {
 			try {
+				sentence.enrichInformation();
 				featureExtractor.setSentence(sentence);
 
 				// process FrameElements
@@ -172,7 +173,7 @@ public class Corpus {
 		Entry<String, Double> assignedRoleWithProbability;
 
 		for (Sentence sentence : sentences) {
-
+			sentence.enrichInformation();
 			featureExtractor.setSentence(sentence);
 			//System.out.println("Current sentence: " + sentence.getId());
 

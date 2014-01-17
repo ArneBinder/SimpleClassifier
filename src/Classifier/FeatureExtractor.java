@@ -278,7 +278,7 @@ public class FeatureExtractor {
     public void setSentence(Sentence s) throws Exception {
         this.sentence = s;
         //dummy = "";
-        enrichInformation();
+        //enrichInformation();
     }
 
     public FeatureVector extract(String idref)
@@ -361,7 +361,7 @@ public class FeatureExtractor {
 		 */
         int targetFirstPos = sentence.getTarget().getFirstWordPos();
         int targetLastPos = sentence.getTarget().getLastWordPos();
-        int ownPos = getPosFromID(sentence.getNode(idref).getHeadIDref());
+        int ownPos = Sentence.getPosFromID(sentence.getNode(idref).getHeadIDref());
 
 
         if (targetFirstPos != targetLastPos && ownPos <= targetFirstPos)
@@ -400,149 +400,24 @@ public class FeatureExtractor {
         return targetLemma;
     }
 
-    // sets following values of all Nodes:
-    //  - parent
-    //  - pathFromRoot
-    //  - firstWordPos
-    //  - lastWordPos
-    //  - headIDref
-    private Map.Entry<Integer, Integer> traverseTree(String curIDRef, ArrayList<String> pathFromRoot) throws Exception {
-        String parentIdRef = "";
-        Node curNode = sentence.getNode(curIDRef);
-        if (curNode.getHeadIDref() == null) {
-            Node newHead = calculateHeadWord(Arrays.asList(curIDRef));
-            if (newHead != null)
-                curNode.setHeadIDref(newHead.getId());
-        }
-        if (pathFromRoot.size() > 0)
-            parentIdRef = pathFromRoot.get(pathFromRoot.size() - 1);
-        curNode.addPathFromRoot(pathFromRoot);
-        if (pathFromRoot.size() > 0)
-            curNode.addParentIDref(parentIdRef);
-
-        Map.Entry<Integer, Integer> lastFirstIDref;
-
-        if (curNode.isTerminal()) {
-            //pathFromRoot.add(curIDRef);
-            lastFirstIDref = new AbstractMap.SimpleEntry<Integer, Integer>(getPosFromID(curIDRef), getPosFromID(curIDRef));
-        } else {
-
-            int firstPos = Integer.MAX_VALUE;
-            int lastPos = 0;
-            pathFromRoot.add(curIDRef);
-            for (String childIdRef : curNode.getEdges().keySet()) {
-                lastFirstIDref = traverseTree(childIdRef, (ArrayList<String>) pathFromRoot.clone());
-                if (lastFirstIDref.getKey() < firstPos)
-                    firstPos = lastFirstIDref.getKey();
-                if (lastFirstIDref.getValue() > lastPos)
-                    lastPos = lastFirstIDref.getValue();
-            }
-
-            curNode.setFirstWordPos(firstPos);
-            curNode.setLastWordPos(lastPos);
-
-            lastFirstIDref = new AbstractMap.SimpleEntry<Integer, Integer>(firstPos, lastPos);
-        }
-        return lastFirstIDref;
-    }
-
-    private int getPosFromID(String idRef) {
-        String[] temp = new String[0];
-        try {
-            temp = idRef.split("_");
-            Integer.parseInt(temp[temp.length - 1]);
-        } catch (Exception e) {
-            System.out.println(idRef);
-        }
-        return Integer.parseInt(temp[temp.length - 1]);
-    }
-
-    public Node calculateHeadWord(List<String> idrefs) throws Exception {
-        Collections.sort(idrefs);
-        //if(idrefs.contains("s21270_1"))
-        //  System.out.println("test");
-        if (idrefs.get(0).equals(sentence.getRootIDref()) && !sentence.getNode(sentence.getRootIDref()).isTerminal() && sentence.getNode(sentence.getRootIDref()).getCategory().equals("VROOT"))
-            return null;
-
-//        if(idrefs.contains("s5142_509")){
-//            System.out.println("TEST");
-//        }
-        Node curNode;
-        List<String> newIdRefs = new ArrayList<String>(40);
-        for (String idref : idrefs) {
-            curNode = sentence.getNode(idref);
-            if (curNode.isTerminal()) {
-                curNode.setHeadIDref(curNode.getId());
-                return curNode;
-            } else {
-                // if just one child --> take this is as head
-                if (curNode.getEdges().size() == 1) {
-                    for (String childIdRef : curNode.getEdges().keySet()) {
-                        Node curHead = calculateHeadWord(Arrays.asList(childIdRef));
-                        if (curHead != null) {
-                            curNode.setHeadIDref(curHead.getId());
-                            return curHead;
-                        } else {
-                            throw new Exception(" the sole child of the node (idref: " + idref + ") contains no head");
-                        }
-                    }
-                } else if (curNode.getEdges().values().contains("HD")) {
-                    //find idref for HD-edge
-                    for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
-                        if (edge.getValue().equals("HD")) {
-                            Node curHead = calculateHeadWord(Arrays.asList(edge.getKey()));
-                            if (curHead != null) {
-                                curNode.setHeadIDref(curHead.getId());
-                                return curHead;
-                            } else {
-                                throw new Exception("HD-edge (idref: " + edge.getKey() + ") contains no head");
-                            }
-                        }
-                    }
-                } else {
-                    String curCat = curNode.getCategory();
-                    String directHead = chooseHeadChild(curCat, curNode.getEdges());
-                    if (directHead != null) {
-                        newIdRefs.add(directHead);
-                    } else {
-                        throw new Exception("no head-edge or no head-pos-tag for category " + curCat + " (for idref: " + curNode.getId() + ")");
-                    }
-                }
-            }
-        }
-        if (newIdRefs.isEmpty()) {
-            if (!idrefs.contains(sentence.getRootIDref())) {
-                throw new Exception("no head found for idrefs: " + idrefs + "\n" + sentence.getNode(idrefs.get(0)));
-            }
-            // TODO: Throw
-            //throw new Exception("no head word found for: "+idrefs);
-            return null;
-        }
-        return calculateHeadWord(newIdRefs);
-    }
-
-    private String chooseHeadChild(String parentCategory, Map<String, String> edges) throws Exception {
-        //smaller is better!
-        int bestEdgeQuality = Integer.MAX_VALUE;
-        String bestChildRef = null;
-        int curEdgeQuality;
-        for (Map.Entry<String, String> edge : edges.entrySet()) {
-            curEdgeQuality = headRules.getHeadRulePriority(parentCategory, edge.getValue(), sentence.getNode(edge.getKey()).getCategory());
-            if (bestEdgeQuality > curEdgeQuality) {
-                bestEdgeQuality = curEdgeQuality;
-                bestChildRef = edge.getKey();
-            }
-        }
+	public static String chooseHeadChild(String parentCategory, Map<String, String> edges, Sentence sentence) throws Exception {
+		//smaller is better!
+		int bestEdgeQuality = Integer.MAX_VALUE;
+		String bestChildRef = null;
+		int curEdgeQuality;
+		for (Map.Entry<String, String> edge : edges.entrySet()) {
+			curEdgeQuality = headRules.getHeadRulePriority(parentCategory, edge.getValue(), sentence.getNode(edge.getKey()).getCategory());
+			if (bestEdgeQuality > curEdgeQuality) {
+				bestEdgeQuality = curEdgeQuality;
+				bestChildRef = edge.getKey();
+			}
+		}
 		//TODO: fix this hack!!!
 		if(bestChildRef==null)
 			return edges.keySet().iterator().next();
-        return bestChildRef;
-    }
-
-    public void enrichInformation() throws Exception {
-        traverseTree(sentence.getRootIDref(), new ArrayList<String>(30));
+		return bestChildRef;
+	}
 
 
-    }
 
 }
