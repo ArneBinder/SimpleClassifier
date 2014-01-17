@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 public class Corpus {
 	private List<Sentence> sentences;
 	private FeatureExtractor featureExtractor;
+	private static double threshold = 0.001;
 
 	public FeatureExtractor getFeatureExtractor() {
 		return featureExtractor;
@@ -122,6 +123,7 @@ public class Corpus {
 						}
 					}
 
+					/*
 					// process all terminal elements
 					FeatureVector currentVector;
 					for (String id : sentence.getTerminals().keySet()) {
@@ -144,6 +146,7 @@ public class Corpus {
 							model.addFeatureVector(currentVector);
 						}
 					}
+					*/
 				}
 
 			} catch (Exception e) {
@@ -180,59 +183,66 @@ public class Corpus {
 			for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model.getTargetLemmata())) {
 
 				for (String targetLemmaIDRef : targetLemmaIDRefs) {
-					annotationProbability = 1.0;
+					//annotationProbability = 0.0;
 					Node targetNode = sentence.getNode(targetLemmaIDRef);
-					String targetLemma;
-					if (targetNode.isTerminal()) {
-						targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
-					} else {
-						targetLemma = sentence.getNode(targetNode.getHeadIDref()).getAttributes().get("lemma");
-					}
-					annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
-					annotationFrame.setTargetLemma(targetLemma);
-					sentence.setTarget(targetLemmaIDRef);
-					// classify all terminals
-					for (Node terminal : sentence.getTerminals().values()) {
-
-						featureVector = featureExtractor.extract(terminal.getId());
-
-						assignedRoleWithProbability = model.classify(featureVector);
-						annotationProbability *= assignedRoleWithProbability.getValue();
-						FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
-						if (frameElement == null) {
-							frameElement = new FrameElement(assignedRoleWithProbability.getKey());
-							annotationFrame.addFrameElement(frameElement);
+					if (targetNode.getHeadIDref() != null) {
+						annotationProbability = 1.0;
+						String targetLemma;
+						if (targetNode.isTerminal()) {
+							targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
+						} else {
+							targetLemma = sentence.getNode(targetNode.getHeadIDref()).getAttributes().get("lemma");
 						}
-						frameElement.addIdRef(terminal.getId(), assignedRoleWithProbability.getValue());
+						annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
+						annotationFrame.setTargetLemma(targetLemma);
+						sentence.setTarget(targetLemmaIDRef);
+						// classify all terminals
+						for (Node terminal : sentence.getTerminals().values()) {
+							if (terminal.getHeadIDref() != null) {
+								featureVector = featureExtractor.extract(terminal.getId());
 
-						//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":"
-						//		+ assignedRoleWithProbability.getValue());
-					}
-
-					// classify all terminals
-					for (Node nonTerminal : sentence.getNonterminals().values()) {
-						if (!sentence.getRootIDref().equals(nonTerminal.getId())) {
-
-							featureVector = featureExtractor.extract(nonTerminal.getId());
-
-							assignedRoleWithProbability = model.classify(featureVector);
-							annotationProbability *= assignedRoleWithProbability.getValue();
-							FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
-							if (frameElement == null) {
-								frameElement = new FrameElement(assignedRoleWithProbability.getKey());
-								annotationFrame.addFrameElement(frameElement);
+								assignedRoleWithProbability = model.classify(featureVector);
+								annotationProbability *= assignedRoleWithProbability.getValue();
+								if (assignedRoleWithProbability.getValue() > threshold) {
+									FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
+									if (frameElement == null) {
+										frameElement = new FrameElement(assignedRoleWithProbability.getKey());
+										annotationFrame.addFrameElement(frameElement);
+									}
+									frameElement.addIdRef(terminal.getId(), assignedRoleWithProbability.getValue());
+								}
+								//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":"
+								//		+ assignedRoleWithProbability.getValue());
 							}
-							frameElement.addIdRef(nonTerminal.getId(), assignedRoleWithProbability.getValue());
-							//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":"
-							//		+ assignedRoleWithProbability.getValue());
 						}
-					} // for
-					if (bestAnnotationProb < annotationProbability) {
-						bestAnnotationProb = annotationProbability;
 
-						// deep copy
-						json = gson.toJson(annotationFrame);
-						bestAnnotationFrame = gson.fromJson(json, Frame.class);
+						// classify all terminals
+						for (Node nonTerminal : sentence.getNonterminals().values()) {
+							if (!sentence.getRootIDref().equals(nonTerminal.getId()) && nonTerminal.getHeadIDref() != null) {
+
+								featureVector = featureExtractor.extract(nonTerminal.getId());
+
+								assignedRoleWithProbability = model.classify(featureVector);
+								annotationProbability *= assignedRoleWithProbability.getValue();
+								if (assignedRoleWithProbability.getValue() > threshold) {
+									FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
+									if (frameElement == null) {
+										frameElement = new FrameElement(assignedRoleWithProbability.getKey());
+										annotationFrame.addFrameElement(frameElement);
+									}
+									frameElement.addIdRef(nonTerminal.getId(), assignedRoleWithProbability.getValue());
+									//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":"
+									//		+ assignedRoleWithProbability.getValue());
+								}
+							}
+						} // for
+						if (bestAnnotationProb < annotationProbability) {
+							bestAnnotationProb = annotationProbability;
+
+							// deep copy
+							json = gson.toJson(annotationFrame);
+							bestAnnotationFrame = gson.fromJson(json, Frame.class);
+						}
 					}
 				} // for targetLemmaIdRef
 			} // for targetLemmaIdRefs

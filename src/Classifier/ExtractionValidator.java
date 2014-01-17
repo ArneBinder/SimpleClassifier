@@ -85,6 +85,7 @@ public class ExtractionValidator {
 
 	public void performCrossValidation(int crossValidationCount) throws Exception {
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
+		double fmeasureSum = 0;
 
 		String folderName = new Date().toString().replace(":", "-");
 		File currentCrossValidationFolder = new File(resultFolder.getAbsolutePath() + File.separatorChar + folderName);
@@ -106,7 +107,7 @@ public class ExtractionValidator {
 			trainCorpus = new Corpus();
 
 			for (int j = 0; j < crossValidationCount; j++) {
-				if (j != i || crossValidationCount==1) {
+				if (j != i || crossValidationCount == 1) {
 					trainCorpus.addSentences(splittedCorpora[j].getSentences());
 					//sourceCorpora = ArrayUtils.addAll(sourceCorpora, splittedCorpora[j]);
 				}
@@ -118,29 +119,36 @@ public class ExtractionValidator {
 			annotateCorpus.deleteAnnotation();
 
 			//try {
-				System.out.println("--- -- Start training and writing model " + (i + 1) + " ---");
-				Model model = trainCorpus.trainModel();
-				model.writeModelToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldModel" + (i + 1) + ".txt");
-				System.out.println("--- -- Finished training and writing model " + (i + 1) + " ---");
+			System.out.println("--- -- Start training and writing model " + (i + 1) + " ---");
+			Model model = trainCorpus.trainModel();
+			model.writeModelToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldModel" + (i + 1) + ".txt");
+			System.out.println("--- -- Finished training and writing model " + (i + 1) + " ---");
 
-				System.out.println("--- -- Start annotating and writing corpus " + (i + 1) + " ---");
-				annotateCorpus.annotateCorpus(model);
-				annotateCorpus.writeCorpusToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldCorpus" + (i + 1) + ".xml");
-				System.out.println("--- -- Finishing annotating and writing corpus " + (i + 1) + "---");
+			System.out.println("--- -- Start annotating and writing corpus " + (i + 1) + " ---");
+			annotateCorpus.annotateCorpus(model);
+			annotateCorpus.writeCorpusToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldCorpus" + (i + 1) + ".xml");
+			System.out.println("--- -- Finishing annotating and writing corpus " + (i + 1) + "---");
 
-				System.out.println("--- -- Start validating annotated corpus " + (i + 1) + " and writing result ---");
-				long[] result = validate(splittedCorpora[i], annotateCorpus);
-				System.out.println("--- -- Finished validating annotated corpus " + (i + 1) + " ---");
+			System.out.println("--- -- Start validating annotated corpus " + (i + 1) + " and writing result ---");
+			long[] result = validate(splittedCorpora[i], annotateCorpus);
+			double precision = result[idxTruePositiveFrameElementCount] / (double) result[idxClassyFrameElementCount];
+			double recall = result[idxTruePositiveFrameElementCount] / (double) result[idxGoldFrameElementCount];
+			double fmeasure = 2.0 * precision * recall / (precision + recall);
+			fmeasureSum +=fmeasure;
+			System.out.println("--- -- Finished validating annotated corpus " + (i + 1) + " ---");
 
-				System.out.println("--- -- Start writing result for fold " + (i + 1) + " ---");
-				writeResult(result);
-				System.out.println("--- -- Finished writing result for fold " + (i + 1) + " ---");
+			System.out.println("--- -- Start writing result for fold " + (i + 1) + " ---");
+
+			writeResult(result);
+			System.out.println("F-Measure: \t" + fmeasure);
+			System.out.println("--- -- Finished writing result for fold " + (i + 1) + " ---");
 
 			//} catch (Exception e) {
 			//	e.printStackTrace();
 			//}
 		}
-
+		System.out.println();
+		System.out.println("AVG F-Measure: \t"+(fmeasureSum / crossValidationCount));
 		// write overall result
 	}
 
@@ -221,5 +229,6 @@ public class ExtractionValidator {
 		System.out.println("TruePositiveFrameElementCount_check: \t" + resultValues[idxTruePositiveFrameElementCount_check]);
 		System.out.println("GoldFrameElementCount: \t" + resultValues[idxGoldFrameElementCount]);
 		System.out.println("ClassyFrameElementCount: \t" + resultValues[idxClassyFrameElementCount]);
+
 	}
 }

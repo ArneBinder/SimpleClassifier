@@ -236,7 +236,7 @@ public class Sentence implements Comparable<Sentence> {
 			if (!nonterminal.getId().equals(rootIDref)) {
 				String headIdRef = nonterminal.getHeadIDref();
 				//System.out.println("XXX" + headIdRef + " " + nonterminal);
-				if (getNode(headIdRef).getAttributes().get("lemma").equals(targetLemma)) {
+				if (headIdRef!=null && getNode(headIdRef).getAttributes().get("lemma").equals(targetLemma)) {
 					if (targetIDRefs == null) {
 						targetIDRefs = new LinkedList<String>();
 					}
