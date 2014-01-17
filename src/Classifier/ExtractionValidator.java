@@ -76,7 +76,7 @@ public class ExtractionValidator {
 		System.out.println("--- Finished cross validation ---");
 
 		System.out.println("--- End ---");
-		System.out.println((((System.currentTimeMillis()-startTime)/1000)/60)+"m"+(((System.currentTimeMillis()-startTime)/1000)%60)+"s");
+		System.out.println((((System.currentTimeMillis()-startTime)/1000)/60)+"min"+(((System.currentTimeMillis()-startTime)/1000)%60)+"sec");
 	}
 
 	public ExtractionValidator(File originalCorpusFile, File resultFile) {
