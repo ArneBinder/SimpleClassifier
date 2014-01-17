@@ -1,15 +1,12 @@
 package Classifier;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import Classifier.bean.FeatureVector;
-import Classifier.bean.Node;
 import Classifier.bean.Sentence;
 
 public class FeatureExtractor {
@@ -69,6 +66,24 @@ public class FeatureExtractor {
                 return headRules.get(category).get(edgeLabel).get(childCategory);
             return Integer.MAX_VALUE;
         }
+
+		public String chooseHeadChild(String parentCategory, Map<String, String> edges, Sentence sentence) throws Exception {
+			//smaller is better!
+			int bestEdgeQuality = Integer.MAX_VALUE;
+			String bestChildRef = null;
+			int curEdgeQuality;
+			for (Map.Entry<String, String> edge : edges.entrySet()) {
+				curEdgeQuality = getHeadRulePriority(parentCategory, edge.getValue(), sentence.getNode(edge.getKey()).getCategory());
+				if (bestEdgeQuality > curEdgeQuality) {
+					bestEdgeQuality = curEdgeQuality;
+					bestChildRef = edge.getKey();
+				}
+			}
+			//TODO: fix this hack!!!
+			//if(bestChildRef==null)
+			//	return edges.keySet().iterator().next();
+			return bestChildRef;
+		}
     }
 
     private Sentence sentence = null;
@@ -271,7 +286,15 @@ public class FeatureExtractor {
         */
     }
 
-    public List<String> getUsedFeatures() {
+	public static HeadRules getHeadRules() {
+		return headRules;
+	}
+
+	public static String calculateHeadIDref(String parentCategory, Map<String, String> edges, Sentence sentence) throws Exception{
+		return headRules.chooseHeadChild(parentCategory, edges, sentence);
+	}
+
+	public List<String> getUsedFeatures() {
         return usedFeatures;
     }
 
@@ -360,7 +383,7 @@ public class FeatureExtractor {
 		 */
         int targetFirstPos = sentence.getTarget().getFirstWordPos();
         int targetLastPos = sentence.getTarget().getLastWordPos();
-        int ownPos = Sentence.getPosFromID(sentence.getNode(idref).getHeadIDref());
+        int ownPos = Helper.getPosFromID(sentence.getNode(idref).getHeadIDref());
 
 
         if (targetFirstPos != targetLastPos && ownPos <= targetFirstPos)
@@ -399,23 +422,7 @@ public class FeatureExtractor {
         return targetLemma;
     }
 
-	public static String chooseHeadChild(String parentCategory, Map<String, String> edges, Sentence sentence) throws Exception {
-		//smaller is better!
-		int bestEdgeQuality = Integer.MAX_VALUE;
-		String bestChildRef = null;
-		int curEdgeQuality;
-		for (Map.Entry<String, String> edge : edges.entrySet()) {
-			curEdgeQuality = headRules.getHeadRulePriority(parentCategory, edge.getValue(), sentence.getNode(edge.getKey()).getCategory());
-			if (bestEdgeQuality > curEdgeQuality) {
-				bestEdgeQuality = curEdgeQuality;
-				bestChildRef = edge.getKey();
-			}
-		}
-		//TODO: fix this hack!!!
-		//if(bestChildRef==null)
-		//	return edges.keySet().iterator().next();
-		return bestChildRef;
-	}
+
 
 
 

@@ -2,10 +2,7 @@ package Classifier.bean;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Arne on 14.01.14.
@@ -14,11 +11,13 @@ public class FrameElement {
 	private String name;
 	private List<String> idrefs;
 	private Map<String, Double> probabilities;
+	private List<String> correct;
 
 	public FrameElement(String name){
 		this.name = name;
 		this.idrefs = new ArrayList<String>();
 		this.probabilities = new HashMap<String, Double>(0);
+		this.correct = new LinkedList<String>();
 	}
 
 	public String getName() {
@@ -38,6 +37,10 @@ public class FrameElement {
 		probabilities.put(idRef, probability);
 	}
 
+	public void setCorrect(String idRef){
+		correct.add(idRef);
+	}
+
 	@Override
 	public String toString() {
 		String result = "\n\t\t\t\t\t\t<fe name=\""+ StringEscapeUtils.escapeXml(getName())+"\">";
@@ -46,6 +49,10 @@ public class FrameElement {
 			if(probabilities.containsKey(idref)){
 				result += " probability=\""+probabilities.get(idref)+"\"";
 			}
+			if(correct.contains(idref)){
+				result += " correct=\"true\"";
+			}
+
 			result +="/>";
 		}
 		result += "\n\t\t\t\t\t\t</fe>";

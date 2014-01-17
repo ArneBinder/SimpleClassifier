@@ -127,11 +127,12 @@ public class ExtractionValidator {
 
 			System.out.println("--- -- Start annotating and writing corpus " + (i + 1) + " ---");
 			annotateCorpus.annotateCorpus(model);
-			annotateCorpus.writeCorpusToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldCorpus" + (i + 1) + ".xml");
-			System.out.println("--- -- Finishing annotating and writing corpus " + (i + 1) + "---");
+			System.out.println("--- -- Finishing annotating corpus " + (i + 1) + "---");
 
 			System.out.println("--- -- Start validating annotated corpus " + (i + 1) + " and writing result ---");
 			long[] result = validate(splittedCorpora[i], annotateCorpus);
+			annotateCorpus.writeCorpusToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldCorpus" + (i + 1) + ".xml");
+			System.out.println("--- -- Finishing writing corpus " + (i + 1) + "---");
 			double precision = result[idxTruePositiveFrameElementCount] / (double) result[idxClassyFrameElementCount];
 			double recall = result[idxTruePositiveFrameElementCount] / (double) result[idxGoldFrameElementCount];
 			double fmeasure = 2.0 * precision * recall / (precision + recall);
@@ -180,6 +181,7 @@ public class ExtractionValidator {
 							for (Frame annotFrame : annotatedFrames) {
 								FrameElement matchingAnnotFE = annotFrame.getFrameElement(origFrameElement.getName());
 								if (matchingAnnotFE != null && matchingAnnotFE.getIdrefs().contains(origIDref)) {
+									matchingAnnotFE.setCorrect(origIDref);
 									foundFE = true;
 									break;
 								}

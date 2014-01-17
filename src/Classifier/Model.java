@@ -215,20 +215,6 @@ public class Model {
 		out.write(">smoothingValue\n");
 		out.write(Double.toString(smoothingValue) + "\n");
 
-		//write targetLemmata
-		//out.write(">targetLemmata\n");
-		//for (String targetLemma : targetLemmata.keySet()) {
-		//    out.write(targetLemma + FeatureVector.getSplitChar());
-		//}
-		//out.write("\n");
-
-		//write roles
-		//out.write(">roles\n");
-		//for (String role : roles) {
-		//    out.write(role + FeatureVector.getSplitChar());
-		//}
-		//out.write("\n");
-
 		//write featureValueRelativeRoleFrequency
 		out.write(">frequencies: featureType\tfeatureValue\tfrequency\t[relativeFrequency]\n");
 		//role#featureType:featureValue:probability
@@ -261,16 +247,6 @@ public class Model {
 		//read smoothingValue
 		in.readLine();
 		smoothingValue = Double.parseDouble(in.readLine());
-
-		//read targetLemmata
-		//in.readLine();
-		//for (String targetLemma : in.readLine().split(FeatureVector.getSplitChar())) {
-		//    targetLemmata.put(targetLemma, new LinkedList<String>());
-		//}
-
-		//read roles
-		//in.readLine();
-		//roles = Arrays.asList(in.readLine().split(FeatureVector.getSplitChar()));
 
 		//read featureValueRelativeRoleFrequency
 		in.readLine();

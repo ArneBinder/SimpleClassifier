@@ -52,17 +52,6 @@ public class Corpus {
 		return splittedCorpora;
 	}
 
-	public static Corpus mergeCorpora(Corpus[] corpora) {
-		Corpus mergeCorpus = new Corpus();
-
-		for (Corpus corpus : corpora) {
-			if (corpus == null) continue;
-			mergeCorpus.addSentences(corpus.getSentences());
-		}
-
-		return mergeCorpus;
-	}
-
 	public int getSentenceCount() {
 		return sentences.size();
 	}
@@ -132,7 +121,7 @@ public class Corpus {
 
 							currentVector = featureExtractor.extract(id);
 							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
-									model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
+									model.getDummyRoles().get(Helper.myRandom(0, model.getDummyRoles().size() - 1)));
 							model.addFeatureVector(currentVector);
 						}
 					}
@@ -143,7 +132,7 @@ public class Corpus {
 
 							currentVector = featureExtractor.extract(id);
 							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
-									model.getDummyRoles().get(myRandom(0, model.getDummyRoles().size() - 1)));
+									model.getDummyRoles().get(Helper.myRandom(0, model.getDummyRoles().size() - 1)));
 							model.addFeatureVector(currentVector);
 						}
 					}
@@ -322,17 +311,8 @@ public class Corpus {
 				iter.remove();
 			}
 		}
-
-
-		//for(Sentence sentence: sentences){
-		//	if(!sentence.filter(allowedFrameElements)){
-		//		sentences.remove(sentence);
-		//	}
-		//}
 	}
 
-	public static int myRandom(int low, int high) {
-		return (int) (Math.random() * (high - low) + low);
-	}
+
 
 }
