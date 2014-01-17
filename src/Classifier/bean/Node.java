@@ -11,6 +11,7 @@ public class Node {
 	private String id = "";
 	private String category = "";
 	private String headIDref = null;
+	private boolean headChecked = false;
 	//idref > label
 	private Map<String, String> edges = new HashMap<String, String>();
 	private List<String> parentIDrefs = new ArrayList<String>(1);
@@ -25,6 +26,13 @@ public class Node {
         this.pathsFromRoot = new LinkedList<String[]>();
 	}
 
+	public boolean isHeadChecked() {
+		return headChecked;
+	}
+
+	public void setHeadChecked(boolean headChecked) {
+		this.headChecked = headChecked;
+	}
 
 	public String getHeadIDref() {
 		return headIDref;

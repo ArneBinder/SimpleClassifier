@@ -238,7 +238,7 @@ public class Sentence implements Comparable<Sentence> {
 			if (!nonterminal.getId().equals(rootIDref)) {
 				String headIdRef = nonterminal.getHeadIDref();
 				//System.out.println("XXX" + headIdRef + " " + nonterminal);
-				if (headIdRef!=null && getNode(headIdRef).getAttributes().get("lemma").equals(targetLemma)) {
+				if (headIdRef != null && getNode(headIdRef).getAttributes().get("lemma").equals(targetLemma)) {
 					if (targetIDRefs == null) {
 						targetIDRefs = new LinkedList<String>();
 					}
@@ -357,7 +357,7 @@ public class Sentence implements Comparable<Sentence> {
 	private Map.Entry<Integer, Integer> traverseTree(String curIDRef, ArrayList<String> pathFromRoot) throws Exception {
 		String parentIdRef = "";
 		Node curNode = getNode(curIDRef);
-		if (curNode.getHeadIDref() == null) {
+		if (curNode.getHeadIDref() == null && !curNode.isHeadChecked()) {
 			Node newHead = calculateHeadWord(Arrays.asList(curIDRef));
 			if (newHead != null)
 				curNode.setHeadIDref(newHead.getId());
@@ -395,7 +395,6 @@ public class Sentence implements Comparable<Sentence> {
 	}
 
 
-
 	public Node calculateHeadWord(List<String> idrefs) throws Exception {
 		Collections.sort(idrefs);
 		//if(idrefs.contains("s21270_1"))
@@ -417,24 +416,35 @@ public class Sentence implements Comparable<Sentence> {
 				// if just one child --> take this is as head
 				if (curNode.getEdges().size() == 1) {
 					for (String childIdRef : curNode.getEdges().keySet()) {
-						Node curHead = calculateHeadWord(Arrays.asList(childIdRef));
+						Node curHead = null;
+						if (!getNode(childIdRef).isHeadChecked()) {
+							curHead = calculateHeadWord(Arrays.asList(childIdRef));
+						}
 						if (curHead != null) {
 							curNode.setHeadIDref(curHead.getId());
 							return curHead;
 						} else {
-							throw new Exception(" the sole child of the node (idref: " + idref + ") contains no head");
+							curNode.setHeadChecked(true);
+							return null;
+							//throw new Exception(" the sole child of the node (idref: " + idref + ") contains no head");
 						}
 					}
 				} else if (curNode.getEdges().values().contains("HD")) {
 					//find idref for HD-edge
 					for (Map.Entry<String, String> edge : curNode.getEdges().entrySet()) {
 						if (edge.getValue().equals("HD")) {
-							Node curHead = calculateHeadWord(Arrays.asList(edge.getKey()));
+							Node curHead = null;
+							if (!getNode(edge.getKey()).isHeadChecked()) {
+								curHead = calculateHeadWord(Arrays.asList(edge.getKey()));
+							}
+							//Node curHead = calculateHeadWord(Arrays.asList(edge.getKey()));
 							if (curHead != null) {
 								curNode.setHeadIDref(curHead.getId());
 								return curHead;
 							} else {
-								throw new Exception("HD-edge (idref: " + edge.getKey() + ") contains no head");
+								curNode.setHeadChecked(true);
+								return null;
+								//throw new Exception("HD-edge (idref: " + edge.getKey() + ") contains no head");
 							}
 						}
 					}
@@ -444,22 +454,23 @@ public class Sentence implements Comparable<Sentence> {
 					if (directHead != null) {
 						newIdRefs.add(directHead);
 					} else {
-						throw new Exception("no head-edge or no head-pos-tag for category " + curCat + " (for idref: " + curNode.getId() + ")");
+						curNode.setHeadChecked(true);
+						return null;
+						//throw new Exception("no head-edge or no head-pos-tag for category " + curCat + " (for idref: " + curNode.getId() + ")");
 					}
 				}
 			}
 		}
 		if (newIdRefs.isEmpty()) {
-			if (!idrefs.contains(getRootIDref())) {
-				throw new Exception("no head found for idrefs: " + idrefs + "\n" + getNode(idrefs.get(0)));
-			}
+			//if (!idrefs.contains(getRootIDref())) {
+			//	throw new Exception("no head found for idrefs: " + idrefs + "\n" + getNode(idrefs.get(0)));
+			//}
 			// TODO: Throw
 			//throw new Exception("no head word found for: "+idrefs);
 			return null;
 		}
 		return calculateHeadWord(newIdRefs);
 	}
-
 
 
 	public void enrichInformation() throws Exception {
