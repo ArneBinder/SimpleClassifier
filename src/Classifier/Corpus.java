@@ -123,7 +123,7 @@ public class Corpus {
 						}
 					}
 
-					/*
+
 					// process all terminal elements
 					FeatureVector currentVector;
 					for (String id : sentence.getTerminals().keySet()) {
@@ -146,7 +146,7 @@ public class Corpus {
 							model.addFeatureVector(currentVector);
 						}
 					}
-					*/
+
 				}
 
 			} catch (Exception e) {
@@ -203,14 +203,14 @@ public class Corpus {
 
 								assignedRoleWithProbability = model.classify(featureVector);
 								annotationProbability *= assignedRoleWithProbability.getValue();
-								if (assignedRoleWithProbability.getValue() > threshold) {
+								//if (assignedRoleWithProbability.getValue() > threshold) {
 									FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
 									if (frameElement == null) {
 										frameElement = new FrameElement(assignedRoleWithProbability.getKey());
 										annotationFrame.addFrameElement(frameElement);
 									}
 									frameElement.addIdRef(terminal.getId(), assignedRoleWithProbability.getValue());
-								}
+								//}
 								//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":"
 								//		+ assignedRoleWithProbability.getValue());
 							}
@@ -224,7 +224,7 @@ public class Corpus {
 
 								assignedRoleWithProbability = model.classify(featureVector);
 								annotationProbability *= assignedRoleWithProbability.getValue();
-								if (assignedRoleWithProbability.getValue() > threshold) {
+								//if (assignedRoleWithProbability.getValue() > threshold) {
 									FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
 									if (frameElement == null) {
 										frameElement = new FrameElement(assignedRoleWithProbability.getKey());
@@ -233,7 +233,7 @@ public class Corpus {
 									frameElement.addIdRef(nonTerminal.getId(), assignedRoleWithProbability.getValue());
 									//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":"
 									//		+ assignedRoleWithProbability.getValue());
-								}
+								//}
 							}
 						} // for
 						if (bestAnnotationProb < annotationProbability) {

@@ -83,23 +83,26 @@ public class Model {
 		for (String featureType : featureExtractor.getUsedFeatures()) {
 			if (featureType.contains(FeatureVector.getRoleTypeIdentifier())) {
 				int roleIndex = 0;
-				String featureTypeWithOutRole = "";
+				String role = "";
+				//String featureTypeWithOutRole = "";
 				int i = 0;
 				for (String featureTypePart : featureType.split(FeatureVector.getSplitChar())) {
-					if (featureTypePart.equals(FeatureVector.getRoleTypeIdentifier()))
+					if (featureTypePart.equals(FeatureVector.getRoleTypeIdentifier())) {
 						roleIndex = i;
-					else
-						featureTypeWithOutRole += FeatureVector.getSplitChar() + featureTypePart;
+						role = featureTypePart;
+					}
+					//else
+					//	featureTypeWithOutRole += FeatureVector.getSplitChar() + featureTypePart;
 					i++;
 				}
-				if (featureTypeWithOutRole.length() > 0)
-					featureTypeWithOutRole = featureTypeWithOutRole.substring(1);
+				//if (featureTypeWithOutRole.length() > 0)
+				//	featureTypeWithOutRole = featureTypeWithOutRole.substring(1);
 
 				for (Entry<String, Integer> countsPerRolePerFeatureValue : featureValueFrequency.get(featureType).getMap().entrySet()) {
 					String featureValue = countsPerRolePerFeatureValue.getKey();
 					String[] featureValueParts = featureValue.split(FeatureVector.getSplitChar());
 					//String currRole = featureValueParts[roleIndex];
-					String featureValueWithoutRole = "";
+					/*String featureValueWithoutRole = "";
 					for (int j = 0; j < roleIndex; j++) {
 						featureValueWithoutRole += FeatureVector.getSplitChar() + featureValueParts[j];
 					}
@@ -112,17 +115,21 @@ public class Model {
 					if (!featureValueRelativeRoleFrequency.containsKey(featureType)) {
 						Map<String, Double> valueProbabilities = new HashMap<String, Double>();
 						featureValueRelativeRoleFrequency.put(featureType, valueProbabilities);
-					}
+					} */
 
-					try {
-						if (featureTypeWithOutRole.equals(""))
-							featureValueRelativeRoleFrequency.get(featureType).put(featureValue, Math.log(countsPerRolePerFeatureValue.getValue()) - Math.log(totalCount));
-						else
-							featureValueRelativeRoleFrequency.get(featureType).put(featureValue, Math.log(countsPerRolePerFeatureValue.getValue()) - Math.log(featureValueFrequency.get(featureTypeWithOutRole).get(featureValueWithoutRole)));
-
-					} catch (Exception e) {
-						System.out.println(e);
+					//try {
+					if (!featureValueRelativeRoleFrequency.containsKey(featureType)) {
+						featureValueRelativeRoleFrequency.put(featureType, new HashMap<String, Double>());
 					}
+					if (featureValueParts.length == 1) {
+						//System.out.println(countsPerRolePerFeatureValue.getValue());
+						featureValueRelativeRoleFrequency.get(featureType).put(featureValue, Math.log(countsPerRolePerFeatureValue.getValue()) - Math.log(totalCount));
+					} else
+						featureValueRelativeRoleFrequency.get(featureType).put(featureValue, Math.log(countsPerRolePerFeatureValue.getValue()) - Math.log(featureValueFrequency.get(role).get(featureValueParts[roleIndex])));
+
+					//} catch (Exception e) {
+					//	System.out.println(e);
+					//}
 				}
 			} else {
 				// wirklich noetig??
@@ -150,7 +157,7 @@ public class Model {
 
 		for (String role : featureValueRelativeRoleFrequency.get(FeatureVector.getRoleTypeIdentifier()).keySet()) {
 			featureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), role);
-			roleProbability = getRoleProbability(startingFeatureTypes, featureVector);
+			roleProbability = featureValueRelativeRoleFrequency.get("role").get(role) + getRoleProbability(startingFeatureTypes, featureVector);
 			if (bestRoleProbability < Math.exp(roleProbability)) {
 				bestRoleProbability = Math.exp(roleProbability);
 				bestRoleName = role;
