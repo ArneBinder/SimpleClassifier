@@ -57,7 +57,7 @@ public class ExtractionValidator {
 		if (!resultFolder.isDirectory()) {
 			throw new IllegalArgumentException("The <resultFolder> has to be a folder!");
 		}
-
+		long startTime = System.currentTimeMillis();
 		System.out.println("--- Start CrossValidation ---");
 		System.out.println("Original Corpus: " + originalCorpusFile.getAbsolutePath());
 		System.out.println("Result Folder: " + resultFolder.getAbsolutePath());
@@ -76,6 +76,7 @@ public class ExtractionValidator {
 		System.out.println("--- Finished cross validation ---");
 
 		System.out.println("--- End ---");
+		System.out.println((((System.currentTimeMillis()-startTime)/1000)/60)+"m"+(((System.currentTimeMillis()-startTime)/1000)%60)+"s");
 	}
 
 	public ExtractionValidator(File originalCorpusFile, File resultFile) {
