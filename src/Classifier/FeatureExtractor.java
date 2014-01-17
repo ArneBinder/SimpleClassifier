@@ -284,7 +284,6 @@ public class FeatureExtractor {
     public FeatureVector extract(String idref)
             throws Exception {
         FeatureVector fv = new FeatureVector();
-
         fv.addFeature("target", extractTarget());
         fv.addFeature("synCat", extractSyntacticalCategory(idref));
         fv.addFeature("position", extractPosition(idref));
@@ -348,7 +347,7 @@ public class FeatureExtractor {
 
 
     private String extractPosition(String idref)
-            throws Exception {
+			throws Exception {
 
         String position = "";
 
@@ -413,8 +412,8 @@ public class FeatureExtractor {
 			}
 		}
 		//TODO: fix this hack!!!
-		if(bestChildRef==null)
-			return edges.keySet().iterator().next();
+		//if(bestChildRef==null)
+		//	return edges.keySet().iterator().next();
 		return bestChildRef;
 	}
 

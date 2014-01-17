@@ -128,7 +128,7 @@ public class Corpus {
 					// process all terminal elements
 					FeatureVector currentVector;
 					for (String id : sentence.getTerminals().keySet()) {
-						if (!frameElementIDRefs.contains(id)) {
+						if (!frameElementIDRefs.contains(id) && sentence.getNode(id).getHeadIDref()!=null) {
 
 							currentVector = featureExtractor.extract(id);
 							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
@@ -139,7 +139,7 @@ public class Corpus {
 
 					// process all nonterminal elements
 					for (String id : sentence.getNonterminals().keySet()) {
-						if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id)) {
+						if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id) && sentence.getNode(id).getHeadIDref()!=null) {
 
 							currentVector = featureExtractor.extract(id);
 							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
