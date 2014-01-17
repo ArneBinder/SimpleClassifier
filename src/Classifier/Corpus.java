@@ -105,7 +105,7 @@ public class Corpus {
 
 						// frameElementIDRef = sentence.getNode(frameElementIDRef).getHeadIDref();
 						// frameElement.getValue().get(0);
-						if (!frameElementIDRef.equals(sentence.getRootIDref())) {
+						if (!frameElementIDRef.equals(sentence.getRootIDref()) && sentence.getNode(frameElementIDRef).getHeadIDref()!=null) {
 							FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
 							feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
 							model.addFeatureVector(feFeatureVector);
