@@ -179,8 +179,8 @@ public class ExtractionValidator {
 		long[] resultValues = new long[8];
 		List<Sentence> annotatedSentenceList = annotatedCorpus.getSentences();
 		//TODO: ask robert if necessary for indexOf()...
-		Collections.sort(annotatedSentenceList);
-		Collections.sort(originalCorpus.getSentences());
+		//Collections.sort(annotatedSentenceList);
+		//Collections.sort(originalCorpus.getSentences());
 
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
 
