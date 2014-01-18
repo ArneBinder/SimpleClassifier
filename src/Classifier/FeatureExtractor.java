@@ -309,6 +309,7 @@ public class FeatureExtractor {
 
 		String path = "";
 		String cat;
+		String lastCat = "";
 
 		String targetHeadIDref = sentence.getTarget().getHeadIDref();
 		if (targetHeadIDref.equals(idref)) {
@@ -327,8 +328,10 @@ public class FeatureExtractor {
 
 			for (int j = ownIdPath.length - 1; j > i; j--) {
 				cat = sentence.getNode(ownIdPath[j]).getCategory();
-				if (!cat.startsWith("C"))
-					path += sentence.getNode(ownIdPath[j]).getCategory() + "+";
+				if (!cat.startsWith("C") && !cat.equals(lastCat))  {
+					path += cat + "+";
+					lastCat = cat;
+				}
 			}
 
 			// nimm die wurzel des subtrees nur mit rein, wenn idref nicht auf (global) root zeigt. sonst fuege Kategorie manuell ein...
@@ -337,11 +340,13 @@ public class FeatureExtractor {
 			//else {
 			path += sentence.getNode(targetIdPath[i]).getCategory();
 
-
+			lastCat = "";
 			for (int j = i + 1; j < targetIdPath.length; j++) {
 				cat = sentence.getNode(targetIdPath[j]).getCategory();
-				if (!cat.startsWith("C"))
-					path += "-" + sentence.getNode(targetIdPath[j]).getCategory();
+				if (!cat.startsWith("C")&& !cat.equals(lastCat)) {
+					path += "-" + cat;
+					lastCat = cat;
+				}
 			}
 		}
 

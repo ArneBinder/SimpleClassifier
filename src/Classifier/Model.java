@@ -13,7 +13,7 @@ import java.util.Map.Entry;
  */
 public class Model {
 	//private static List<String> dummyRoles = Arrays.asList("dummyRole1");//,"dummyRole2","dummyRole3","dummyRole4","dummyRole5","dummyRole6","dummyRole7","dummyRole8","dummyRole9","dummyRole10");//new ArrayList<String>();//"dummy";
-	private static String dummyRole = "dummyRole1";
+	private static String dummyRole = "dummyRole";
 	private static double smoothingValue = Math.log(0.000001);
 	private static final String modelOutSplitChar = "\t";
 
