@@ -88,7 +88,7 @@ public class XMLParser extends DefaultHandler {
 
 			if (localName.equals("target") && topElement.equals("frame")) {
 				elements.push(localName);
-				curFrame.setTarget(attributes.getValue("lemma"));
+				curFrame.setTargetLemma(attributes.getValue("lemma"));
 			}
 
 			if (localName.equals("fe") && topElement.equals("frame")) {

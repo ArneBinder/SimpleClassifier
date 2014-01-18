@@ -12,19 +12,20 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import Classifier.bean.*;
+import com.rits.cloning.Cloner;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import com.google.gson.Gson;
 
 /**
  * Created by Arne on 09.12.13.
  */
 public class Corpus {
+	//private static double threshold = 0.001;
+
 	private List<Sentence> sentences;
 	private FeatureExtractor featureExtractor;
-	private static double threshold = 0.001;
 
 	public FeatureExtractor getFeatureExtractor() {
 		return featureExtractor;
@@ -105,7 +106,7 @@ public class Corpus {
 
 						// frameElementIDRef = sentence.getNode(frameElementIDRef).getHeadIDref();
 						// frameElement.getValue().get(0);
-						if (!frameElementIDRef.equals(sentence.getRootIDref()) && sentence.getNode(frameElementIDRef).getHeadIDref()!=null) {
+						if (!frameElementIDRef.equals(sentence.getRootIDref()) && sentence.getNode(frameElementIDRef).getHeadIDref() != null) {
 							FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
 							feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
 							model.addFeatureVector(feFeatureVector);
@@ -117,22 +118,20 @@ public class Corpus {
 					// process all terminal elements
 					FeatureVector currentVector;
 					for (String id : sentence.getTerminals().keySet()) {
-						if (!frameElementIDRefs.contains(id) && sentence.getNode(id).getHeadIDref()!=null) {
+						if (!frameElementIDRefs.contains(id) && sentence.getNode(id).getHeadIDref() != null) {
 
 							currentVector = featureExtractor.extract(id);
-							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
-									model.getDummyRoles().get(Helper.myRandom(0, model.getDummyRoles().size() - 1)));
+							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), Model.getDummyRole());
 							model.addFeatureVector(currentVector);
 						}
 					}
 
 					// process all nonterminal elements
 					for (String id : sentence.getNonterminals().keySet()) {
-						if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id) && sentence.getNode(id).getHeadIDref()!=null) {
+						if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id) && sentence.getNode(id).getHeadIDref() != null) {
 
 							currentVector = featureExtractor.extract(id);
-							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(),
-									model.getDummyRoles().get(Helper.myRandom(0, model.getDummyRoles().size() - 1)));
+							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), Model.getDummyRole());
 							model.addFeatureVector(currentVector);
 						}
 					}
@@ -145,7 +144,6 @@ public class Corpus {
 			}
 			allreadyProcessed++;
 		}
-		// dout.close();
 		model.calculateRelativeFrequenciesPerRole();
 
 		return model;
@@ -156,8 +154,9 @@ public class Corpus {
 		FeatureVector featureVector = null;
 		Frame annotationFrame;
 
-		Gson gson = new Gson();
-		String json;
+		//Gson gson = new Gson();
+		//String json;
+		Cloner cloner = new Cloner();
 
 		Entry<String, Double> assignedRoleWithProbability;
 
@@ -193,16 +192,13 @@ public class Corpus {
 
 								assignedRoleWithProbability = model.classify(featureVector);
 								annotationProbability *= assignedRoleWithProbability.getValue();
-								//if (assignedRoleWithProbability.getValue() > threshold) {
-									FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
-									if (frameElement == null) {
-										frameElement = new FrameElement(assignedRoleWithProbability.getKey());
-										annotationFrame.addFrameElement(frameElement);
-									}
-									frameElement.addIdRef(terminal.getId(), assignedRoleWithProbability.getValue());
-								//}
-								//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), terminal.getId() + ":"
-								//		+ assignedRoleWithProbability.getValue());
+
+								FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
+								if (frameElement == null) {
+									frameElement = new FrameElement(assignedRoleWithProbability.getKey());
+									annotationFrame.addFrameElement(frameElement);
+								}
+								frameElement.addIdRef(terminal.getId(), assignedRoleWithProbability.getValue());
 							}
 						}
 
@@ -214,24 +210,21 @@ public class Corpus {
 
 								assignedRoleWithProbability = model.classify(featureVector);
 								annotationProbability *= assignedRoleWithProbability.getValue();
-								//if (assignedRoleWithProbability.getValue() > threshold) {
-									FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
-									if (frameElement == null) {
-										frameElement = new FrameElement(assignedRoleWithProbability.getKey());
-										annotationFrame.addFrameElement(frameElement);
-									}
-									frameElement.addIdRef(nonTerminal.getId(), assignedRoleWithProbability.getValue());
-									//annotationFrame.addFrameElementWithIDRef(assignedRoleWithProbability.getKey(), nonTerminal.getId() + ":"
-									//		+ assignedRoleWithProbability.getValue());
-								//}
+
+								FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
+								if (frameElement == null) {
+									frameElement = new FrameElement(assignedRoleWithProbability.getKey());
+									annotationFrame.addFrameElement(frameElement);
+								}
+								frameElement.addIdRef(nonTerminal.getId(), assignedRoleWithProbability.getValue());
 							}
 						} // for
 						if (bestAnnotationProb < annotationProbability) {
 							bestAnnotationProb = annotationProbability;
 
 							// deep copy
-							json = gson.toJson(annotationFrame);
-							bestAnnotationFrame = gson.fromJson(json, Frame.class);
+							//json = gson.toJson(annotationFrame);
+							bestAnnotationFrame = cloner.deepClone(annotationFrame);//gson.fromJson(json, Frame.class);
 						}
 					}
 				} // for targetLemmaIdRef
@@ -298,12 +291,6 @@ public class Corpus {
 		}
 	}
 
-	public void printSentences() {
-		for (Sentence sentence : sentences) {
-			System.out.println(sentence.toString());
-		}
-	}
-
 	public void filter(List<String> allowedFrameElements) {
 		Iterator<Sentence> iter = sentences.iterator();
 		while (iter.hasNext()) {
@@ -312,7 +299,6 @@ public class Corpus {
 			}
 		}
 	}
-
 
 
 }

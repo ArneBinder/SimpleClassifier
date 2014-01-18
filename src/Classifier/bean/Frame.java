@@ -21,6 +21,21 @@ public class Frame {
 		this.setName(name);
 	}
 
+	/*public Frame(Frame frame){
+		this.setId(frame.getId());
+		this.setName(frame.getName());
+		this.setTargetLemma(frame.getTargetLemma());
+		this.targetIDs = new ArrayList<String>(frame.getTargetIDs().size());
+		for(String targetID: frame.getTargetIDs()){
+			this.targetIDs.add(targetID);
+		}
+		this.frameElements = new HashMap<String, FrameElement>(frame.getFrameElements().size());
+		Cloner
+		for(FrameElement fe: frame.getFrameElements()){
+			this.frameElements.put(fe.getName(), new FrameElement());
+		}
+	} */
+
 	@Override
 	public String toString() {
 		String result = "\n\t\t\t\t\t<frame name=\"" + StringEscapeUtils.escapeXml(name) + "\" id=\"" + id + "\">";
@@ -46,9 +61,9 @@ public class Frame {
 	//	return frameElements.keySet();
 	//}
 
-	public void setTarget(String lemma) {
-		this.setTargetLemma(lemma);
-	}
+	//public void setTarget(String lemma) {
+	//	this.setTargetLemma(lemma);
+	//}
 
 	public void addTargetID(String idref) {
 		targetIDs.add(idref);

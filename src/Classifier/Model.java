@@ -12,11 +12,13 @@ import java.util.Map.Entry;
  * Created by Arne on 09.12.13.
  */
 public class Model {
-	private static List<String> dummyRoles = Arrays.asList("dummyRole1");//,"dummyRole2","dummyRole3","dummyRole4","dummyRole5","dummyRole6","dummyRole7","dummyRole8","dummyRole9","dummyRole10");//new ArrayList<String>();//"dummy";
-	private double smoothingValue = Math.log(0.000001);
+	//private static List<String> dummyRoles = Arrays.asList("dummyRole1");//,"dummyRole2","dummyRole3","dummyRole4","dummyRole5","dummyRole6","dummyRole7","dummyRole8","dummyRole9","dummyRole10");//new ArrayList<String>();//"dummy";
+	private static String dummyRole = "dummyRole1";
+	private static double smoothingValue = Math.log(0.000001);
 	private static final String modelOutSplitChar = "\t";
-	private int totalCount = 0;
 
+
+	private int totalCount = 0;
 
 	// FeatureType > [ FeatureValue > Frequency] : count per (featureValue per featureType)
 	private Map<String, MultiSet<String>> featureValueFrequency = new HashMap<String, MultiSet<String>>();
@@ -30,7 +32,6 @@ public class Model {
 	private FeatureExtractor featureExtractor;
 
 	public Model(FeatureExtractor featureExtractor) {
-		//roles.addAll(dummyRoles);
 		this.featureExtractor = featureExtractor;
 	}
 
@@ -38,25 +39,14 @@ public class Model {
 		return featureValueFrequency;
 	}
 
-	public static List<String> getDummyRoles() {
-		return dummyRoles;
+	public static String getDummyRole() {
+		return dummyRole;
 	}
 
 	public Set<String> getTargetLemmata() {
 
 		return featureValueFrequency.get("target").getSet();
 	}
-/*
-   public void addTargetWord(String frameName, String targetWord) {
-        List<String> targetFrames;
-        if (!targetLemmata.containsKey(targetWord)) {
-            targetFrames = new LinkedList<String>();
-            targetFrames.add(frameName);
-        } else {
-            targetFrames = targetLemmata.get(targetWord);
-        }
-        targetLemmata.put(targetWord, targetFrames);
-    }*/
 
 	private void incCount(String featureType, String featureValue) {
 
@@ -71,7 +61,6 @@ public class Model {
 		for (Entry<String, String> pair : featureVector.getFilteredPowerSet(featureExtractor.getUsedFeatures()).entrySet()) {
 			incCount(pair.getKey(), pair.getValue());
 			totalCount++;
-			//incCount("all", "all");
 		}
 	}
 
@@ -84,52 +73,26 @@ public class Model {
 			if (featureType.contains(FeatureVector.getRoleTypeIdentifier())) {
 				int roleIndex = 0;
 				String role = "";
-				//String featureTypeWithOutRole = "";
 				int i = 0;
 				for (String featureTypePart : featureType.split(FeatureVector.getSplitChar())) {
 					if (featureTypePart.equals(FeatureVector.getRoleTypeIdentifier())) {
 						roleIndex = i;
 						role = featureTypePart;
 					}
-					//else
-					//	featureTypeWithOutRole += FeatureVector.getSplitChar() + featureTypePart;
 					i++;
 				}
-				//if (featureTypeWithOutRole.length() > 0)
-				//	featureTypeWithOutRole = featureTypeWithOutRole.substring(1);
 
 				for (Entry<String, Integer> countsPerRolePerFeatureValue : featureValueFrequency.get(featureType).getMap().entrySet()) {
 					String featureValue = countsPerRolePerFeatureValue.getKey();
 					String[] featureValueParts = featureValue.split(FeatureVector.getSplitChar());
-					//String currRole = featureValueParts[roleIndex];
-					/*String featureValueWithoutRole = "";
-					for (int j = 0; j < roleIndex; j++) {
-						featureValueWithoutRole += FeatureVector.getSplitChar() + featureValueParts[j];
-					}
-					for (int j = roleIndex + 1; j < featureValueParts.length; j++) {
-						featureValueWithoutRole += FeatureVector.getSplitChar() + featureValueParts[j];
-					}
-					if (featureValueWithoutRole.length() > 0)
-						featureValueWithoutRole = featureValueWithoutRole.substring(1);
 
-					if (!featureValueRelativeRoleFrequency.containsKey(featureType)) {
-						Map<String, Double> valueProbabilities = new HashMap<String, Double>();
-						featureValueRelativeRoleFrequency.put(featureType, valueProbabilities);
-					} */
-
-					//try {
 					if (!featureValueRelativeRoleFrequency.containsKey(featureType)) {
 						featureValueRelativeRoleFrequency.put(featureType, new HashMap<String, Double>());
 					}
 					if (featureValueParts.length == 1) {
-						//System.out.println(countsPerRolePerFeatureValue.getValue());
 						featureValueRelativeRoleFrequency.get(featureType).put(featureValue, Math.log(countsPerRolePerFeatureValue.getValue()) - Math.log(totalCount));
 					} else
 						featureValueRelativeRoleFrequency.get(featureType).put(featureValue, Math.log(countsPerRolePerFeatureValue.getValue()) - Math.log(featureValueFrequency.get(role).get(featureValueParts[roleIndex])));
-
-					//} catch (Exception e) {
-					//	System.out.println(e);
-					//}
 				}
 			} else {
 				// wirklich noetig??
@@ -143,12 +106,12 @@ public class Model {
 				} */
 			}
 		}
-		System.out.println();
+		//System.out.println();
 	}
 
 	// return [role > probability]
 	public Entry<String, Double> classify(FeatureVector featureVector) throws Exception {
-		List<String> startingFeatureTypes = featureExtractor.backOffFeature("");
+		List<String> startingFeatureTypes = FeatureExtractor.backOffFeature("");
 
 		String bestRoleName = "";
 		double bestRoleProbability = 0.0;
@@ -157,21 +120,19 @@ public class Model {
 
 		for (String role : featureValueRelativeRoleFrequency.get(FeatureVector.getRoleTypeIdentifier()).keySet()) {
 			featureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), role);
-			roleProbability = featureValueRelativeRoleFrequency.get("role").get(role) + getRoleProbability(startingFeatureTypes, featureVector);
+			if(featureValueRelativeRoleFrequency.get(FeatureVector.getRoleTypeIdentifier()).containsKey(role)){
+				roleProbability = featureValueRelativeRoleFrequency.get(FeatureVector.getRoleTypeIdentifier()).get(role) + getRoleProbability(startingFeatureTypes, featureVector);
+			} else{
+				roleProbability = smoothingValue + getRoleProbability(startingFeatureTypes, featureVector);
+		}
 			if (bestRoleProbability < Math.exp(roleProbability)) {
 				bestRoleProbability = Math.exp(roleProbability);
 				bestRoleName = role;
 			}
 		}
 		Entry<String, Double> bestRole;
-		if (dummyRoles.contains(bestRoleName))
-			bestRole = new AbstractMap.SimpleEntry<String, Double>("dummyRole", bestRoleProbability);
-		else
-			//if(bestRoleProbability > Math.exp(smoothingValue))//Math.exp(smoothingValue))
-			bestRole = new AbstractMap.SimpleEntry<String, Double>(bestRoleName, bestRoleProbability);
-		//else{
-		//	bestRole = new AbstractMap.SimpleEntry<String, Double>(dummyRole, bestRoleProbability);
-		//}
+
+		bestRole = new AbstractMap.SimpleEntry<String, Double>(bestRoleName, bestRoleProbability);
 		return bestRole;
 	}
 
@@ -179,7 +140,6 @@ public class Model {
 
 		if (featureTypes == null)
 			return smoothingValue;
-
 
 		double probability = 0.0;
 
@@ -194,13 +154,11 @@ public class Model {
 
 				} else {
 					//try{
-					probability += getRoleProbability(featureExtractor.backOffFeature(featureType), featureVector);
-
-
+					probability += getRoleProbability(FeatureExtractor.backOffFeature(featureType), featureVector);
 				}
 
 			} else {
-				probability += getRoleProbability(featureExtractor.backOffFeature(featureType), featureVector);
+				probability += getRoleProbability(FeatureExtractor.backOffFeature(featureType), featureVector);
 			}
 		}
 

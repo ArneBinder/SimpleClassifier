@@ -245,6 +245,7 @@ public class FeatureExtractor {
 
 
     //used while training: in model.addFeatureVector and model.calculateRelativeFrequenciesPerRole
+	// TODO complete rule set @ P17 @ Jurafsky
     public static final List<String> usedFeatures = Arrays.asList(
             roleIdent,
             "target",
@@ -261,29 +262,8 @@ public class FeatureExtractor {
             roleIdent + splitChar + "head");
 
     //used while classification: in model.classify and
-    public List<String> backOffFeature(String concatenatedFeature) {
-        //System.out.println();
+    public static List<String> backOffFeature(String concatenatedFeature) {
         return backOffRules.get(concatenatedFeature);
-        /*
-        List<String> result = new LinkedList<String>();
-
-        // starting rule
-        if (concatenatedFeature.equals("")) {
-            result.add("target");
-            result.add("position");
-            result.add("path" + FeatureVector.getSplitChar() + "synCat");
-            result.add("head");
-        }
-
-        if (concatenatedFeature.equals("path" + FeatureVector.getSplitChar() + "synCat")) {
-            result.add("path");
-            result.add("synCat");
-        }
-
-        // TODO complete rule set @ P17 @ Jurafsky
-
-        return result;
-        */
     }
 
 	public static HeadRules getHeadRules() {

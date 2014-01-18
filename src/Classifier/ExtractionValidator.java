@@ -6,13 +6,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import Classifier.bean.FeatureVector;
 import Classifier.bean.FrameElement;
+import com.rits.cloning.Cloner;
 import org.apache.commons.lang3.ArrayUtils;
 
 import Classifier.bean.Frame;
 import Classifier.bean.Sentence;
 
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 /**
  * Takes two annotated corpora and writes the result into a result file
@@ -85,6 +87,7 @@ public class ExtractionValidator {
 	}
 
 	public void performCrossValidation(int crossValidationCount) throws Exception {
+		long startTime = System.currentTimeMillis();
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
 		double fmeasureSum = 0;
 
@@ -92,8 +95,8 @@ public class ExtractionValidator {
 		File currentCrossValidationFolder = new File(resultFolder.getAbsolutePath() + File.separatorChar + folderName);
 		currentCrossValidationFolder.mkdir();
 
-		Gson gson = new Gson();
-		String annotateCorpusJson = "";
+		//Gson gson = new Gson();
+		//String annotateCorpusJson = "";
 		Corpus trainCorpus;
 		Corpus annotateCorpus;
 
@@ -104,7 +107,8 @@ public class ExtractionValidator {
 			foldFolder.mkdir();
 
 			//annotateCorpusJson = gson.toJson(splittedCorpora[i], Corpus.class);
-
+			startTime = System.currentTimeMillis();
+			System.out.print("--- -- generate training corpus " + (i + 1) + "... ");
 			trainCorpus = new Corpus();
 
 			for (int j = 0; j < crossValidationCount; j++) {
@@ -113,37 +117,53 @@ public class ExtractionValidator {
 					//sourceCorpora = ArrayUtils.addAll(sourceCorpora, splittedCorpora[j]);
 				}
 			}
+			System.out.println((System.currentTimeMillis()-startTime)+"ms");
 
-			//trainCorpus = Corpus.mergeCorpora(sourceCorpora);
-			annotateCorpusJson = gson.toJson(splittedCorpora[i], Corpus.class);
-			annotateCorpus = gson.fromJson(annotateCorpusJson, Corpus.class);
+			startTime = System.currentTimeMillis();
+			System.out.print("--- -- generate annotation corpus " + (i + 1) + "... ");
+			Cloner cloner = new Cloner();
+			//annotateCorpusJson = gson.toJson(splittedCorpora[i], Corpus.class);
+			annotateCorpus = cloner.deepClone(splittedCorpora[i]);//gson.fromJson(annotateCorpusJson, Corpus.class);
 			annotateCorpus.deleteAnnotation();
-
+			System.out.println((System.currentTimeMillis()-startTime)+"ms");
 			//try {
-			System.out.println("--- -- Start training and writing model " + (i + 1) + " ---");
+
+			startTime = System.currentTimeMillis();
+			System.out.print("--- -- train model " + (i + 1) + "... ");
 			Model model = trainCorpus.trainModel();
+			System.out.println((System.currentTimeMillis()-startTime)+"ms");
+
+			startTime = System.currentTimeMillis();
+			System.out.print("--- -- write model to file " + (i + 1) + "... ");
 			model.writeModelToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldModel" + (i + 1) + ".txt");
-			System.out.println("--- -- Finished training and writing model " + (i + 1) + " ---");
+			System.out.println((System.currentTimeMillis()-startTime)+"ms");
 
-			System.out.println("--- -- Start annotating and writing corpus " + (i + 1) + " ---");
+			startTime = System.currentTimeMillis();
+			System.out.print("--- -- annotate corpus " + (i + 1) + "... ");
 			annotateCorpus.annotateCorpus(model);
-			System.out.println("--- -- Finishing annotating corpus " + (i + 1) + "---");
+			System.out.println((System.currentTimeMillis()-startTime)+"ms");
 
-			System.out.println("--- -- Start validating annotated corpus " + (i + 1) + " and writing result ---");
+			startTime = System.currentTimeMillis();
+			System.out.print("--- -- validate annotated corpus " + (i + 1) + "... ");
 			long[] result = validate(splittedCorpora[i], annotateCorpus);
+			System.out.println((System.currentTimeMillis()-startTime)+"ms");
+
+			startTime = System.currentTimeMillis();
+			System.out.print("--- -- write annotated corpus to file " + (i + 1) + "... ");
 			annotateCorpus.writeCorpusToFile(foldFolder.getAbsolutePath() + File.separatorChar + "foldCorpus" + (i + 1) + ".xml");
-			System.out.println("--- -- Finishing writing corpus " + (i + 1) + "---");
+			System.out.println((System.currentTimeMillis()-startTime)+"ms");
+
+			//System.out.println("--- -- Finished validating annotated corpus " + (i + 1) + " ---");
+
+			System.out.println("--- -- Result for fold " + (i + 1) + " ---");
+
+			writeResult(result);
 			double precision = result[idxTruePositiveFrameElementCount] / (double) result[idxClassyFrameElementCount];
 			double recall = result[idxTruePositiveFrameElementCount] / (double) result[idxGoldFrameElementCount];
 			double fmeasure = 2.0 * precision * recall / (precision + recall);
 			fmeasureSum +=fmeasure;
-			System.out.println("--- -- Finished validating annotated corpus " + (i + 1) + " ---");
-
-			System.out.println("--- -- Start writing result for fold " + (i + 1) + " ---");
-
-			writeResult(result);
 			System.out.println("F-Measure: \t" + fmeasure);
-			System.out.println("--- -- Finished writing result for fold " + (i + 1) + " ---");
+			System.out.println("--- -- finished fold " + (i + 1) + " ---");
 
 			//} catch (Exception e) {
 			//	e.printStackTrace();
@@ -158,7 +178,7 @@ public class ExtractionValidator {
 	private long[] validate(Corpus originalCorpus, Corpus annotatedCorpus) {
 		long[] resultValues = new long[8];
 		List<Sentence> annotatedSentenceList = annotatedCorpus.getSentences();
-		//TODO: ask robert if necessary...
+		//TODO: ask robert if necessary for indexOf()...
 		Collections.sort(annotatedSentenceList);
 		Collections.sort(originalCorpus.getSentences());
 
@@ -199,7 +219,7 @@ public class ExtractionValidator {
 				for (Frame annotFrame : annotatedFrames) {
 					for (FrameElement annotFrameElement : annotFrame.getFrameElements())
 						// shouldnt be a dummy...
-						if (!annotFrameElement.getName().equals("dummyRole")) {
+						if (!annotFrameElement.getName().equals(Model.getDummyRole())) {
 							for (String annotIDref : annotFrameElement.getIdrefs()) {
 								boolean foundFE = false;
 								for (Frame origFrame : originalFrames) {

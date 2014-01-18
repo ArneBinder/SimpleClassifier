@@ -20,6 +20,13 @@ public class FrameElement {
 		this.correct = new LinkedList<String>();
 	}
 
+	/*public FrameElement(FrameElement frameElement){
+		this.name = frameElement.getName();
+		this.idrefs = new ArrayList<String>();
+		this.probabilities = new HashMap<String, Double>(0);
+		this.correct = new LinkedList<String>();
+	} */
+
 	public String getName() {
 		return name;
 	}
