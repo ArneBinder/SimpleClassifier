@@ -92,6 +92,7 @@ public class FeatureExtractor {
 	private static String[] phrasalCategories = {"AA", "AP", "AVP", "CAC", "CAVP", "CCP", "CH", "CNP", "CO", "CPP", "CS", "CVP", "CVZ", "DL", "ISU", "MPN", "MTA", "NM", "NP", "PP", "QL", "S", "VP", "VZ"};
 	private static HeadRules headRules;
 	private static Map<String, List<String>> backOffRules = new HashMap<String, List<String>>();
+	private static Map<String, String> abstractSynCat = new HashMap<String, String>();
 
 	private static String[] addToPhrasalCat(String cat) {
 		String[] temp = new String[phrasalCategories.length + 1];
@@ -241,6 +242,91 @@ public class FeatureExtractor {
 				Arrays.asList(
 						roleIdent + splitChar + "path",
 						roleIdent + splitChar + "synCat"));
+
+		abstractSynCat.put("AA", "AA"); // superlative phrase with "am"
+		abstractSynCat.put("CVZ", "Z"); // coordinated zu-marked infinitive
+		abstractSynCat.put("AP", "A"); //adjektive phrase
+		abstractSynCat.put("DL", "DL"); //discourse level constituent
+		abstractSynCat.put("AVP", "AV"); //adverbial phrase
+		abstractSynCat.put("ISU", "ISU"); //idiosyncratis unit
+		abstractSynCat.put("CAC", "P"); //coordinated adposition
+		abstractSynCat.put("MPN", "N"); //multi-word proper noun
+		abstractSynCat.put("CAP", "A"); //coordinated adjektive phrase
+		abstractSynCat.put("MTA", "A"); //multi-token adjective
+		abstractSynCat.put("CAVP", "AV"); //coordinated adverbial phrase
+		abstractSynCat.put("NM", "NM"); //multi-token number
+		abstractSynCat.put("CCP", "CP"); //coordinated complementiser
+		abstractSynCat.put("NP", "N"); //noun phrase
+		abstractSynCat.put("CH", "CH"); //chunk
+		abstractSynCat.put("PP", "P"); //adpositional phrase
+		abstractSynCat.put("CNP", "N"); // coordinated noun phrase
+		abstractSynCat.put("QL", "QL"); // quasi-languag
+		abstractSynCat.put("CO", "CO"); // coordination
+		abstractSynCat.put("S", "S"); // sentence
+		abstractSynCat.put("CPP", "P"); // coordinated adpositional phrase
+		abstractSynCat.put("VP", "V"); // verb phrase (non-finite)
+		abstractSynCat.put("CS", "S"); // coordinated sentence
+		abstractSynCat.put("VZ", "Z"); // zu-marked infinitive
+		abstractSynCat.put("CVP", "V"); // coordinated verb phrase (non-finite)
+
+		abstractSynCat.put("ADJA", "A"); //   attributives Adjektiv                   [das] große [Haus]
+		abstractSynCat.put("ADJD", "A"); //     adverbiales oder prädikatives Adjektiv                       [er fährt] schnell;  [er ist] schnell
+		abstractSynCat.put("ADV", "AV"); //      Adverb                                  schon, bald, doch
+		abstractSynCat.put("APPR", "P"); //     Präposition; Zirkumposition links       in [der Stadt], ohne [mich]
+		abstractSynCat.put("APPRART", "P"); //  Präposition mit Artikel                 im [Haus], zur [Sache]
+		abstractSynCat.put("APPO", "P"); //     Postposition                            [ihm] zufolge, [der Sache] wegen
+		abstractSynCat.put("APZR", "P"); //     Zirkumposition rechts                   [von jetzt] an
+		abstractSynCat.put("ART", "D"); //      bestimmter oder unbestimmter Artikel                        der, die, das, ein, eine, ...
+		abstractSynCat.put("CARD", "NM"); //     Kardinalzahl                            zwei [Männer], [im Jahre] 1994
+		abstractSynCat.put("FM", ""); //       Fremdsprachliches Material              [Er hat das mit ``] A big fish ['' übersetzt]
+		abstractSynCat.put("ITJ", ""); //      Interjektion                            mhm, ach, tja
+		abstractSynCat.put("ORD", "NM"); //      Ordinalzahl                             [der] neunte [August]
+		abstractSynCat.put("KOUI", "C"); //     unterordnende Konjunktion mit ``zu'' und Infinitiv              um [zu leben], anstatt [zu fragen]
+		abstractSynCat.put("KOUS", "C"); //     unterordnende Konjunktion mit Satz              weil, daß, damit, wenn, ob
+		abstractSynCat.put("KON", "C"); //      nebenordnende Konjunktion               und, oder, aber
+		abstractSynCat.put("KOKOM", "C"); //    Vergleichskonjunktion                   als, wie
+		abstractSynCat.put("NN", "N"); //       normales Nomen                          Tisch, Herr, [das] Reisen
+		abstractSynCat.put("NE", "N"); //       Eigennamen                              Hans, Hamburg, HSV
+		abstractSynCat.put("PDS", "PR"); //      substituierendes Demonstrativ-pronomen          dieser, jener
+		abstractSynCat.put("PDAT", "PR"); //     attribuierendes Demonstrativ-pronomen           jener [Mensch]
+		abstractSynCat.put("PIS", "PR"); //      substituierendes Indefinit-pronomen             keiner, viele, man, niemand
+		abstractSynCat.put("PIAT", "PR"); //     attribuierendes Indefinit-pronomen ohne Determiner              kein [Mensch], irgendein [Glas]
+		abstractSynCat.put("PIDAT", "PR"); //    attribuierendes Indefinit-pronomen mit Determiner                [ein] wenig [Wasser], [die] beiden [Brüder]
+		abstractSynCat.put("PPER", "PR"); //     irreflexives Personalpronomen           ich, er, ihm, mich, dir
+		abstractSynCat.put("PPOSS", "PR"); //    substituierendes Possessiv-pronomen             meins, deiner
+		abstractSynCat.put("PPOSAT", "PR"); //   attribuierendes Possessivpronomen       mein [Buch], deine [Mutter]
+		abstractSynCat.put("PRELS", "PR"); //   substituierendes Relativpronomen        [der Hund ,] der
+		abstractSynCat.put("PRELAT", "PR"); //  attribuierendes Relativpronomen         [der Mann ,] dessen [Hund]
+		abstractSynCat.put("PRF", "PR"); //     reflexives Personalpronomen             sich, einander, dich, mir
+		abstractSynCat.put("PWS", "PR"); //     substituierendes Interrogativpronomen                       wer, was
+		abstractSynCat.put("PWAT", "PR"); //    attribuierendes Interrogativpronomen                        welche [Farbe], wessen [Hut]
+		abstractSynCat.put("PWAV", "PR"); //    adverbiales Interrogativ- oder Relativpronomen                warum, wo, wann, worüber, wobei
+		abstractSynCat.put("PAV", ""); //     Pronominaladverb                        dafür, dabei, deswegen, trotzdem
+		abstractSynCat.put("PTKZU", ""); //   ``zu'' vor Infinitiv                    zu [gehen]
+		abstractSynCat.put("PTKNEG", ""); //  Negationspartikel                       nicht
+		abstractSynCat.put("PTKVZ", ""); //   abgetrennter Verbzusatz                 [er kommt] an, [er fährt] rad
+		abstractSynCat.put("PTKANT", ""); //  Antwortpartikel                         ja, nein, danke, bitte
+		abstractSynCat.put("PTKA", ""); //    Partikel bei Adjektiv oder Adverb                  am [schönsten], zu [schnell]
+		abstractSynCat.put("SGML", ""); //    SGML Markup
+		abstractSynCat.put("SPELL", ""); //   Buchstabierfolge                        S-C-H-W-E-I-K-L
+		abstractSynCat.put("TRUNC", ""); //   Kompositions-Erstglied                  An- [und Abreise]
+		abstractSynCat.put("VVFIN", ""); //   finites Verb, voll                      [du] gehst, [wir] kommen [an]
+		abstractSynCat.put("VVIMP", ""); //   Imperativ, voll                         komm [!]
+		abstractSynCat.put("VVINF", ""); //   Infinitiv, voll                         gehen, ankommen
+		abstractSynCat.put("VVIZU", ""); //   Infinitiv mit ``zu'', voll              anzukommen, loszulassen
+		abstractSynCat.put("VVPP", ""); //    Partizip Perfekt, voll                  gegangen, angekommen
+		abstractSynCat.put("VAFIN", ""); //   finites Verb, aux                       [du] bist, [wir] werden
+		abstractSynCat.put("VAIMP", ""); //   Imperativ, aux                          sei [ruhig !]
+		abstractSynCat.put("VAINF", ""); //   Infinitiv, aux                          werden, sein
+		abstractSynCat.put("VAPP", ""); //    Partizip Perfekt, aux                   gewesen
+		abstractSynCat.put("VMFIN", ""); //   finites Verb, modal                     dürfen
+		abstractSynCat.put("VMINF", ""); //   Infinitiv, modal                        wollen
+		abstractSynCat.put("VMPP", ""); //    Partizip Perfekt, modal                 gekonnt, [er hat gehen] können
+		abstractSynCat.put("XY", ""); //      Nichtwort, Sonderzeichen enthaltend                3:7, H2O, D2XW3
+		abstractSynCat.put("\\$,", ""); //     Komma                                   ,
+		abstractSynCat.put("\\$.", ""); //     Satzbeendende Interpunktion             . ? ! ; :
+		abstractSynCat.put("\\$(", ""); //     sonstige Satzzeichen; satzintern        - [,]()
+
 	}
 
 
@@ -264,6 +350,12 @@ public class FeatureExtractor {
 	//used while classification: in model.classify and
 	public static List<String> backOffFeature(String concatenatedFeature) {
 		return backOffRules.get(concatenatedFeature);
+	}
+
+	public static String getAbstractSynCat(String synCat) throws Exception{
+		if(!abstractSynCat.containsKey(synCat))
+		    throw new Exception("synCat "+synCat+" is unknown");
+		return abstractSynCat.get(synCat);
 	}
 
 	public static HeadRules getHeadRules() {
@@ -328,7 +420,7 @@ public class FeatureExtractor {
 
 			for (int j = ownIdPath.length - 1; j > i; j--) {
 				cat = sentence.getNode(ownIdPath[j]).getCategory();
-				if (!cat.startsWith("C") && !cat.equals(lastCat))  {
+				if (!cat.startsWith("C") && !cat.equals(lastCat)) {
 					path += cat + "+";
 					lastCat = cat;
 				}
@@ -343,7 +435,7 @@ public class FeatureExtractor {
 			lastCat = "";
 			for (int j = i + 1; j < targetIdPath.length; j++) {
 				cat = sentence.getNode(targetIdPath[j]).getCategory();
-				if (!cat.startsWith("C")&& !cat.equals(lastCat)) {
+				if (!cat.startsWith("C") && !cat.equals(lastCat)) {
 					path += "-" + cat;
 					lastCat = cat;
 				}
