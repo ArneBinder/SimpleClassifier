@@ -122,6 +122,14 @@ public class Sentence implements Comparable<Sentence> {
 		getFrames().add(frame);
 	}
 
+	public Frame getFrameForTargetLemma(String targetLemma){
+		for(Frame frame: frames){
+			if(frame.getTargetLemma().equals(targetLemma))
+				return frame;
+		}
+		return null;
+	}
+
 	public void setRootID(String rootID) {
 		this.rootIDref = rootID;
 	}
