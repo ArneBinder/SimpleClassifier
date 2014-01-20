@@ -56,7 +56,7 @@ public class ClassifierNB {
 		    readCorpus.parseFile(file);
 		}
 	    } else {
-		System.out.print("--- - Parse corpus file: " + corpusFile.getName() + " - ---");
+		System.out.println("--- - Parse corpus file: " + corpusFile.getName() + " - ---");
 		readCorpus.parseFile(corpusFile);
 	    }
 	} catch (Exception e) {

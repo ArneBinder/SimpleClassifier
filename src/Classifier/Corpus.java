@@ -167,10 +167,12 @@ public class Corpus {
 
 			// List<List<String>> test = sentence.extractTargetIDRefs(model.getTargetLemmata());
 			double annotationProbability = 1.0;
-			double bestAnnotationProb = 0;
-			Frame bestAnnotationFrame = null;
-			for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model.getTargetLemmata())) {
 
+			// for every targetLemma...
+			for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model.getTargetLemmata())) {
+				double bestAnnotationProb = 0;
+				Frame bestAnnotationFrame = null;
+				// for every occurrence of of the targetLemma...
 				for (String targetLemmaIDRef : targetLemmaIDRefs) {
 					//annotationProbability = 0.0;
 					Node targetNode = sentence.getNode(targetLemmaIDRef);
@@ -228,12 +230,13 @@ public class Corpus {
 						}
 					}
 				} // for targetLemmaIdRef
-			} // for targetLemmaIdRefs
 
-			// no target word detected
-			if (bestAnnotationFrame != null) {
-				sentence.addFrame(bestAnnotationFrame);
-			}
+				// no target word detected?
+				if (bestAnnotationFrame != null) {
+					sentence.addFrame(bestAnnotationFrame);
+				}
+
+			} // for targetLemmaIdRefs
 		}
 	}
 
