@@ -22,7 +22,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * Created by Arne on 09.12.13.
  */
 public class Corpus {
-	//private static double threshold = 0.001;
+	private static double threshold = -600.0;
 
 	private List<Sentence> sentences;
 	private FeatureExtractor featureExtractor;
@@ -201,7 +201,7 @@ public class Corpus {
 									frameElement = new FrameElement(assignedRoleWithProbability.getKey());
 									annotationFrame.addFrameElement(frameElement);
 								}
-								frameElement.addIdRef(terminal.getId(),  Math.exp(assignedRoleWithProbability.getValue()));
+								frameElement.addIdRef(terminal.getId(), Math.exp(assignedRoleWithProbability.getValue()));
 							}
 						}
 
@@ -234,8 +234,10 @@ public class Corpus {
 
 				// no target word detected?
 				if (bestAnnotationFrame != null) {
-					bestAnnotationFrame.setProbability(bestAnnotationProb);
-					sentence.addFrame(bestAnnotationFrame);
+					if (bestAnnotationProb > threshold) {
+						bestAnnotationFrame.setProbability(bestAnnotationProb);
+						sentence.addFrame(bestAnnotationFrame);
+					}
 				}
 
 			} // for targetLemmaIdRefs
