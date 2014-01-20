@@ -208,48 +208,52 @@ public class ExtractionValidator {
 				List<Frame> originalFrames = originalSentence.getFrames();
 				List<Frame> annotatedFrames = annotatedSentence.getFrames();
 
-				Set<String> checkedIDrefs = new HashSet<String>(50);
-				Set<String> correctIDrefs1 = new HashSet<String>();
+				// check only sentences with found target...
+				if (annotatedFrames.size() > 0) {
+					Set<String> checkedIDrefs = new HashSet<String>(50);
+					Set<String> correctIDrefs1 = new HashSet<String>();
 
-				// check if all FEs are found...
-				for (Frame origFrame : originalFrames) {
-					for (FrameElement origFrameElement : origFrame.getFrameElements()) {
-						boolean foundFE = false;
-						for (Frame annotFrame : annotatedFrames) {
-							if (annotFrame.getFrameElement(origFrameElement.getName()) != null)
-								foundFE = true;
-						}
-						if (foundFE)
-							resultValues[idxTruePositiveFrameElementCount]++;
-						resultValues[idxGoldFrameElementCount]++;
-
-						for (String origIDref : origFrameElement.getIdrefs()) {
-							checkedIDrefs.add(origIDref);
+					// check if all FEs are found...
+					for (Frame origFrame : originalFrames) {
+						for (FrameElement origFrameElement : origFrame.getFrameElements()) {
+							boolean foundFE = false;
 							for (Frame annotFrame : annotatedFrames) {
-								FrameElement matchingAnnotFE = annotFrame.getFrameElement(origFrameElement.getName());
-								if (matchingAnnotFE != null && matchingAnnotFE.getIdrefs().contains(origIDref)) {
-									matchingAnnotFE.setCorrect(origIDref);
-									correctIDrefs1.add(origIDref);
-									break;
+								if (annotFrame.getFrameElement(origFrameElement.getName()) != null)
+									foundFE = true;
+							}
+							if (foundFE)
+								resultValues[idxTruePositiveFrameElementCount]++;
+							resultValues[idxGoldFrameElementCount]++;
+
+							for (String origIDref : origFrameElement.getIdrefs()) {
+								checkedIDrefs.add(origIDref);
+								for (Frame annotFrame : annotatedFrames) {
+									FrameElement matchingAnnotFE = annotFrame.getFrameElement(origFrameElement.getName());
+									if (matchingAnnotFE != null && matchingAnnotFE.getIdrefs().contains(origIDref)) {
+										matchingAnnotFE.setCorrect(origIDref);
+										correctIDrefs1.add(origIDref);
+										break;
+									}
 								}
 							}
 						}
 					}
-				}
-				resultValues[idxTruePositiveFrameElementIDrefCount] += correctIDrefs1.size();
-				resultValues[idxGoldFrameElementIDrefCount] += checkedIDrefs.size();
+					resultValues[idxTruePositiveFrameElementIDrefCount] += correctIDrefs1.size();
+					resultValues[idxGoldFrameElementIDrefCount] += checkedIDrefs.size();
 
-				// check if all FEs which are found are correct...
-				for (Frame annotFrame : annotatedFrames) {
-					for (FrameElement annotFrameElement : annotFrame.getFrameElements()) {
-						// shouldnt be a dummy...
-						if (!annotFrameElement.getName().equals(Model.getDummyRole())) {
-							resultValues[idxClassyFrameElementCount]++;
-							resultValues[idxClassyFrameElementIDrefCount] += annotFrameElement.getIdrefs().size();
+					// check if all FEs which are found are correct...
+					for (Frame annotFrame : annotatedFrames) {
+						for (FrameElement annotFrameElement : annotFrame.getFrameElements()) {
+							// shouldnt be a dummy...
+							if (!annotFrameElement.getName().equals(Model.getDummyRole())) {
+								resultValues[idxClassyFrameElementCount]++;
+								resultValues[idxClassyFrameElementIDrefCount] += annotFrameElement.getIdrefs().size();
+							}
 						}
 					}
 				}
 			}
+
 
 			resultValues[idxSentenceCount]++;
 		}
