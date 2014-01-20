@@ -161,6 +161,7 @@ public class Corpus {
 		Entry<String, Double> assignedRoleWithProbability;
 
 		for (Sentence sentence : sentences) {
+
 			sentence.enrichInformation();
 			featureExtractor.setSentence(sentence);
 			//System.out.println("Current sentence: " + sentence.getId());
@@ -169,56 +170,56 @@ public class Corpus {
 			double annotationProbability = 1.0;
 
 			// for every targetLemma...
-			for (List<String> targetLemmaIDRefs : sentence.extractTargetIDRefs(model.getTargetLemmata())) {
-				double bestAnnotationProb = 0;
+			for (List<String> targetConstituentIDRefs : sentence.extractTargetIDRefs(model.getTargetLemmata())) {
+				double bestAnnotationProb = Double.NEGATIVE_INFINITY;
 				Frame bestAnnotationFrame = null;
 				// for every occurrence of of the targetLemma...
-				for (String targetLemmaIDRef : targetLemmaIDRefs) {
+				for (String targetConstituentIDRef : targetConstituentIDRefs) {
 					//annotationProbability = 0.0;
-					Node targetNode = sentence.getNode(targetLemmaIDRef);
+					Node targetNode = sentence.getNode(targetConstituentIDRef);
 					if (targetNode.getHeadIDref() != null) {
-						annotationProbability = 1.0;
+						annotationProbability = 0.0;
 						String targetLemma;
 						if (targetNode.isTerminal()) {
-							targetLemma = sentence.getNode(targetLemmaIDRef).getAttributes().get("lemma");
+							targetLemma = sentence.getNode(targetConstituentIDRef).getAttributes().get("lemma");
 						} else {
 							targetLemma = sentence.getNode(targetNode.getHeadIDref()).getAttributes().get("lemma");
 						}
 						annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
 						annotationFrame.setTargetLemma(targetLemma);
-						sentence.setTarget(targetLemmaIDRef);
+						sentence.setTarget(targetConstituentIDRef);
 						// classify all terminals
 						for (Node terminal : sentence.getTerminals().values()) {
 							if (terminal.getHeadIDref() != null) {
 								featureVector = featureExtractor.extract(terminal.getId());
 
 								assignedRoleWithProbability = model.classify(featureVector);
-								annotationProbability *= assignedRoleWithProbability.getValue();
+								annotationProbability += assignedRoleWithProbability.getValue();
 
 								FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
 								if (frameElement == null) {
 									frameElement = new FrameElement(assignedRoleWithProbability.getKey());
 									annotationFrame.addFrameElement(frameElement);
 								}
-								frameElement.addIdRef(terminal.getId(), assignedRoleWithProbability.getValue());
+								frameElement.addIdRef(terminal.getId(),  Math.exp(assignedRoleWithProbability.getValue()));
 							}
 						}
 
-						// classify all terminals
+						// classify all nonTerminals
 						for (Node nonTerminal : sentence.getNonterminals().values()) {
 							if (!sentence.getRootIDref().equals(nonTerminal.getId()) && nonTerminal.getHeadIDref() != null) {
 
 								featureVector = featureExtractor.extract(nonTerminal.getId());
 
 								assignedRoleWithProbability = model.classify(featureVector);
-								annotationProbability *= assignedRoleWithProbability.getValue();
+								annotationProbability += assignedRoleWithProbability.getValue();
 
 								FrameElement frameElement = annotationFrame.getFrameElement(assignedRoleWithProbability.getKey());
 								if (frameElement == null) {
 									frameElement = new FrameElement(assignedRoleWithProbability.getKey());
 									annotationFrame.addFrameElement(frameElement);
 								}
-								frameElement.addIdRef(nonTerminal.getId(), assignedRoleWithProbability.getValue());
+								frameElement.addIdRef(nonTerminal.getId(), Math.exp(assignedRoleWithProbability.getValue()));
 							}
 						} // for
 						if (bestAnnotationProb < annotationProbability) {
@@ -233,6 +234,7 @@ public class Corpus {
 
 				// no target word detected?
 				if (bestAnnotationFrame != null) {
+					bestAnnotationFrame.setProbability(bestAnnotationProb);
 					sentence.addFrame(bestAnnotationFrame);
 				}
 

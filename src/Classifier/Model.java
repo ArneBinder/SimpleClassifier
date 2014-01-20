@@ -114,7 +114,7 @@ public class Model {
 		List<String> startingFeatureTypes = FeatureExtractor.backOffFeature("");
 
 		String bestRoleName = "";
-		double bestRoleProbability = 0.0;
+		double bestRoleProbability = Double.NEGATIVE_INFINITY;
 
 		double roleProbability = 0.0;
 
@@ -125,8 +125,8 @@ public class Model {
 			} else{
 				roleProbability = smoothingValue + getRoleProbability(startingFeatureTypes, featureVector);
 		}
-			if (bestRoleProbability < Math.exp(roleProbability)) {
-				bestRoleProbability = Math.exp(roleProbability);
+			if (bestRoleProbability < roleProbability) {
+				bestRoleProbability = roleProbability;
 				bestRoleName = role;
 			}
 		}

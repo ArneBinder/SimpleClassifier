@@ -33,6 +33,7 @@ public class ExtractionValidator {
 	//private final static int idxTruePositiveFrameElementCount_check = 6;
 	private final static int idxClassyFrameElementCount = 7;
 	private final static int idxGoldFrameElementCount = 8;
+	private final static int idxUnclassifiedSentenceCount = 9;
 
 	//private final Corpus originalCorpus;
 	//private final File resultFolder;
@@ -178,6 +179,8 @@ public class ExtractionValidator {
 			double precisionFE = result[idxTruePositiveFrameElementCount] / (double) result[idxClassyFrameElementCount];
 			double recallFE = result[idxTruePositiveFrameElementCount] / (double) result[idxGoldFrameElementCount];
 			double fmeasureFE = 2.0 * precisionFE * recallFE / (precisionFE + recallFE);
+			System.out.println("Precision (IDrefs): \t" + precision);
+			System.out.println("Recall (IDrefs): \t" + recall);
 			fmeasureSum += fmeasure;
 			fmeasureFESum += fmeasureFE;
 			System.out.println("F-Measure (IDrefs): \t" + fmeasure);
@@ -195,7 +198,7 @@ public class ExtractionValidator {
 	}
 
 	private long[] validate(Corpus originalCorpus, Corpus annotatedCorpus) {
-		long[] resultValues = new long[9];
+		long[] resultValues = new long[100];
 		List<Sentence> annotatedSentenceList = annotatedCorpus.getSentences();
 
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
@@ -217,22 +220,30 @@ public class ExtractionValidator {
 					for (Frame origFrame : originalFrames) {
 						for (FrameElement origFrameElement : origFrame.getFrameElements()) {
 							boolean foundFE = false;
+							boolean foundTarget = false;
 							for (Frame annotFrame : annotatedFrames) {
-								if (annotFrame.getFrameElement(origFrameElement.getName()) != null)
-									foundFE = true;
-							}
-							if (foundFE)
-								resultValues[idxTruePositiveFrameElementCount]++;
-							resultValues[idxGoldFrameElementCount]++;
-
-							for (String origIDref : origFrameElement.getIdrefs()) {
-								checkedIDrefs.add(origIDref);
-								for (Frame annotFrame : annotatedFrames) {
-									FrameElement matchingAnnotFE = annotFrame.getFrameElement(origFrameElement.getName());
-									if (matchingAnnotFE != null && matchingAnnotFE.getIdrefs().contains(origIDref)) {
-										matchingAnnotFE.setCorrect(origIDref);
-										correctIDrefs1.add(origIDref);
+								if (annotFrame.getTargetLemma().equals(origFrame.getTargetLemma())) {
+									foundTarget = true;
+									if (annotFrame.getFrameElement(origFrameElement.getName()) != null) {
+										foundFE = true;
 										break;
+									}
+								}
+							}
+							// targetLemma have to be in annotFrame...
+							if (foundTarget) {
+								resultValues[idxGoldFrameElementCount]++;
+								if (foundFE)
+									resultValues[idxTruePositiveFrameElementCount]++;
+								for (String origIDref : origFrameElement.getIdrefs()) {
+									checkedIDrefs.add(origIDref);
+									for (Frame annotFrame : annotatedFrames) {
+										FrameElement matchingAnnotFE = annotFrame.getFrameElement(origFrameElement.getName());
+										if (matchingAnnotFE != null && matchingAnnotFE.getIdrefs().contains(origIDref)) {
+											matchingAnnotFE.setCorrect(origIDref);
+											correctIDrefs1.add(origIDref);
+											break;
+										}
 									}
 								}
 							}
@@ -251,6 +262,8 @@ public class ExtractionValidator {
 							}
 						}
 					}
+				} else{
+					resultValues[idxUnclassifiedSentenceCount]++;
 				}
 			}
 
@@ -272,6 +285,8 @@ public class ExtractionValidator {
 		//System.out.println("TruePositiveFrameElementCount_check: \t" + resultValues[idxTruePositiveFrameElementCount_check]);
 		System.out.println("GoldFrameElementCount: \t" + resultValues[idxGoldFrameElementCount]);
 		System.out.println("ClassyFrameElementCount: \t" + resultValues[idxClassyFrameElementCount]);
+		System.out.println();
+		System.out.println("UnclassifiedSentenceCount: \t" + resultValues[idxUnclassifiedSentenceCount]);
 
 	}
 }

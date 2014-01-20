@@ -8,6 +8,7 @@ public class Frame {
 
 	private String id = "";
 	private String name = "";
+	private double probability = Double.NEGATIVE_INFINITY;
 
 	private String targetLemma = "";
 	private List<String> targetIDs = new ArrayList<String>();
@@ -36,9 +37,14 @@ public class Frame {
 		}
 	} */
 
+	public void setProbability(double probability) {
+		this.probability = probability;
+	}
+
 	@Override
 	public String toString() {
-		String result = "\n\t\t\t\t\t<frame name=\"" + StringEscapeUtils.escapeXml(name) + "\" id=\"" + id + "\">";
+		String probabilityS = (probability != Double.NEGATIVE_INFINITY) ? "probability=\"" + probability + "\"" : "";
+		String result = "\n\t\t\t\t\t<frame name=\"" + StringEscapeUtils.escapeXml(name) + "\" id=\"" + id + "\" " + probabilityS + ">";
 		result += "\n\t\t\t\t\t\t<target lemma=\"" + StringEscapeUtils.escapeXml(targetLemma) + "\">";
 		for (String targetID : targetIDs) {
 			result += "\n\t\t\t\t\t\t\t<fenode idref=\"" + targetID + "\"/>";
