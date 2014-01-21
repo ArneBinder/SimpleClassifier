@@ -325,7 +325,9 @@ public class FeatureExtractor {
 						roleIdent + splitChar + "target",
 						roleIdent + splitChar + "position",
 						roleIdent + splitChar + "path" + splitChar + "synCat",
-						roleIdent + splitChar + "head"
+						roleIdent + splitChar + "head",
+						roleIdent + splitChar + "nextHead"
+
 						//roleIdent + splitChar + "terminal"
 						//roleIdent + splitChar + "funcPath"
 						//roleIdent + splitChar + "funcBig",
@@ -355,6 +357,7 @@ public class FeatureExtractor {
 			"path",
 			"path" + splitChar + "synCat",
 			"head",
+			"nextHead",
 			//"terminal",
 			//"funcPath",
 			//"funcBig",
@@ -365,7 +368,8 @@ public class FeatureExtractor {
 			roleIdent + splitChar + "position",
 			roleIdent + splitChar + "path",
 			roleIdent + splitChar + "path" + splitChar + "synCat",
-			roleIdent + splitChar + "head"
+			roleIdent + splitChar + "head",
+			roleIdent + splitChar + "nextHead"
 			//roleIdent + splitChar + "terminal"
 			//roleIdent + splitChar + "funcPath"
 			//roleIdent + splitChar + "funcBig",
@@ -411,7 +415,8 @@ public class FeatureExtractor {
 		//fv.addFeature("path", extractPath(idref));
 		extractPath(idref, fv);
 		fv.addFeature("head", extractHead(idref));
-		fv.addFeature("terminal", sentence.getNode(idref).isTerminal()?"1":"0");
+		fv.addFeature("terminal", sentence.getNode(idref).isTerminal() ? "1" : "0");
+		fv.addFeature("nextHead", extractNextHead(idref));
 
 		return fv;
 	}
@@ -423,6 +428,48 @@ public class FeatureExtractor {
 		return "null";
 	}
 
+	private String extractNextHead(String idRef) throws Exception {
+
+		Node node = sentence.getNode(idRef);
+		String headIDref = null;
+		String result = "HEAD";
+		int readyCount = 0;
+		int i = 0;
+		while (headIDref == null && readyCount < node.getPathsFromRoot().size()) {
+			i++;
+			for (String[] path : node.getPathsFromRoot()) {
+				if (path.length >= i) {
+					String curHeadIDref;
+					try {
+						curHeadIDref = sentence.getNode(path[path.length - i]).getHeadIDref();
+					} catch (Exception e) {
+						System.out.println(i + "; " + path.length);
+
+						throw e;
+					}
+					if (curHeadIDref != null && !curHeadIDref.equals(sentence.getNode(idRef).getHeadIDref())) {
+						headIDref = curHeadIDref;
+					}
+
+				} else {
+					readyCount++;
+				}
+
+			}
+
+		}
+
+		if (headIDref != null) {
+			result = sentence.getNode(headIDref).getAttributes().get("lemma");
+			//System.out.print(idRef + ": " + result + "\t[");
+			//for(String s: sentence.getNode(headIDref).getPathsFromRoot().get(0)){
+			//	System.out.print(s+":"+sentence.getNode(s).getHeadIDref()+", ");
+			//}
+			//System.out.println("]");
+		}
+		return result;
+
+	}
 
 	private void extractPath(String idref, FeatureVector fv)
 			throws Exception {
