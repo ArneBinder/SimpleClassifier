@@ -382,7 +382,8 @@ public class FeatureExtractor {
 		fv.addFeature("target", extractTarget());
 		fv.addFeature("synCat", extractSyntacticalCategory(idref));
 		fv.addFeature("position", extractPosition(idref));
-		fv.addFeature("path", extractPath(idref));
+		//fv.addFeature("path", extractPath(idref));
+		extractPath(idref, fv);
 		fv.addFeature("head", extractHead(idref));
 
 		return fv;
@@ -396,7 +397,7 @@ public class FeatureExtractor {
 	}
 
 
-	private String extractPath(String idref)
+	private void extractPath(String idref, FeatureVector fv)
 			throws Exception {
 
 		String path = "";
@@ -443,7 +444,8 @@ public class FeatureExtractor {
 		}
 
 		//System.out.println(sentence.getTargets().get(0).getId() + ", " + idref + ": " + path);
-		return path;
+		//return path;
+		fv.addFeature("path", path);
 	}
 
 

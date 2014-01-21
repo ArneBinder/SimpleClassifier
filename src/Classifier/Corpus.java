@@ -22,7 +22,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * Created by Arne on 09.12.13.
  */
 public class Corpus {
-	private static double threshold = -600.0;
+	private static double threshold = -400.0;
 
 	private List<Sentence> sentences;
 	private FeatureExtractor featureExtractor;
