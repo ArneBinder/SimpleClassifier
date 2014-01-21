@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import Classifier.bean.FeatureVector;
+import Classifier.bean.Node;
 import Classifier.bean.Sentence;
 
 public class FeatureExtractor {
@@ -232,16 +233,6 @@ public class FeatureExtractor {
 		headRules.addRule("VP", "OP", "PP"); //s2398_506
 		headRules.addRule("NP", "MO", "ADV"); //s39166_507
 
-		backOffRules.put("",
-				Arrays.asList(
-						roleIdent + splitChar + "target",
-						roleIdent + splitChar + "position",
-						roleIdent + splitChar + "path" + splitChar + "synCat",
-						roleIdent + splitChar + "head"));
-		backOffRules.put(roleIdent + splitChar + "path" + splitChar + "synCat",
-				Arrays.asList(
-						roleIdent + splitChar + "path",
-						roleIdent + splitChar + "synCat"));
 
 		abstractSynCat.put("AA", "AA"); // superlative phrase with "am"
 		abstractSynCat.put("CVZ", "Z"); // coordinated zu-marked infinitive
@@ -327,6 +318,30 @@ public class FeatureExtractor {
 		abstractSynCat.put("\\$.", ""); //     Satzbeendende Interpunktion             . ? ! ; :
 		abstractSynCat.put("\\$(", ""); //     sonstige Satzzeichen; satzintern        - [,]()
 
+
+		//used while classification: in model.classify and
+		backOffRules.put("",
+				Arrays.asList(
+						roleIdent + splitChar + "target",
+						roleIdent + splitChar + "position",
+						roleIdent + splitChar + "path" + splitChar + "synCat",
+						roleIdent + splitChar + "head"
+						//roleIdent + splitChar + "terminal"
+						//roleIdent + splitChar + "funcPath"
+						//roleIdent + splitChar + "funcBig",
+						//roleIdent + splitChar + "funcSmall",
+						//roleIdent + splitChar + "funcBig"+ splitChar + "funcSmall"
+				));
+		backOffRules.put(roleIdent + splitChar + "path" + splitChar + "synCat",
+				Arrays.asList(
+						roleIdent + splitChar + "path",
+						roleIdent + splitChar + "synCat"));
+		/*backOffRules.put(roleIdent + splitChar + "funcBig"+ splitChar + "funcSmall",
+				Arrays.asList(
+						roleIdent + splitChar + "funcBig",
+						roleIdent + splitChar + "funcSmall"));
+        */
+
 	}
 
 
@@ -340,21 +355,32 @@ public class FeatureExtractor {
 			"path",
 			"path" + splitChar + "synCat",
 			"head",
+			//"terminal",
+			//"funcPath",
+			//"funcBig",
+			//"funcSmall",
+			//"funcBig"+ splitChar + "funcSmall",
 			roleIdent + splitChar + "target",
 			roleIdent + splitChar + "synCat",
 			roleIdent + splitChar + "position",
 			roleIdent + splitChar + "path",
 			roleIdent + splitChar + "path" + splitChar + "synCat",
-			roleIdent + splitChar + "head");
+			roleIdent + splitChar + "head"
+			//roleIdent + splitChar + "terminal"
+			//roleIdent + splitChar + "funcPath"
+			//roleIdent + splitChar + "funcBig",
+			//roleIdent + splitChar + "funcSmall",
+			//roleIdent + splitChar + "funcBig"+ splitChar + "funcSmall"
+	);
 
-	//used while classification: in model.classify and
+
 	public static List<String> backOffFeature(String concatenatedFeature) {
 		return backOffRules.get(concatenatedFeature);
 	}
 
-	public static String getAbstractSynCat(String synCat) throws Exception{
-		if(!abstractSynCat.containsKey(synCat))
-		    throw new Exception("synCat "+synCat+" is unknown");
+	public static String getAbstractSynCat(String synCat) throws Exception {
+		if (!abstractSynCat.containsKey(synCat))
+			throw new Exception("synCat " + synCat + " is unknown");
 		return abstractSynCat.get(synCat);
 	}
 
@@ -385,6 +411,7 @@ public class FeatureExtractor {
 		//fv.addFeature("path", extractPath(idref));
 		extractPath(idref, fv);
 		fv.addFeature("head", extractHead(idref));
+		fv.addFeature("terminal", sentence.getNode(idref).isTerminal()?"1":"0");
 
 		return fv;
 	}
@@ -403,10 +430,16 @@ public class FeatureExtractor {
 		String path = "";
 		String cat;
 		String lastCat = "";
+		String func = "";
+		String lastFunc = "";
+		//String grammaticalFunctionBig = "X";
+		//String grammaticalFunctionSmall = "X";
+		String functionPath = "";
 
-		String targetHeadIDref = sentence.getTarget().getHeadIDref();
+		String targetHeadIDref = sentence.getTarget().getId();//sentence.getTarget().getHeadIDref(); //
 		if (targetHeadIDref.equals(idref)) {
 			path = "TARGET";
+			functionPath = "~";
 		} else {
 			List<String> idRefs = new ArrayList<String>(2);
 			idRefs.add(idref);
@@ -419,33 +452,107 @@ public class FeatureExtractor {
 
 			int i = indices[0];//0;
 
+			String daughterIDref = idref;
 			for (int j = ownIdPath.length - 1; j > i; j--) {
-				cat = sentence.getNode(ownIdPath[j]).getCategory();
+				Node node = sentence.getNode(ownIdPath[j]);
+				cat = node.getCategory();
 				if (!cat.startsWith("C") && !cat.equals(lastCat)) {
 					path += cat + "+";
 					lastCat = cat;
 				}
+				func = node.getEdges().get(daughterIDref);
+				if (!func.startsWith("C") && !func.equals(lastFunc)) {
+					functionPath += func + "+";
+					lastFunc = func;
+				}
+				daughterIDref = ownIdPath[j];
+				/*if(daughterIDref!=null){
+					grammaticalFunctionSmall = sentence.getNode(ownIdPath[j]).getEdges().get(daughterIDref);
+					daughterIDref = null;
+				} */
 			}
 
-			// nimm die wurzel des subtrees nur mit rein, wenn idref nicht auf (global) root zeigt. sonst fuege Kategorie manuell ein...
-			//if (i == 0)
-			//    path += "VROOT";
-			//else {
-			path += sentence.getNode(targetIdPath[i]).getCategory();
+			String parentIDref;
+			try {
+
+				if (i < targetIdPath.length) {
+					path += sentence.getNode(targetIdPath[i]).getCategory();
+					func = sentence.getNode(targetIdPath[i]).getEdges().get(daughterIDref);
+					parentIDref = targetIdPath[i];
+				} else {
+					path += sentence.getNode(targetHeadIDref).getCategory();
+					func = sentence.getNode(targetHeadIDref).getEdges().get(daughterIDref);
+					parentIDref = targetHeadIDref;
+				}
+			} catch (Exception e) {
+				System.out.println();
+				throw e;
+			}
+
+
+			if (func != null)
+				functionPath += func;
+			functionPath += "~";
+			//func = sentence.getNode(targetIdPath[i]).getEdges().get(daughterIDref);
+			/*
+			if(sentence.getNode(targetIdPath[i]).getEdges().containsKey(idref))
+				grammaticalFunctionSmall = sentence.getNode(targetIdPath[i]).getEdges().get(idref);
+
+			if (i < ownIdPath.length - 1) {
+				try {
+					grammaticalFunctionBig = sentence.getNode(targetIdPath[i]).getEdges().get(ownIdPath[i + 1]);
+					//System.out.println(idref + " (a): " + grammaticalFunctionBig + ", targetIdPath[i]: " + targetIdPath[i] + ", ownIdPath[i + 1]: " + ownIdPath[i + 1]);
+				} catch (Exception e) {
+					System.out.println();
+					throw new Exception("i: " + i + ", ownIdPath: " + ownIdPath);
+				}
+			} else {
+				if (!targetIdPath[i].equals(idref)) {
+					grammaticalFunctionBig = sentence.getNode(targetIdPath[i]).getEdges().get(idref);
+				} else {
+					try {
+					grammaticalFunctionBig = "X";//sentence.getNode(targetIdPath[i-1]).getEdges().get(targetIdPath[i]);
+					} catch (Exception e) {
+						System.out.println();
+						throw new Exception("i: " + i + ", ownIdPath: " + ownIdPath);
+					}
+				}
+				//System.out.println(idref + " (b): " + grammaticalFunctionBig + ", targetIdPath[i]: " + targetIdPath[i]);
+			}
+            */
 
 			lastCat = "";
+			lastFunc = "";
 			for (int j = i + 1; j < targetIdPath.length; j++) {
-				cat = sentence.getNode(targetIdPath[j]).getCategory();
+				Node node = sentence.getNode(targetIdPath[j]);
+				cat = node.getCategory();
 				if (!cat.startsWith("C") && !cat.equals(lastCat)) {
 					path += "-" + cat;
 					lastCat = cat;
 				}
+				func = sentence.getNode(parentIDref).getEdges().get(targetIdPath[j]);
+				if ((!func.startsWith("C") || j == i + 1) && !func.equals(lastFunc)) {
+					functionPath += func + "-";
+					lastFunc = func;
+				}
+				parentIDref = targetIdPath[j];
 			}
-		}
+			func = sentence.getNode(parentIDref).getEdges().get(targetHeadIDref);
 
-		//System.out.println(sentence.getTargets().get(0).getId() + ", " + idref + ": " + path);
+			if (func != null && !func.equals(lastFunc))
+				functionPath += func;
+			else if (functionPath.endsWith("-"))
+				functionPath = functionPath.substring(0, functionPath.length() - 1);
+		}
+		if (functionPath.equals(""))
+			System.out.println("ERROR functionPath: " + idref);
+
 		//return path;
 		fv.addFeature("path", path);
+		fv.addFeature("funcPath", functionPath);
+		//fv.addFeature("funcBig", grammaticalFunctionBig);
+		//fv.addFeature("funcSmall", grammaticalFunctionSmall);
+		//System.out.println(idref+": "+grammaticalFunctionSmall);
 	}
 
 
