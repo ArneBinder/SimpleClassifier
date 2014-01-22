@@ -29,9 +29,14 @@ public class ValidateResult {
 	private long[] result;
 	private final static double roundFactor = 1000000.0;
 	private final static String splitOut = "\t";
+	private final static int resultSize = 19;
+
+	public ValidateResult() {
+		result = new long[resultSize];
+	}
 
 	public ValidateResult(long[] result) {
-		this.result = new long[19];
+		this.result = new long[resultSize];
 		assert (result.length == 10);
 		//int pos = 0;
 		System.arraycopy(result, 0, this.result, 0, result.length);
@@ -41,7 +46,10 @@ public class ValidateResult {
 		System.arraycopy(getStats(idxTruePositiveFrameElementCount, idxClassyFrameElementCount, idxGoldFrameElementCount), 0, this.result, idxFEsFMeasure, 3);
 		//pos += 3;
 		System.arraycopy(getStats(idxTruePositiveFrameElementIDrefCountNameIndependent, idxClassyFrameElementIDrefCount, idxGoldFrameElementIDrefCount), 0, this.result, idxIDrefsNIFMeasure, 3);
+	}
 
+	public long[] getResult() {
+		return result;
 	}
 
 	public void printResult() {
@@ -59,15 +67,15 @@ public class ValidateResult {
 		System.out.println("TruePositiveFrameElementIDrefCountNameIndependent: \t" + result[idxTruePositiveFrameElementIDrefCountNameIndependent]);
 		System.out.println();
 		System.out.println("F-Measure (IDrefs): " + result[idxIDrefsFMeasure] / roundFactor);
-		System.out.println("F-Measure (FEs): " + result[idxFEsFMeasure]/ roundFactor);
-		System.out.println("F-Measure (IDrefsNI): " + result[idxIDrefsNIFMeasure]/ roundFactor);
+		System.out.println("F-Measure (FEs): " + result[idxFEsFMeasure] / roundFactor);
+		System.out.println("F-Measure (IDrefsNI): " + result[idxIDrefsNIFMeasure] / roundFactor);
 	}
 
 	@Override
 	public String toString() {
 		String temp = Long.toString(result[0]);
 		for (int i = 1; i < result.length; i++) {
-			if (i >= idxIDrefsFMeasure)
+			if (i < idxIDrefsFMeasure)
 				temp += splitOut + Long.toString(result[i]);
 			else
 				temp += splitOut + Double.toString(((double) result[i]) / roundFactor);
@@ -75,19 +83,26 @@ public class ValidateResult {
 		return temp;
 	}
 
-	public String getCaption(){
-		return "TruePositiveFrameElementIDrefCount"
-				+splitOut+"TruePositiveFrameElementIDrefCount_check"
-				+splitOut+"ClassyFrameElementIDrefCount"
-				+splitOut+"GoldFrameElementIDrefCount"
-				+splitOut+"TruePositiveFrameElementCount"
-				+splitOut+"TruePositiveFrameElementIDrefCountNameIndependent"
-				+splitOut+"ClassyFrameElementCount"
-				+splitOut+"GoldFrameElementCount"
-				+splitOut+"UnclassifiedSentenceCount"
-				+splitOut+"IDrefsFMeasure"
-				+splitOut+"FEsFMeasure"
-				+splitOut+"IDrefsNIFMeasure";
+	public static String getCaption() {
+		return "SentenceCount"
+				+ splitOut + "TruePositiveFrameElementIDrefCount"
+				+ splitOut + "TruePositiveFrameElementIDrefCount_check"
+				+ splitOut + "ClassyFrameElementIDrefCount"
+				+ splitOut + "GoldFrameElementIDrefCount"
+				+ splitOut + "TruePositiveFrameElementCount"
+				+ splitOut + "TruePositiveFrameElementIDrefCountNameIndependent"
+				+ splitOut + "ClassyFrameElementCount"
+				+ splitOut + "GoldFrameElementCount"
+				+ splitOut + "UnclassifiedSentenceCount"
+				+ splitOut + "IDrefsFMeasure"
+				+ splitOut + "IDrefsPrecision"
+				+ splitOut + "IDrefsRecall"
+				+ splitOut + "FEsFMeasure"
+				+ splitOut + "FEsPrecision"
+				+ splitOut + "FEsRecall"
+				+ splitOut + "IDrefsNIFMeasure"
+				+ splitOut + "IDrefsNIPrecision"
+				+ splitOut + "IDrefsNIRecall";
 	}
 
 
@@ -97,7 +112,7 @@ public class ValidateResult {
 		double recall = result[tpCount] / (double) result[origCount];
 		double fmeasure = 2.0 * precision * recall / (precision + recall);
 
-		return new long[]{(long) (precision * roundFactor), (long) (recall * roundFactor), (long) (fmeasure * roundFactor)};
+		return new long[]{(long) (fmeasure * roundFactor), (long) (precision * roundFactor), (long) (recall * roundFactor)};
 	}
 
 	public double getFMeasure(int idx) {
@@ -108,5 +123,18 @@ public class ValidateResult {
 		if (idx == 2)
 			return ((double) result[idxIDrefsNIFMeasure]) / roundFactor;
 		return -1.0;
+	}
+
+	public void addResult(ValidateResult validateResult) {
+		for (int i = 0; i < result.length; i++) {
+			result[i] += validateResult.getResult()[i];
+		}
+	}
+
+	public void normalize(int count) {
+		for (int i = 0; i < result.length; i++) {
+			result[i] /= count;
+		}
+
 	}
 }

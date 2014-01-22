@@ -15,10 +15,6 @@ import com.rits.cloning.Cloner;
  * @author Robert
  */
 public class ExtractionValidator {
-
-
-
-
 	public static void main(String[] args) throws SRLException, IOException {
 		if (args.length < 3) {
 			throw new IllegalArgumentException("3 arguments needed: -cross <originalCorpus> <resultFolder> <type:[single,(number)]>\n\t\t\t-single <orignalCorpus> <annotatedCorpus>");
@@ -69,12 +65,10 @@ public class ExtractionValidator {
 			System.out.println("validation: " + args[0] + " unknown");
 	}
 
-	public void performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException {
+	public ValidateResult performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException {
+		ValidateResult result = new ValidateResult();
 		long startTime = System.currentTimeMillis();
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
-		double fmeasureIDrefsSum = 0;
-		double fmeasureFEsSum = 0;
-		double fmeasureIDrefsNISum = 0;
 
 		String folderName = new Date().toString().replace(":", "-");
 		File currentCrossValidationFolder = new File(resultFolder.getAbsolutePath() + File.separatorChar + folderName);
@@ -135,8 +129,9 @@ public class ExtractionValidator {
 
 			startTime = System.currentTimeMillis();
 			System.out.print("--- -- validate annotated corpus " + (i + 1) + "... ");
-			long[] result = validate(splittedCorpora[i], annotateCorpus);
-			ValidateResult validateResult = new ValidateResult(result);
+			long[] valResult = validate(splittedCorpora[i], annotateCorpus);
+			ValidateResult validateResult = new ValidateResult(valResult);
+			result.addResult(validateResult);
 			System.out.println((System.currentTimeMillis() - startTime) + "ms");
 
 			startTime = System.currentTimeMillis();
@@ -151,9 +146,9 @@ public class ExtractionValidator {
 			validateResult.printResult();
 			//double[] stats;
 			//stats = getStats(result[idxTruePositiveFrameElementIDrefCount], result[idxClassyFrameElementIDrefCount], result[idxGoldFrameElementIDrefCount]);
-			fmeasureIDrefsSum += validateResult.getFMeasure(0);
-			fmeasureFEsSum += validateResult.getFMeasure(1);
-			fmeasureIDrefsNISum += validateResult.getFMeasure(2);
+			//fmeasureIDrefsSum += validateResult.getFMeasure(0);
+			//fmeasureFEsSum += validateResult.getFMeasure(1);
+			//fmeasureIDrefsNISum += validateResult.getFMeasure(2);
 
 			System.out.println("--- -- finished fold " + (i + 1) + " ---");
 
@@ -161,11 +156,13 @@ public class ExtractionValidator {
 			//	e.printStackTrace();
 			//}
 		}
+
 		System.out.println();
-		System.out.println("AVG F-Measure (correct IDref): \t" + (fmeasureIDrefsSum / crossValidationCount));
-		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (fmeasureFEsSum / crossValidationCount));
-		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (fmeasureIDrefsNISum / crossValidationCount));
-		// write overall result
+		System.out.println("AVG F-Measure (correct IDref): \t" + (result.getFMeasure(0) / crossValidationCount));
+		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (result.getFMeasure(1) / crossValidationCount));
+		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (result.getFMeasure(2) / crossValidationCount));
+
+		return result;
 	}
 
 	private long[] validate(Corpus originalCorpus, Corpus annotatedCorpus) {
