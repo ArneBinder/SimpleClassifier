@@ -8,7 +8,6 @@ import Classifier.bean.*;
 import Classifier.bean.Exceptions.*;
 import com.rits.cloning.Cloner;
 
-//import com.google.gson.Gson;
 
 /**
  * Takes two annotated corpora and writes the result into a result file
@@ -17,37 +16,8 @@ import com.rits.cloning.Cloner;
  */
 public class ExtractionValidator {
 
-	private final static int idxSentenceCount = 0;
-	//private final static int idxFrameCount = 1;
 
 
-	//private final static int idxCorrectSentenceCount = 3;
-	//private final static int idxCorrectFrameCount = 4;
-	private final static int idxTruePositiveFrameElementIDrefCount = 1;
-	private final static int idxTruePositiveFrameElementIDrefCount_check = 2;
-	private final static int idxClassyFrameElementIDrefCount = 3;
-	private final static int idxGoldFrameElementIDrefCount = 4;
-
-	private final static int idxTruePositiveFrameElementCount = 5;
-	private final static int idxTruePositiveFrameElementIDrefCountNameIndependent = 6;
-	private final static int idxClassyFrameElementCount = 7;
-	private final static int idxGoldFrameElementCount = 8;
-	private final static int idxUnclassifiedSentenceCount = 9;
-
-	//private final Corpus originalCorpus;
-	//private final File resultFolder;
-
-	// basic structure for a result array
-	// private final long[] resultValues = { // see next line
-	//
-	// 0, // sentenceCount
-	// 0, // frameCount
-	// 0, // frameElementCount
-	//
-	// 0, // correctSentenceCount
-	// 0, // correctFrameCount
-	// 0 // correctFrameElementCount
-	// };
 
 	public static void main(String[] args) throws SRLException, IOException {
 		if (args.length < 3) {
@@ -90,15 +60,9 @@ public class ExtractionValidator {
 			Corpus originalCorpus = ClassifierNB.readCorpusData(new File(args[1]));
 			Corpus annotatedCorpus = ClassifierNB.readCorpusData(new File(args[2]));
 			long[] result = extractionValidator.validate(originalCorpus, annotatedCorpus);
+			ValidateResult validateResult = new ValidateResult(result);
+			validateResult.printResult();
 
-			writeResult(result);
-			double[] stats;
-			stats = getStats(result[idxTruePositiveFrameElementIDrefCount], result[idxClassyFrameElementIDrefCount], result[idxGoldFrameElementIDrefCount]);
-			printStats(stats, "IDrefs");
-			stats = getStats(result[idxTruePositiveFrameElementCount], result[idxClassyFrameElementCount], result[idxGoldFrameElementCount]);
-			printStats(stats, "FEs");
-			stats = getStats(result[idxTruePositiveFrameElementIDrefCountNameIndependent], result[idxClassyFrameElementIDrefCount], result[idxGoldFrameElementIDrefCount]);
-			printStats(stats, "IdRefsNI");
 			annotatedCorpus.writeCorpusToFile(args[2]);
 
 		} else
@@ -108,9 +72,9 @@ public class ExtractionValidator {
 	public void performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException {
 		long startTime = System.currentTimeMillis();
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
-		double fmeasureSum = 0;
-		double fmeasureFESum = 0;
-		double fmeasureNISum = 0;
+		double fmeasureIDrefsSum = 0;
+		double fmeasureFEsSum = 0;
+		double fmeasureIDrefsNISum = 0;
 
 		String folderName = new Date().toString().replace(":", "-");
 		File currentCrossValidationFolder = new File(resultFolder.getAbsolutePath() + File.separatorChar + folderName);
@@ -172,6 +136,7 @@ public class ExtractionValidator {
 			startTime = System.currentTimeMillis();
 			System.out.print("--- -- validate annotated corpus " + (i + 1) + "... ");
 			long[] result = validate(splittedCorpora[i], annotateCorpus);
+			ValidateResult validateResult = new ValidateResult(result);
 			System.out.println((System.currentTimeMillis() - startTime) + "ms");
 
 			startTime = System.currentTimeMillis();
@@ -183,19 +148,12 @@ public class ExtractionValidator {
 
 			System.out.println("--- -- Result for fold " + (i + 1) + " ---");
 
-			writeResult(result);
-			double[] stats;
-			stats = getStats(result[idxTruePositiveFrameElementIDrefCount], result[idxClassyFrameElementIDrefCount], result[idxGoldFrameElementIDrefCount]);
-			fmeasureSum += stats[2];
-			printStats(stats, "IDrefs");
-
-			stats = getStats(result[idxTruePositiveFrameElementCount], result[idxClassyFrameElementCount], result[idxGoldFrameElementCount]);
-			fmeasureFESum += stats[2];
-			printStats(stats, "FEs");
-
-			stats = getStats(result[idxTruePositiveFrameElementIDrefCountNameIndependent], result[idxClassyFrameElementIDrefCount], result[idxGoldFrameElementIDrefCount]);
-			fmeasureNISum += stats[2];
-			printStats(stats, "IdRefsNI");
+			validateResult.printResult();
+			//double[] stats;
+			//stats = getStats(result[idxTruePositiveFrameElementIDrefCount], result[idxClassyFrameElementIDrefCount], result[idxGoldFrameElementIDrefCount]);
+			fmeasureIDrefsSum += validateResult.getFMeasure(0);
+			fmeasureFEsSum += validateResult.getFMeasure(1);
+			fmeasureIDrefsNISum += validateResult.getFMeasure(2);
 
 			System.out.println("--- -- finished fold " + (i + 1) + " ---");
 
@@ -204,14 +162,14 @@ public class ExtractionValidator {
 			//}
 		}
 		System.out.println();
-		System.out.println("AVG F-Measure (correct IDref): \t" + (fmeasureSum / crossValidationCount));
-		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (fmeasureFESum / crossValidationCount));
-		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (fmeasureNISum / crossValidationCount));
+		System.out.println("AVG F-Measure (correct IDref): \t" + (fmeasureIDrefsSum / crossValidationCount));
+		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (fmeasureFEsSum / crossValidationCount));
+		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (fmeasureIDrefsNISum / crossValidationCount));
 		// write overall result
 	}
 
 	private long[] validate(Corpus originalCorpus, Corpus annotatedCorpus) {
-		long[] resultValues = new long[100];
+		long[] resultValues = new long[10];
 		List<Sentence> annotatedSentenceList = annotatedCorpus.getSentences();
 
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
@@ -234,14 +192,14 @@ public class ExtractionValidator {
 						Frame annotatedFrame = annotatedSentence.getFrameForTargetLemma(origFrame.getTargetLemma());
 						if (annotatedFrame != null) {
 							for (FrameElement origFrameElement : origFrame.getFrameElements()) {
-								resultValues[idxGoldFrameElementCount]++;
-								resultValues[idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
+								resultValues[ValidateResult.idxGoldFrameElementCount]++;
+								resultValues[ValidateResult.idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
 
 								for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
 									if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
 										for (String origIDref : origFrameElement.getIdrefs()) {
 											if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
-												resultValues[idxTruePositiveFrameElementIDrefCountNameIndependent]++;
+												resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCountNameIndependent]++;
 											}
 										}
 									}
@@ -250,10 +208,10 @@ public class ExtractionValidator {
 								// check only for FE-Name...
 								FrameElement annotatedFrameElement = annotatedFrame.getFrameElement(origFrameElement.getName());
 								if (annotatedFrameElement != null) {
-									resultValues[idxTruePositiveFrameElementCount]++;
+									resultValues[ValidateResult.idxTruePositiveFrameElementCount]++;
 									for (String origIDref : origFrameElement.getIdrefs()) {
 										if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
-											resultValues[idxTruePositiveFrameElementIDrefCount]++;
+											resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCount]++;
 											annotatedFrameElement.setCorrect(origIDref);
 										}
 									}
@@ -269,53 +227,32 @@ public class ExtractionValidator {
 					for (Frame annotatedFrame : annotatedFrames)
 						for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
 							if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
-								resultValues[idxClassyFrameElementCount]++;
-								resultValues[idxClassyFrameElementIDrefCount] += annotatedFrameElement.getIdrefs().size();
+								resultValues[ValidateResult.idxClassyFrameElementCount]++;
+								resultValues[ValidateResult.idxClassyFrameElementIDrefCount] += annotatedFrameElement.getIdrefs().size();
 							}
 						}
 				} else {
-					resultValues[idxUnclassifiedSentenceCount]++;
+					resultValues[ValidateResult.idxUnclassifiedSentenceCount]++;
 				}
 			}
 
 
-			resultValues[idxSentenceCount]++;
+			resultValues[ValidateResult.idxSentenceCount]++;
 		}
 
 		return resultValues;
 	}
 
-	private static void writeResult(long[] resultValues) {
-		System.out.println("SentenceCount: \t" + resultValues[idxSentenceCount]);
-		System.out.println("TruePositiveFrameElementIDrefCount: \t" + resultValues[idxTruePositiveFrameElementIDrefCount]);
-		//System.out.println("TruePositiveFrameElementIDrefCount_check: \t" + resultValues[idxTruePositiveFrameElementIDrefCount_check]);
-		System.out.println("GoldFrameElementIDrefCount: \t" + resultValues[idxGoldFrameElementIDrefCount]);
-		System.out.println("ClassyFrameElementIDrefCount: \t" + resultValues[idxClassyFrameElementIDrefCount]);
-		System.out.println();
-		System.out.println("TruePositiveFrameElementCount: \t" + resultValues[idxTruePositiveFrameElementCount]);
-		//System.out.println("TruePositiveFrameElementCount_check: \t" + resultValues[idxTruePositiveFrameElementCount_check]);
-		System.out.println("GoldFrameElementCount: \t" + resultValues[idxGoldFrameElementCount]);
-		System.out.println("ClassyFrameElementCount: \t" + resultValues[idxClassyFrameElementCount]);
-		System.out.println();
-		System.out.println("TruePositiveFrameElementIDrefCountNameIndependent: \t" + resultValues[idxTruePositiveFrameElementIDrefCountNameIndependent]);
 
-	}
 
-	private static void printStats(double[] stats, String label) {
+	/*private static void printStats(double[] stats, String label) {
 		System.out.println("Precision (" + label + "): \t" + stats[0]);
 		System.out.println("Recall (" + label + "): \t" + stats[1]);
 		System.out.println("F-Measure (" + label + "): \t" + stats[2]);
 		System.out.println();
-	}
+	} */
 
-	private static double[] getStats(long tpCount, long classyCount, long origCount) {
 
-		double precision = tpCount / (double) classyCount;
-		double recall = tpCount / (double) origCount;
-		double fmeasure = 2.0 * precision * recall / (precision + recall);
-
-		return new double[]{precision, recall, fmeasure};
-	}
 
 
 }
