@@ -1,12 +1,15 @@
 package Classifier;
 
+import Classifier.bean.Exceptions;
+
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by Arne on 11.12.13.
  */
 public class Tester {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, Exceptions.SRLException {
         if (args.length < 4) {
             System.out.println("4 arguments (paths) needed: <separatedCorpusFolder> <singleCorpusFile> <modelFile> <annotatedFile>");
             return;

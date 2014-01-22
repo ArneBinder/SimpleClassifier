@@ -1,10 +1,6 @@
 package Classifier;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,6 +8,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import Classifier.bean.*;
+import Classifier.bean.Exceptions.*;
 import com.rits.cloning.Cloner;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -78,7 +75,7 @@ public class Corpus {
 	}
 
 
-	public Model trainModel() throws Exception {
+	public Model trainModel() throws SRLException  {
 		Model model = new Model(featureExtractor);
 
 		List<String> frameElementIDRefs;
@@ -138,7 +135,7 @@ public class Corpus {
 
 				}
 
-			} catch (Exception e) {
+			} catch (SRLException e) {
 				System.out.println("alreadyProcessed: " + allreadyProcessed);
 				throw e;
 			}
@@ -149,7 +146,7 @@ public class Corpus {
 		return model;
 	}
 
-	public void annotateCorpus(Model model) throws Exception {
+	public void annotateCorpus(Model model) throws SRLException {
 
 		FeatureVector featureVector = null;
 		Frame annotationFrame;
@@ -250,7 +247,7 @@ public class Corpus {
 		}
 	}
 
-	public void writeCorpusToFile(String fileName) throws Exception {
+	public void writeCorpusToFile(String fileName) throws IOException {
 		BufferedWriter out = new BufferedWriter(new FileWriter(new File(fileName)));
 		out.write("<?xml version='1.0' encoding='UTF-8'?>");
 		out.write("\n<corpus corpusname=\"tagged-corpus\">");
@@ -265,11 +262,11 @@ public class Corpus {
 		out.close();
 	}
 
-	public void parseFile(File file) throws Exception {
+	public void parseFile(File file) throws IOException {
 
 		// InputSource inputSource = null;
 		if (!file.exists() || !file.isFile()) {
-			throw new Exception("Given corpus file does not exist or is no file!");
+			throw new IOException("Given corpus file does not exist or is no file!");
 		}
 		try {
 			InputSource inputSource = new InputSource(new BufferedReader(new FileReader(file)));

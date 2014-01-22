@@ -67,19 +67,14 @@ public class Node {
         return pathsFromRoot.get(index);
     }
 
-	public void addPathFromRoot(List<String> pathFromRoot) throws Exception{
+	public void addPathFromRoot(List<String> pathFromRoot){
 		String[] newPathFromRoot = new String[pathFromRoot.size()];
         int i=0;
 		for (String idRef: pathFromRoot) {
             newPathFromRoot[i] = idRef;
             i++;
 		}
-        try{
         pathsFromRoot.add(newPathFromRoot);
-        }catch (Exception e){
-            System.out.println("TEST");
-            throw e;
-        }
 	}
 
 	public int getLastWordPos() {

@@ -1,10 +1,7 @@
 
 package Classifier;
 
-import Classifier.bean.Const;
-import Classifier.bean.FeatureTypes;
-import Classifier.bean.FeatureVector;
-import Classifier.bean.MultiSet;
+import Classifier.bean.*;
 
 import java.io.*;
 import java.util.*;
@@ -59,7 +56,7 @@ public class Model {
 		featureValueFrequency.get(featureType).add(featureValue);
 	}
 
-	public void addFeatureVector(FeatureVector featureVector) throws Exception {
+	public void addFeatureVector(FeatureVector featureVector) throws Exceptions.FeatureTypeNotFoundException {
 		for (Entry<String, String> pair : featureVector.getFilteredPowerSet(featureExtractor.getFeatureTypes().getUsedFeatures()).entrySet()) {
 			incCount(pair.getKey(), pair.getValue());
 			totalCount++;
@@ -112,7 +109,7 @@ public class Model {
 	}
 
 	// return [role > probability]
-	public Entry<String, Double> classify(FeatureVector featureVector) throws Exception {
+	public Entry<String, Double> classify(FeatureVector featureVector) throws Exceptions.FeatureTypeNotFoundException {
 		List<String> startingFeatureTypes = FeatureTypes.backOffFeature("");
 
 		String bestRoleName = "";
@@ -138,7 +135,7 @@ public class Model {
 		return bestRole;
 	}
 
-	public Double getRoleProbability(List<String> featureTypes, FeatureVector featureVector) throws Exception {
+	public Double getRoleProbability(List<String> featureTypes, FeatureVector featureVector) throws Exceptions.FeatureTypeNotFoundException {
 
 		if (featureTypes == null)
 			return smoothingValue;
@@ -167,7 +164,7 @@ public class Model {
 		return probability;
 	}
 
-	public void writeModelToFile(String fileName) throws Exception {
+	public void writeModelToFile(String fileName) throws IOException {
 
 		BufferedWriter out = new BufferedWriter(new FileWriter(new File(fileName)));
 
@@ -200,7 +197,7 @@ public class Model {
 		out.close();
 	}
 
-	public void readModelFromFile(String fileName) throws Exception {
+	public void readModelFromFile(String fileName) throws IOException{
 
 		BufferedReader in = new BufferedReader(new FileReader(new File(fileName)));
 

@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import Classifier.bean.FeatureTypes;
-import Classifier.bean.FeatureVector;
-import Classifier.bean.Node;
-import Classifier.bean.Sentence;
+import Classifier.bean.*;
+import Classifier.bean.Exceptions.*;
 
 public class FeatureExtractor {
 
@@ -69,7 +67,7 @@ public class FeatureExtractor {
 			return Integer.MAX_VALUE;
 		}
 
-		public String chooseHeadChild(String parentCategory, Map<String, String> edges, Sentence sentence) throws Exception {
+		public String chooseHeadChild(String parentCategory, Map<String, String> edges, Sentence sentence) throws IDrefNotInSentenceException {
 			//smaller is better!
 			int bestEdgeQuality = Integer.MAX_VALUE;
 			String bestChildRef = null;
@@ -321,8 +319,6 @@ public class FeatureExtractor {
 		abstractSynCat.put("\\$(", ""); //     sonstige Satzzeichen; satzintern        - [,]()
 
 
-
-
 	}
 
 
@@ -340,41 +336,47 @@ public class FeatureExtractor {
 		return headRules;
 	}
 
-	public static String calculateHeadIDref(String parentCategory, Map<String, String> edges, Sentence sentence) throws Exception {
+	public static String calculateHeadIDref(String parentCategory, Map<String, String> edges, Sentence sentence) throws IDrefNotInSentenceException {
 		return headRules.chooseHeadChild(parentCategory, edges, sentence);
 	}
 
 
-
-	public void setSentence(Sentence s) throws Exception {
+	public void setSentence(Sentence s) {
 		this.sentence = s;
 		//dummy = "";
 		//enrichInformation();
 	}
 
 	public FeatureVector extract(String idref)
-			throws Exception {
+			throws IDrefNotInSentenceException, RootNotInPathException, FeatureValueNotCalculatedException {
 		FeatureVector fv = new FeatureVector();
-		fv.addFeature("target", extractTarget());
-		fv.addFeature("synCat", extractSyntacticalCategory(idref));
-		fv.addFeature("position", extractPosition(idref));
+		if (FeatureTypes.isUsedFeatureType("target"))
+			fv.addFeature("target", extractTarget());
+		if (FeatureTypes.isUsedFeatureType("synCat"))
+			fv.addFeature("synCat", extractSyntacticalCategory(idref));
+		if (FeatureTypes.isUsedFeatureType("position"))
+			fv.addFeature("position", extractPosition(idref));
 		//fv.addFeature("path", extractPath(idref));
-		extractPath(idref, fv);
-		fv.addFeature("head", extractHead(idref));
-		fv.addFeature("terminal", sentence.getNode(idref).isTerminal() ? "1" : "0");
-		fv.addFeature("nextHead", extractNextHead(idref));
+		if (FeatureTypes.isUsedFeatureType("path") || FeatureTypes.isUsedFeatureType("funcPath"))
+			extractPath(idref, fv);
+		if (FeatureTypes.isUsedFeatureType("head"))
+			fv.addFeature("head", extractHead(idref));
+		if (FeatureTypes.isUsedFeatureType("terminal"))
+			fv.addFeature("terminal", sentence.getNode(idref).isTerminal() ? "1" : "0");
+		if (FeatureTypes.isUsedFeatureType("nextHead"))
+			fv.addFeature("nextHead", extractNextHead(idref));
 
 		return fv;
 	}
 
-	private String extractHead(String idref) throws Exception {
+	private String extractHead(String idref) throws IDrefNotInSentenceException {
 		String headIDref = sentence.getNode(idref).getHeadIDref();
 		if (headIDref != null)
 			return sentence.getNode(headIDref).getAttributes().get("lemma");
-		return "null";
+		return "NOHEAD";
 	}
 
-	private String extractNextHead(String idRef) throws Exception {
+	private String extractNextHead(String idRef) throws IDrefNotInSentenceException {
 
 		Node node = sentence.getNode(idRef);
 		String headIDref = null;
@@ -386,13 +388,13 @@ public class FeatureExtractor {
 			for (String[] path : node.getPathsFromRoot()) {
 				if (path.length >= i) {
 					String curHeadIDref;
-					try {
-						curHeadIDref = sentence.getNode(path[path.length - i]).getHeadIDref();
-					} catch (Exception e) {
-						System.out.println(i + "; " + path.length);
+					//try {
+					curHeadIDref = sentence.getNode(path[path.length - i]).getHeadIDref();
+					//} catch (Exception e) {
+					//	System.out.println(i + "; " + path.length);
 
-						throw e;
-					}
+					//	throw e;
+					//}
 					if (curHeadIDref != null && !curHeadIDref.equals(sentence.getNode(idRef).getHeadIDref())) {
 						headIDref = curHeadIDref;
 					}
@@ -418,7 +420,7 @@ public class FeatureExtractor {
 	}
 
 	private void extractPath(String idref, FeatureVector fv)
-			throws Exception {
+			throws IDrefNotInSentenceException, RootNotInPathException {
 
 		String path = "";
 		String cat;
@@ -441,7 +443,6 @@ public class FeatureExtractor {
 			int[] indices = sentence.calculateRootOfSubtree(idRefs);
 			String[] ownIdPath = sentence.getNode(idref).getPathFromRoot(indices[1]);
 			String[] targetIdPath = sentence.getNode(targetHeadIDref).getPathFromRoot(indices[2]);
-			//TODO: check if correct...
 
 			int i = indices[0];//0;
 
@@ -466,21 +467,21 @@ public class FeatureExtractor {
 			}
 
 			String parentIDref;
-			try {
+			//try {
 
-				if (i < targetIdPath.length) {
-					path += sentence.getNode(targetIdPath[i]).getCategory();
-					func = sentence.getNode(targetIdPath[i]).getEdges().get(daughterIDref);
-					parentIDref = targetIdPath[i];
-				} else {
-					path += sentence.getNode(targetHeadIDref).getCategory();
-					func = sentence.getNode(targetHeadIDref).getEdges().get(daughterIDref);
-					parentIDref = targetHeadIDref;
-				}
-			} catch (Exception e) {
-				System.out.println();
-				throw e;
+			if (i < targetIdPath.length) {
+				path += sentence.getNode(targetIdPath[i]).getCategory();
+				func = sentence.getNode(targetIdPath[i]).getEdges().get(daughterIDref);
+				parentIDref = targetIdPath[i];
+			} else {
+				path += sentence.getNode(targetHeadIDref).getCategory();
+				func = sentence.getNode(targetHeadIDref).getEdges().get(daughterIDref);
+				parentIDref = targetHeadIDref;
 			}
+			//} catch (Exception e) {
+			//	System.out.println();
+			//	throw e;
+			//}
 
 
 			if (func != null)
@@ -541,8 +542,10 @@ public class FeatureExtractor {
 			System.out.println("ERROR functionPath: " + idref);
 
 		//return path;
-		fv.addFeature("path", path);
-		fv.addFeature("funcPath", functionPath);
+		if (FeatureTypes.isUsedFeatureType("path"))
+			fv.addFeature("path", path);
+		if (FeatureTypes.isUsedFeatureType("funcPath"))
+			fv.addFeature("funcPath", functionPath);
 		//fv.addFeature("funcBig", grammaticalFunctionBig);
 		//fv.addFeature("funcSmall", grammaticalFunctionSmall);
 		//System.out.println(idref+": "+grammaticalFunctionSmall);
@@ -550,7 +553,7 @@ public class FeatureExtractor {
 
 
 	private String extractPosition(String idref)
-			throws Exception {
+			throws IDrefNotInSentenceException, FeatureValueNotCalculatedException {
 
 		String position = "";
 
@@ -576,7 +579,7 @@ public class FeatureExtractor {
 			return "3";
 
 		if (position.isEmpty()) {
-			throw new Exception("The position could not be determined!");
+			throw new FeatureValueNotCalculatedException("The position could not be determined!");
 		}
 		return "";
 
@@ -590,11 +593,11 @@ public class FeatureExtractor {
 	 * @return
 	 * @throws Exception
 	 */
-	private String extractSyntacticalCategory(String idref) throws Exception {
+	private String extractSyntacticalCategory(String idref) throws IDrefNotInSentenceException {
 		return sentence.getNode(idref).getCategory();
 	}
 
-	private String extractTarget() throws Exception {
+	private String extractTarget() throws IDrefNotInSentenceException {
 
 		String targetLemma = "";
 		targetLemma = sentence.getNode(sentence.getTarget().getHeadIDref()).getAttributes().get("lemma");

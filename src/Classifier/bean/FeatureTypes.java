@@ -1,19 +1,17 @@
 package Classifier.bean;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 /**
  * Created by Arne on 22.01.14.
  */
 public class FeatureTypes {
-	private static final List<String> usedFeatures;
+	private static List<String> usedFeatures;
 	private static Map<String, List<String>> backOffRules = new HashMap<String, List<String>>();
 	private static final String splitMap = ">";
 	private static final String splitList = ",";
-	private static final String commentIndicator = "%";
+	private static final char commentIndicator = '%';
 
 	static {
 		String splitChar = Const.splitChar;
@@ -83,8 +81,37 @@ public class FeatureTypes {
 		return usedFeatures;
 	}
 
-	public static void readFeatureTypesFromFile(String fileName){
+	public static void readFeatureTypesFromFile(String fileName) throws IOException{
+		BufferedReader in = new BufferedReader(new FileReader(new File(fileName)));
+		backOffRules = new HashMap<String, List<String>>();
+		usedFeatures = new LinkedList<String>();
+		String line = in.readLine().replaceAll("\\s+","");
+		while (line != null) {
+			if(!line.isEmpty() && line.charAt(0)!=commentIndicator){
 
+				if(line.contains(splitMap)){
+					String[] pair = line.split(splitMap);
+					String key = pair[0];
+					backOffRules.put(key, Arrays.asList(pair[0].split(splitList)));
+				}else{
+					if(line.contains(splitList)){
+						for(String featureType: line.split(splitList)){
+							usedFeatures.add(featureType);
+							usedFeatures.add(Const.roleTypeIdentifier+Const.splitChar+featureType);
+						}
+					}else{
+						usedFeatures.add(line);
+					    usedFeatures.add(Const.roleTypeIdentifier+Const.splitChar+line);
+					}
+				}
+			}
 
+			line = in.readLine().replaceAll("\\s+","");
+		}
+
+	}
+
+	public static boolean isUsedFeatureType(String featureType){
+		return usedFeatures.contains(featureType);
 	}
 }

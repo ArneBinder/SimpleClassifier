@@ -2,6 +2,7 @@ package Classifier.bean;
 
 import Classifier.FeatureExtractor;
 import Classifier.Helper;
+import Classifier.bean.Exceptions.*;
 
 import java.util.*;
 
@@ -52,12 +53,12 @@ public class Sentence implements Comparable<Sentence> {
 		}
 	}
 
-	public Node getNode(String idRef) throws Exception {
+	public Node getNode(String idRef) throws IDrefNotInSentenceException {
 		if (terminals.containsKey(idRef))
 			return terminals.get(idRef);
 		else if (nonterminals.containsKey(idRef))
 			return nonterminals.get(idRef);
-		else throw new Exception("idRef: " + idRef + " not in Sentence: " + getId());
+		else throw new IDrefNotInSentenceException("idRef: " + idRef + " not in Sentence: " + getId());
 	}
 
 	public Node getTarget() {
@@ -67,12 +68,12 @@ public class Sentence implements Comparable<Sentence> {
 
 
 	//TODO: report to the others: targets can be nonTerminals too!!! --> solution (already implemented): take head  (kriechen.xml)
-	public void setTarget(List<String> targetIdRefs) throws Exception {
+	public void setTarget(List<String> targetIdRefs) throws SRLException {
 		//if(getId().equals("s38580"))
 		//  System.out.println("test");
 		if (targetIdRefs.size() == 0) {
 			//System.out.println("test");
-			throw new Exception(
+			throw new NoTargetsException(
 					"No targets for sentenceID: " + getId() + " to add.");
 		}
 
@@ -89,7 +90,7 @@ public class Sentence implements Comparable<Sentence> {
 		}
 	}
 
-	public void setTarget(String targetIdRef) throws Exception {
+	public void setTarget(String targetIdRef) throws IDrefNotInSentenceException {
 		target = getNode(targetIdRef);
 	}
 
@@ -134,7 +135,7 @@ public class Sentence implements Comparable<Sentence> {
 		this.rootIDref = rootID;
 	}
 
-	public List<List<String>> extractTargetIDRefs(Set<String> targetLemmata) throws Exception {
+	public List<List<String>> extractTargetIDRefs(Set<String> targetLemmata) throws IDrefNotInSentenceException {
 		List<List<String>> result = new LinkedList<List<String>>();
 		List<String> extractTargetIDRefs;
 
@@ -151,7 +152,7 @@ public class Sentence implements Comparable<Sentence> {
 		return result;
 	}
 
-	public List<String> extractTargetIDRefs(String targetLemma) throws Exception {
+	public List<String> extractTargetIDRefs(String targetLemma) throws IDrefNotInSentenceException {
 		List<String> targetIDRefs = null;
 
 		for (Node nonterminal : nonterminals.values()) {
@@ -272,7 +273,7 @@ public class Sentence implements Comparable<Sentence> {
 	// smallest subtree, which contains all idRefs
 	// returns: [depth, indexOfPathFromRoot_0, indexOfPathFromRoot_1, indexOfPathFromRoot_2, ... ]
 	// -> indexOfPathFromRoot for each idref (ordered!),
-	public int[] calculateRootOfSubtree(List<String> idRefs) throws Exception {
+	public int[] calculateRootOfSubtree(List<String> idRefs) throws IDrefNotInSentenceException, RootNotInPathException {
 		//idref Index > pathsFromRoot Index > pathFromRoot Path
 		String[][][] pathsFromRoot = new String[idRefs.size()][][];
 
@@ -341,7 +342,7 @@ public class Sentence implements Comparable<Sentence> {
 		if (indices[0] > 0) {
 			//indices[0]--;
 		} else {
-			throw new Exception("Could not calculate common path for passed idrefs (VROOT not in path)");
+			throw new RootNotInPathException("Could not calculate common path for passed idrefs (VROOT not in path)");
 		}
 
 		return result;
@@ -367,7 +368,7 @@ public class Sentence implements Comparable<Sentence> {
 	//  - firstWordPos
 	//  - lastWordPos
 	//  - headIDref
-	private Map.Entry<Integer, Integer> traverseTree(String curIDRef, ArrayList<String> pathFromRoot) throws Exception {
+	private Map.Entry<Integer, Integer> traverseTree(String curIDRef, ArrayList<String> pathFromRoot) throws IDrefNotInSentenceException {
 		String parentIdRef = "";
 		Node curNode = getNode(curIDRef);
 		if (curNode.getHeadIDref() == null && !curNode.isHeadChecked()) {
@@ -408,7 +409,7 @@ public class Sentence implements Comparable<Sentence> {
 	}
 
 
-	public Node calculateHeadWord(List<String> idrefs) throws Exception {
+	public Node calculateHeadWord(List<String> idrefs) throws IDrefNotInSentenceException {
 		Collections.sort(idrefs);
 		//if(idrefs.contains("s21270_1"))
 		//  System.out.println("test");
@@ -486,7 +487,7 @@ public class Sentence implements Comparable<Sentence> {
 	}
 
 
-	public void enrichInformation() throws Exception {
+	public void enrichInformation() throws IDrefNotInSentenceException {
 		traverseTree(getRootIDref(), new ArrayList<String>(30));
 
 

@@ -4,6 +4,7 @@ import Classifier.bean.Const;
 import Classifier.bean.FeatureVector;
 import Classifier.bean.MultiSet;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.*;
 
@@ -11,7 +12,7 @@ import java.util.*;
  * Created by Arne on 14.01.14.
  */
 public class StatisticalTest {
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException{
 		if ((args.length < 2) || (args.length < 4 && !args[0].equals("-chisquareALL"))) {
 			System.out.println("Wrong arguments: -chisquare modelFileName featureA featureB");
 			System.out.println("                 -chisquareALL modelFileName");

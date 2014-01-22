@@ -1,14 +1,12 @@
 package Classifier;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
-import Classifier.bean.Const;
-import Classifier.bean.FrameElement;
+import Classifier.bean.*;
+import Classifier.bean.Exceptions.*;
 import com.rits.cloning.Cloner;
-
-import Classifier.bean.Frame;
-import Classifier.bean.Sentence;
 
 //import com.google.gson.Gson;
 
@@ -51,7 +49,7 @@ public class ExtractionValidator {
 	// 0 // correctFrameElementCount
 	// };
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws SRLException, IOException {
 		if (args.length < 3) {
 			throw new IllegalArgumentException("3 arguments needed: -cross <originalCorpus> <resultFolder> <type:[single,(number)]>\n\t\t\t-single <orignalCorpus> <annotatedCorpus>");
 
@@ -107,7 +105,7 @@ public class ExtractionValidator {
 			System.out.println("validation: " + args[0] + " unknown");
 	}
 
-	public void performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exception {
+	public void performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException {
 		long startTime = System.currentTimeMillis();
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
 		double fmeasureSum = 0;
