@@ -3,6 +3,7 @@ package Classifier;
 import java.io.File;
 import java.util.*;
 
+import Classifier.bean.Const;
 import Classifier.bean.FrameElement;
 import com.rits.cloning.Cloner;
 
@@ -239,7 +240,7 @@ public class ExtractionValidator {
 								resultValues[idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
 
 								for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
-									if (!annotatedFrameElement.getName().equals(Model.getDummyRole())) {
+									if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
 										for (String origIDref : origFrameElement.getIdrefs()) {
 											if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
 												resultValues[idxTruePositiveFrameElementIDrefCountNameIndependent]++;
@@ -269,7 +270,7 @@ public class ExtractionValidator {
 
 					for (Frame annotatedFrame : annotatedFrames)
 						for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
-							if (!annotatedFrameElement.getName().equals(Model.getDummyRole())) {
+							if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
 								resultValues[idxClassyFrameElementCount]++;
 								resultValues[idxClassyFrameElementIDrefCount] += annotatedFrameElement.getIdrefs().size();
 							}

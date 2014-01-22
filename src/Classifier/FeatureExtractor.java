@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import Classifier.bean.FeatureTypes;
 import Classifier.bean.FeatureVector;
 import Classifier.bean.Node;
 import Classifier.bean.Sentence;
@@ -88,11 +89,12 @@ public class FeatureExtractor {
 	}
 
 	private Sentence sentence = null;
-	private static final String roleIdent = FeatureVector.getRoleTypeIdentifier();
-	private static final String splitChar = FeatureVector.getSplitChar();
+	//private static final String roleIdent = FeatureVector.getRoleTypeIdentifier();
+	//private static final String splitChar = FeatureVector.getSplitChar();
+	private static FeatureTypes featureTypes = new FeatureTypes();
 	private static String[] phrasalCategories = {"AA", "AP", "AVP", "CAC", "CAVP", "CCP", "CH", "CNP", "CO", "CPP", "CS", "CVP", "CVZ", "DL", "ISU", "MPN", "MTA", "NM", "NP", "PP", "QL", "S", "VP", "VZ"};
 	private static HeadRules headRules;
-	private static Map<String, List<String>> backOffRules = new HashMap<String, List<String>>();
+
 	private static Map<String, String> abstractSynCat = new HashMap<String, String>();
 
 	private static String[] addToPhrasalCat(String cat) {
@@ -319,67 +321,13 @@ public class FeatureExtractor {
 		abstractSynCat.put("\\$(", ""); //     sonstige Satzzeichen; satzintern        - [,]()
 
 
-		//used while classification: in model.classify and
-		backOffRules.put("",
-				Arrays.asList(
-						roleIdent + splitChar + "target",
-						roleIdent + splitChar + "position",
-						roleIdent + splitChar + "path" + splitChar + "synCat",
-						roleIdent + splitChar + "head",
-						roleIdent + splitChar + "nextHead"
 
-						//roleIdent + splitChar + "terminal"
-						//roleIdent + splitChar + "funcPath"
-						//roleIdent + splitChar + "funcBig",
-						//roleIdent + splitChar + "funcSmall",
-						//roleIdent + splitChar + "funcBig"+ splitChar + "funcSmall"
-				));
-		backOffRules.put(roleIdent + splitChar + "path" + splitChar + "synCat",
-				Arrays.asList(
-						roleIdent + splitChar + "path",
-						roleIdent + splitChar + "synCat"));
-		/*backOffRules.put(roleIdent + splitChar + "funcBig"+ splitChar + "funcSmall",
-				Arrays.asList(
-						roleIdent + splitChar + "funcBig",
-						roleIdent + splitChar + "funcSmall"));
-        */
 
 	}
 
 
-	//used while training: in model.addFeatureVector and model.calculateRelativeFrequenciesPerRole
-	// TODO complete rule set @ P17 @ Jurafsky
-	public static final List<String> usedFeatures = Arrays.asList(
-			roleIdent,
-			"target",
-			"synCat",
-			"position",
-			"path",
-			"path" + splitChar + "synCat",
-			"head",
-			"nextHead",
-			//"terminal",
-			//"funcPath",
-			//"funcBig",
-			//"funcSmall",
-			//"funcBig"+ splitChar + "funcSmall",
-			roleIdent + splitChar + "target",
-			roleIdent + splitChar + "synCat",
-			roleIdent + splitChar + "position",
-			roleIdent + splitChar + "path",
-			roleIdent + splitChar + "path" + splitChar + "synCat",
-			roleIdent + splitChar + "head",
-			roleIdent + splitChar + "nextHead"
-			//roleIdent + splitChar + "terminal"
-			//roleIdent + splitChar + "funcPath"
-			//roleIdent + splitChar + "funcBig",
-			//roleIdent + splitChar + "funcSmall",
-			//roleIdent + splitChar + "funcBig"+ splitChar + "funcSmall"
-	);
-
-
-	public static List<String> backOffFeature(String concatenatedFeature) {
-		return backOffRules.get(concatenatedFeature);
+	public static FeatureTypes getFeatureTypes() {
+		return featureTypes;
 	}
 
 	public static String getAbstractSynCat(String synCat) throws Exception {
@@ -396,9 +344,7 @@ public class FeatureExtractor {
 		return headRules.chooseHeadChild(parentCategory, edges, sentence);
 	}
 
-	public List<String> getUsedFeatures() {
-		return usedFeatures;
-	}
+
 
 	public void setSentence(Sentence s) throws Exception {
 		this.sentence = s;

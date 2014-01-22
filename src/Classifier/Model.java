@@ -1,6 +1,8 @@
 
 package Classifier;
 
+import Classifier.bean.Const;
+import Classifier.bean.FeatureTypes;
 import Classifier.bean.FeatureVector;
 import Classifier.bean.MultiSet;
 
@@ -13,7 +15,7 @@ import java.util.Map.Entry;
  */
 public class Model {
 	//private static List<String> dummyRoles = Arrays.asList("dummyRole1");//,"dummyRole2","dummyRole3","dummyRole4","dummyRole5","dummyRole6","dummyRole7","dummyRole8","dummyRole9","dummyRole10");//new ArrayList<String>();//"dummy";
-	private static String dummyRole = "dummyRole";
+
 	private static double smoothingValue = Math.log(0.000001);
 	private static final String modelOutSplitChar = "\t";
 
@@ -39,9 +41,9 @@ public class Model {
 		return featureValueFrequency;
 	}
 
-	public static String getDummyRole() {
-		return dummyRole;
-	}
+	//public static String getDummyRole() {
+	//	return dummyRole;
+	//}
 
 	public Set<String> getTargetLemmata() {
 
@@ -58,7 +60,7 @@ public class Model {
 	}
 
 	public void addFeatureVector(FeatureVector featureVector) throws Exception {
-		for (Entry<String, String> pair : featureVector.getFilteredPowerSet(featureExtractor.getUsedFeatures()).entrySet()) {
+		for (Entry<String, String> pair : featureVector.getFilteredPowerSet(featureExtractor.getFeatureTypes().getUsedFeatures()).entrySet()) {
 			incCount(pair.getKey(), pair.getValue());
 			totalCount++;
 		}
@@ -69,13 +71,13 @@ public class Model {
 
 		featureValueFrequency.put("all", new MultiSet<String>());
 		featureValueFrequency.get("all").add("all", totalCount);
-		for (String featureType : featureExtractor.getUsedFeatures()) {
-			if (featureType.contains(FeatureVector.getRoleTypeIdentifier())) {
+		for (String featureType : featureExtractor.getFeatureTypes().getUsedFeatures()) {
+			if (featureType.contains(Const.roleTypeIdentifier)) {
 				int roleIndex = 0;
 				String role = "";
 				int i = 0;
-				for (String featureTypePart : featureType.split(FeatureVector.getSplitChar())) {
-					if (featureTypePart.equals(FeatureVector.getRoleTypeIdentifier())) {
+				for (String featureTypePart : featureType.split(Const.splitChar)) {
+					if (featureTypePart.equals(Const.roleTypeIdentifier)) {
 						roleIndex = i;
 						role = featureTypePart;
 					}
@@ -84,7 +86,7 @@ public class Model {
 
 				for (Entry<String, Integer> countsPerRolePerFeatureValue : featureValueFrequency.get(featureType).getMap().entrySet()) {
 					String featureValue = countsPerRolePerFeatureValue.getKey();
-					String[] featureValueParts = featureValue.split(FeatureVector.getSplitChar());
+					String[] featureValueParts = featureValue.split(Const.splitChar);
 
 					if (!featureValueRelativeRoleFrequency.containsKey(featureType)) {
 						featureValueRelativeRoleFrequency.put(featureType, new HashMap<String, Double>());
@@ -111,17 +113,17 @@ public class Model {
 
 	// return [role > probability]
 	public Entry<String, Double> classify(FeatureVector featureVector) throws Exception {
-		List<String> startingFeatureTypes = FeatureExtractor.backOffFeature("");
+		List<String> startingFeatureTypes = FeatureTypes.backOffFeature("");
 
 		String bestRoleName = "";
 		double bestRoleProbability = Double.NEGATIVE_INFINITY;
 
 		double roleProbability = 0.0;
 
-		for (String role : featureValueRelativeRoleFrequency.get(FeatureVector.getRoleTypeIdentifier()).keySet()) {
-			featureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), role);
-			if(featureValueRelativeRoleFrequency.get(FeatureVector.getRoleTypeIdentifier()).containsKey(role)){
-				roleProbability = featureValueRelativeRoleFrequency.get(FeatureVector.getRoleTypeIdentifier()).get(role) + getRoleProbability(startingFeatureTypes, featureVector);
+		for (String role : featureValueRelativeRoleFrequency.get(Const.roleTypeIdentifier).keySet()) {
+			featureVector.addFeature(Const.roleTypeIdentifier, role);
+			if(featureValueRelativeRoleFrequency.get(Const.roleTypeIdentifier).containsKey(role)){
+				roleProbability = featureValueRelativeRoleFrequency.get(Const.roleTypeIdentifier).get(role) + getRoleProbability(startingFeatureTypes, featureVector);
 			} else{
 				roleProbability = smoothingValue + getRoleProbability(startingFeatureTypes, featureVector);
 		}
@@ -154,11 +156,11 @@ public class Model {
 
 				} else {
 					//try{
-					probability += getRoleProbability(FeatureExtractor.backOffFeature(featureType), featureVector);
+					probability += getRoleProbability(FeatureTypes.backOffFeature(featureType), featureVector);
 				}
 
 			} else {
-				probability += getRoleProbability(FeatureExtractor.backOffFeature(featureType), featureVector);
+				probability += getRoleProbability(FeatureTypes.backOffFeature(featureType), featureVector);
 			}
 		}
 

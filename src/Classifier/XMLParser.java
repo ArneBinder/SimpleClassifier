@@ -72,7 +72,7 @@ public class XMLParser extends DefaultHandler {
 
 			if (localName.equals("nt") && topElement.equals("graph")) {
 				elements.push(localName);
-				curNode = new Node(attributes.getValue("id"),	attributes.getValue("cat"));
+				curNode = new Node(attributes.getValue("id"), attributes.getValue("cat"));
 			}
 
 			if (localName.equals("edge") && topElement.equals("nt")) {

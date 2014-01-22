@@ -108,7 +108,7 @@ public class Corpus {
 						// frameElement.getValue().get(0);
 						if (!frameElementIDRef.equals(sentence.getRootIDref()) && sentence.getNode(frameElementIDRef).getHeadIDref() != null) {
 							FeatureVector feFeatureVector = featureExtractor.extract(frameElementIDRef);
-							feFeatureVector.addFeature(FeatureVector.getRoleTypeIdentifier(), frameElementName);
+							feFeatureVector.addFeature(Const.roleTypeIdentifier, frameElementName);
 							model.addFeatureVector(feFeatureVector);
 							frameElementIDRefs.add(frameElementIDRef);
 						}
@@ -121,7 +121,7 @@ public class Corpus {
 						if (!frameElementIDRefs.contains(id) && sentence.getNode(id).getHeadIDref() != null) {
 
 							currentVector = featureExtractor.extract(id);
-							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), Model.getDummyRole());
+							currentVector.addFeature(Const.roleTypeIdentifier, Const.dummyRole);
 							model.addFeatureVector(currentVector);
 						}
 					}
@@ -131,7 +131,7 @@ public class Corpus {
 						if (!frameElementIDRefs.contains(id) && !sentence.getRootIDref().equals(id) && sentence.getNode(id).getHeadIDref() != null) {
 
 							currentVector = featureExtractor.extract(id);
-							currentVector.addFeature(FeatureVector.getRoleTypeIdentifier(), Model.getDummyRole());
+							currentVector.addFeature(Const.roleTypeIdentifier, Const.dummyRole);
 							model.addFeatureVector(currentVector);
 						}
 					}

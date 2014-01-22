@@ -1,5 +1,6 @@
 package Classifier;
 
+import Classifier.bean.Const;
 import Classifier.bean.FeatureVector;
 import Classifier.bean.MultiSet;
 
@@ -22,13 +23,13 @@ public class StatisticalTest {
 			model.readModelFromFile(args[1]);
 			if (args[0].equals("-chisquare")) {
 				System.out.println("start calculation... " + args[2] + " x " + args[3]);
-				double p = calculateChiSquare(model, args[2], args[3], FeatureVector.getSplitChar());
+				double p = calculateChiSquare(model, args[2], args[3], Const.splitChar);
 				System.out.println("p-value: " + p);
 			} else if (args[0].equals("-chisquareALL")) {
 				for (Map.Entry<String, MultiSet<String>> feature : model.getFeatureValueFrequency().entrySet()) {
-					if (!feature.getKey().contains(FeatureVector.getRoleTypeIdentifier()) && !feature.getKey().equals("all")) {
-						System.out.print("start calculation... " + FeatureVector.getRoleTypeIdentifier() + " x " + feature.getKey());
-						double p = calculateChiSquare(model, FeatureVector.getRoleTypeIdentifier(), feature.getKey(), FeatureVector.getSplitChar());
+					if (!feature.getKey().contains(Const.roleTypeIdentifier) && !feature.getKey().equals("all")) {
+						System.out.print("start calculation... " + Const.roleTypeIdentifier+ " x " + feature.getKey());
+						double p = calculateChiSquare(model, Const.roleTypeIdentifier, feature.getKey(), Const.splitChar);
 						results.put(feature.getKey(), p);
 						System.out.println("\tp-value: " + p);
 					}
