@@ -28,7 +28,7 @@ public class ValidateResult {
 
 	private long[] result;
 	private final static double roundFactor = 1000000.0;
-	private final static String splitOut = "\t";
+
 	private final static int resultSize = 19;
 
 	public ValidateResult() {
@@ -76,33 +76,33 @@ public class ValidateResult {
 		String temp = Long.toString(result[0]);
 		for (int i = 1; i < result.length; i++) {
 			if (i < idxIDrefsFMeasure)
-				temp += splitOut + Long.toString(result[i]);
+				temp += Const.splitOutValStats + Long.toString(result[i]);
 			else
-				temp += splitOut + Double.toString(((double) result[i]) / roundFactor);
+				temp += Const.splitOutValStats + Double.toString(((double) result[i]) / roundFactor);
 		}
 		return temp;
 	}
 
 	public static String getCaption() {
 		return "SentenceCount"
-				+ splitOut + "TruePositiveFrameElementIDrefCount"
-				+ splitOut + "TruePositiveFrameElementIDrefCount_check"
-				+ splitOut + "ClassyFrameElementIDrefCount"
-				+ splitOut + "GoldFrameElementIDrefCount"
-				+ splitOut + "TruePositiveFrameElementCount"
-				+ splitOut + "TruePositiveFrameElementIDrefCountNameIndependent"
-				+ splitOut + "ClassyFrameElementCount"
-				+ splitOut + "GoldFrameElementCount"
-				+ splitOut + "UnclassifiedSentenceCount"
-				+ splitOut + "IDrefsFMeasure"
-				+ splitOut + "IDrefsPrecision"
-				+ splitOut + "IDrefsRecall"
-				+ splitOut + "FEsFMeasure"
-				+ splitOut + "FEsPrecision"
-				+ splitOut + "FEsRecall"
-				+ splitOut + "IDrefsNIFMeasure"
-				+ splitOut + "IDrefsNIPrecision"
-				+ splitOut + "IDrefsNIRecall";
+				+ Const.splitOutValStats + "TruePositiveFrameElementIDrefCount"
+				+ Const.splitOutValStats + "TruePositiveFrameElementIDrefCount_check"
+				+ Const.splitOutValStats + "ClassyFrameElementIDrefCount"
+				+ Const.splitOutValStats + "GoldFrameElementIDrefCount"
+				+ Const.splitOutValStats + "TruePositiveFrameElementCount"
+				+ Const.splitOutValStats + "TruePositiveFrameElementIDrefCountNameIndependent"
+				+ Const.splitOutValStats + "ClassyFrameElementCount"
+				+ Const.splitOutValStats + "GoldFrameElementCount"
+				+ Const.splitOutValStats + "UnclassifiedSentenceCount"
+				+ Const.splitOutValStats + "IDrefsFMeasure"
+				+ Const.splitOutValStats + "IDrefsPrecision"
+				+ Const.splitOutValStats + "IDrefsRecall"
+				+ Const.splitOutValStats + "FEsFMeasure"
+				+ Const.splitOutValStats + "FEsPrecision"
+				+ Const.splitOutValStats + "FEsRecall"
+				+ Const.splitOutValStats + "IDrefsNIFMeasure"
+				+ Const.splitOutValStats + "IDrefsNIPrecision"
+				+ Const.splitOutValStats + "IDrefsNIRecall";
 	}
 
 

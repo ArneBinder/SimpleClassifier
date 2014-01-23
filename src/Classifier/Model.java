@@ -44,7 +44,7 @@ public class Model {
 
 	public Set<String> getTargetLemmata() {
 
-		return featureValueFrequency.get("target").getSet();
+		return featureValueFrequency.get(Const.targetTypeIdentifier).getSet();
 	}
 
 	private void incCount(String featureType, String featureValue) {

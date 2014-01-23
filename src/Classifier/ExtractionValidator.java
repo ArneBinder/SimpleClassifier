@@ -1,6 +1,8 @@
 package Classifier;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -17,7 +19,7 @@ import com.rits.cloning.Cloner;
 public class ExtractionValidator {
 	public static void main(String[] args) throws SRLException, IOException {
 		if (args.length < 3) {
-			throw new IllegalArgumentException("3 arguments needed: -cross <originalCorpus> <resultFolder> <type:[single,(number)]>\n\t\t\t-single <orignalCorpus> <annotatedCorpus>");
+			throw new IllegalArgumentException("3 arguments needed:\n\t\t\t-cross <originalCorpus> <resultFolder> <type:[single,(number)]>\n\t\t\t-single <orignalCorpus> <annotatedCorpus>\n\t\t\t-featureTypes <corpusFileName> <validateOutFolder> <crossFoldCount> <validationStatisticOutFileName> [<featureTypeFileName>]*");
 
 		}
 		if (args[0].equals("-cross")) {
@@ -43,10 +45,9 @@ public class ExtractionValidator {
 				crossValidationCount = Integer.parseInt(args[3]);
 			}
 
-			System.out.println("--- Start cross validation ---");
-			System.out.println("--- - FoldCount: " + crossValidationCount);
+
 			extractionValidator.performCrossValidation(ClassifierNB.readCorpusData(originalCorpusFile), crossValidationCount, resultFolder);
-			System.out.println("--- Finished cross validation ---");
+
 
 			System.out.println("--- End ---");
 			System.out.println((((System.currentTimeMillis() - startTime) / 1000) / 60) + "min" + (((System.currentTimeMillis() - startTime) / 1000) % 60) + "sec");
@@ -61,11 +62,59 @@ public class ExtractionValidator {
 
 			annotatedCorpus.writeCorpusToFile(args[2]);
 
+		} else if (args[0].equals("-featureTypes")) {
+			if (args.length < 5) {
+				System.out.println("not enough arguments: -featureTypes <corpusFileName> <validateOutFolder> <crossFoldCount> <validationStatisticOutFileName> [<featureTypeFileName>]*");
+			} else {
+				Corpus corpus = ClassifierNB.readCorpusData(new File(args[1]));
+				File valOut = new File(args[2]);
+				int crossFoldCount = Integer.parseInt(args[3]);
+				File fileOut = new File(args[4]);
+
+				BufferedWriter out = new BufferedWriter(new FileWriter(fileOut));
+
+				ExtractionValidator extractionValidator = new ExtractionValidator();
+				ValidateResult validateResult;
+
+				if (args.length < 6) {
+					out.write(ValidateResult.getCaption() + "\n");
+					out.close();
+					validateResult = extractionValidator.performCrossValidation(corpus, crossFoldCount, valOut);
+					out = new BufferedWriter(new FileWriter(fileOut, true));
+					//validateResult.normalize(crossFoldCount);
+					out.write(validateResult + "\n");
+				} else {
+					File featureFile = new File(args[5]);
+					File[] featureFiles;
+					if (featureFile.isDirectory()) {
+						featureFiles = featureFile.listFiles();
+					} else {
+						featureFiles = new File[args.length - 5];
+						for (int i = 5; i < args.length; i++) {
+							featureFiles[i - 5] = new File(args[i]);
+						}
+					}
+					out.write("featureFile" + Const.splitOutValStats + ValidateResult.getCaption() + "\n");
+					out.close();
+					for (int i = 0; i < featureFiles.length; i++) {
+						System.out.println();
+						System.out.println("Read featureTypes from File: "+featureFiles[i].getName());
+						FeatureTypes.readFeatureTypesFromFile(featureFiles[i]);
+						validateResult = extractionValidator.performCrossValidation(corpus, crossFoldCount, valOut);
+						//validateResult.normalize(crossFoldCount);
+						out = new BufferedWriter(new FileWriter(fileOut, true));
+						out.write(featureFiles[i].getName() + Const.splitOutValStats + validateResult + "\n");
+						out.close();
+					}
+				}
+			}
 		} else
 			System.out.println("validation: " + args[0] + " unknown");
 	}
 
 	public ValidateResult performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException {
+		System.out.println("--- Start cross validation ---");
+		System.out.println("--- - FoldCount: " + crossValidationCount);
 		ValidateResult result = new ValidateResult();
 		long startTime = System.currentTimeMillis();
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
@@ -161,7 +210,8 @@ public class ExtractionValidator {
 		System.out.println("AVG F-Measure (correct IDref): \t" + (result.getFMeasure(0) / crossValidationCount));
 		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (result.getFMeasure(1) / crossValidationCount));
 		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (result.getFMeasure(2) / crossValidationCount));
-
+		result.normalize(crossValidationCount);
+		System.out.println("--- Finished cross validation ---");
 		return result;
 	}
 
@@ -248,8 +298,6 @@ public class ExtractionValidator {
 		System.out.println("F-Measure (" + label + "): \t" + stats[2]);
 		System.out.println();
 	} */
-
-
 
 
 }

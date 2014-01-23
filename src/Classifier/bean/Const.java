@@ -6,5 +6,7 @@ package Classifier.bean;
 public class Const {
 	public static final String splitChar = "#";
 	public static final String roleTypeIdentifier = "role";
+	public static final String targetTypeIdentifier = "target";
 	public static final String dummyRole = "dummyRole";
+	public static final String splitOutValStats = "\t";
 }

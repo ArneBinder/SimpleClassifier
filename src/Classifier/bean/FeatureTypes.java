@@ -11,7 +11,7 @@ public class FeatureTypes {
 	private static Map<String, List<String>> backOffRules = new HashMap<String, List<String>>();
 	private static final String splitMap = ">";
 	private static final String splitList = ",";
-	private static final char commentIndicator = '%' ;
+	private static final char commentIndicator = '%';
 
 	static {
 		String splitChar = Const.splitChar;
@@ -81,11 +81,12 @@ public class FeatureTypes {
 		return usedFeatures;
 	}
 
-	public static void readFeatureTypesFromFile(String fileName) throws IOException {
-		BufferedReader in = new BufferedReader(new FileReader(new File(fileName)));
+	public static void readFeatureTypesFromFile(File file) throws IOException {
+		BufferedReader in = new BufferedReader(new FileReader(file));
 		backOffRules = new HashMap<String, List<String>>();
 		usedFeatures = new LinkedList<String>();
 		usedFeatures.add(Const.roleTypeIdentifier);
+		usedFeatures.add(Const.targetTypeIdentifier);
 		String line = in.readLine().replaceAll("\\s+", "");
 		while (line != null) {
 			if (!line.isEmpty() && line.charAt(0) != commentIndicator) {
@@ -93,10 +94,14 @@ public class FeatureTypes {
 				if (line.contains(splitMap)) {
 					String[] pair = line.split(splitMap);
 					String key = "";
+					String[] valueStrings;
 					if (!pair[0].isEmpty()) {
 						key = Const.roleTypeIdentifier + Const.splitChar + pair[0];
+						valueStrings = pair[1].split(splitList);
+					} else {
+						valueStrings = (pair[1] + splitList + Const.targetTypeIdentifier).split(splitList);
 					}
-					String[] valueStrings = pair[1].split(splitList);
+
 					for (int i = 0; i < valueStrings.length; i++) {
 						valueStrings[i] = Const.roleTypeIdentifier + Const.splitChar + valueStrings[i];
 					}
