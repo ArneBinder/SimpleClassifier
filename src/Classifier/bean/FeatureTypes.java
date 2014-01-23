@@ -95,11 +95,23 @@ public class FeatureTypes {
 					String[] pair = line.split(splitMap);
 					String key = "";
 					String[] valueStrings;
+					//System.out.println("line: "+line);
+					//System.out.println("pair.length: "+pair.length);
+					if(pair.length==0){
+						pair = new String[2];
+						pair[0] = "";
+						pair[1] = "";
+					}
 					if (!pair[0].isEmpty()) {
 						key = Const.roleTypeIdentifier + Const.splitChar + pair[0];
 						valueStrings = pair[1].split(splitList);
 					} else {
-						valueStrings = (pair[1] + splitList + Const.targetTypeIdentifier).split(splitList);
+						if(!pair[1].isEmpty()){
+							valueStrings = (pair[1] + splitList + Const.targetTypeIdentifier).split(splitList);
+						}else{
+							valueStrings = new String[1];
+							valueStrings[0] = Const.targetTypeIdentifier;
+						}
 					}
 
 					for (int i = 0; i < valueStrings.length; i++) {
