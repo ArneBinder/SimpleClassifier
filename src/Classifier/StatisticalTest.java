@@ -1,12 +1,11 @@
 package Classifier;
 
-import Classifier.bean.Const;
-import Classifier.bean.FeatureVector;
-import Classifier.bean.MultiSet;
-
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.*;
+
+import Classifier.bean.Const;
+import Classifier.bean.MultiSet;
 
 /**
  * Created by Arne on 14.01.14.
