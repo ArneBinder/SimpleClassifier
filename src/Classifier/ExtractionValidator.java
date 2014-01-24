@@ -8,6 +8,7 @@ import java.util.*;
 
 import Classifier.bean.*;
 import Classifier.bean.Exceptions.*;
+
 import com.rits.cloning.Cloner;
 
 
@@ -17,7 +18,8 @@ import com.rits.cloning.Cloner;
  * @author Robert
  */
 public class ExtractionValidator {
-	public static void main(String[] args) throws SRLException, IOException {
+    
+	public static void main(String[] args) throws SRLException, IOException, InterruptedException {
 		if (args.length < 3) {
 			throw new IllegalArgumentException("3 arguments needed:\n\t\t\t-cross <originalCorpus> <resultFolder> <type:[single,(number)]>\n\t\t\t-single <orignalCorpus> <annotatedCorpus>\n\t\t\t-featureTypes <corpusFileName> <validateOutFolder> <crossFoldCount> <validationStatisticOutFileName> [<featureTypeFileName>]*");
 
@@ -112,9 +114,10 @@ public class ExtractionValidator {
 			System.out.println("validation: " + args[0] + " unknown");
 	}
 
-	public ValidateResult performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException {
+	public ValidateResult performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException, InterruptedException {
 		System.out.println("--- Start cross validation ---");
 		System.out.println("--- - FoldCount: " + crossValidationCount);
+
 		ValidateResult result = new ValidateResult();
 		long startTime = System.currentTimeMillis();
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
@@ -123,26 +126,20 @@ public class ExtractionValidator {
 		File currentCrossValidationFolder = new File(resultFolder.getAbsolutePath() + File.separatorChar + folderName);
 		currentCrossValidationFolder.mkdir();
 
-		//Gson gson = new Gson();
-		//String annotateCorpusJson = "";
-		Corpus trainCorpus;
-		Corpus annotateCorpus;
-
-		//Corpus[] sourceCorpora = new Corpus[0];
-		File foldFolder;
 		for (int i = 0; i < crossValidationCount; i++) {
-			foldFolder = new File(currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "Fold " + (i + 1));
+			System.gc();
+			Thread.sleep(5000);
+		    
+		    	File foldFolder = new File(currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "Fold " + (i + 1));
 			foldFolder.mkdir();
 
-			//annotateCorpusJson = gson.toJson(splittedCorpora[i], Corpus.class);
 			startTime = System.currentTimeMillis();
 			System.out.print("--- -- generate training corpus " + (i + 1) + "... ");
-			trainCorpus = new Corpus();
+			Corpus trainCorpus = new Corpus();
 
 			for (int j = 0; j < crossValidationCount; j++) {
 				if (j != i || crossValidationCount == 1) {
 					trainCorpus.addSentences(splittedCorpora[j].getSentences());
-					//sourceCorpora = ArrayUtils.addAll(sourceCorpora, splittedCorpora[j]);
 				}
 			}
 			System.out.println((System.currentTimeMillis() - startTime) + "ms");
@@ -154,12 +151,11 @@ public class ExtractionValidator {
             */
 			startTime = System.currentTimeMillis();
 			System.out.print("--- -- generate annotation corpus " + (i + 1) + "... ");
+
 			Cloner cloner = new Cloner();
-			//annotateCorpusJson = gson.toJson(splittedCorpora[i], Corpus.class);
-			annotateCorpus = cloner.deepClone(splittedCorpora[i]);//gson.fromJson(annotateCorpusJson, Corpus.class);
+			Corpus annotateCorpus = cloner.deepClone(splittedCorpora[i]);
 			annotateCorpus.deleteAnnotation();
 			System.out.println((System.currentTimeMillis() - startTime) + "ms");
-			//try {
 
 			startTime = System.currentTimeMillis();
 			System.out.print("--- -- train model " + (i + 1) + "... ");
@@ -191,34 +187,41 @@ public class ExtractionValidator {
 			//System.out.println("--- -- Finished validating annotated corpus " + (i + 1) + " ---");
 
 			System.out.println("--- -- Result for fold " + (i + 1) + " ---");
-
 			validateResult.printResult();
-			//double[] stats;
-			//stats = getStats(result[idxTruePositiveFrameElementIDrefCount], result[idxClassyFrameElementIDrefCount], result[idxGoldFrameElementIDrefCount]);
-			//fmeasureIDrefsSum += validateResult.getFMeasure(0);
-			//fmeasureFEsSum += validateResult.getFMeasure(1);
-			//fmeasureIDrefsNISum += validateResult.getFMeasure(2);
 
 			System.out.println("--- -- finished fold " + (i + 1) + " ---");
-
-			//} catch (Exception e) {
-			//	e.printStackTrace();
-			//}
 		}
 
 		System.out.println();
 		System.out.println("AVG F-Measure (correct IDref): \t" + (result.getFMeasure(0) / crossValidationCount));
 		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (result.getFMeasure(1) / crossValidationCount));
 		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (result.getFMeasure(2) / crossValidationCount));
+		
 		result.normalize(crossValidationCount);
 		System.out.println("--- Finished cross validation ---");
+		
 		return result;
 	}
 
 	private long[] validate(Corpus originalCorpus, Corpus annotatedCorpus) {
-		long[] resultValues = new long[10];
+		long[] resultValues = new long[ValidateResult.resultSize];
 		List<Sentence> annotatedSentenceList = annotatedCorpus.getSentences();
 
+		// loop for statistical reasons
+		for (Sentence originalSentence : originalCorpus.getSentences()) {
+		    resultValues[ValidateResult.idxSentenceCount]++;
+
+		    for ( Frame frame : originalSentence.getFrames()) {
+			resultValues[ValidateResult.idxFrameCount]++;
+			
+			for (FrameElement frameElement : frame.getFrameElements()) {
+			    resultValues[ValidateResult.idxFrameElementCount]++;
+			    resultValues[ValidateResult.idxFrameElementIDrefCount] += frameElement.getIdrefs().size();
+			}
+		    }		    
+		}
+		
+		// real validate
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
 
 			int index = annotatedSentenceList.indexOf(originalSentence);
@@ -231,8 +234,6 @@ public class ExtractionValidator {
 
 				// check only sentences with found target...
 				if (annotatedSentence.getFrames().size() > 0) {
-					//List<String> checkedIDrefs = new LinkedList<String>();
-					//List<String> correctIDrefs1 = new LinkedList<String>();
 
 					// check if all FEs are found...
 					for (Frame origFrame : originalFrames) {
@@ -267,7 +268,12 @@ public class ExtractionValidator {
 
 
 						} else {
-							// skipped frames where it is impossible to find a target
+							resultValues[ValidateResult.idxUnclassifiedFrameCount_TargetNotFound]++;
+							
+							for (FrameElement frameElement : origFrame.getFrameElements()) {
+							    resultValues[ValidateResult.idxUnclassifiedFrameElementCount_FTargetNotFound]++;
+							    resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_FTargetNotFound] += frameElement.getIdrefs().size();
+							}
 						}
 					}
 
@@ -279,25 +285,31 @@ public class ExtractionValidator {
 							}
 						}
 				} else {
-					resultValues[ValidateResult.idxUnclassifiedSentenceCount]++;
+					resultValues[ValidateResult.idxUnclassifiedSentenceCount_NoAnnotation]++;
+					
+					for ( Frame frame : originalSentence.getFrames()) {
+						resultValues[ValidateResult.idxUnclassifiedFrameCount_SNoAnnotation]++;
+						
+						for (FrameElement frameElement : frame.getFrameElements()) {
+						    resultValues[ValidateResult.idxUnclassifiedFrameElementCount_SNoAnnotation]++;
+						    resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_SNoAnnotation] += frameElement.getIdrefs().size();
+						}
+					    }
 				}
+			}else{
+			    resultValues[ValidateResult.idxUnclassifiedSentenceCount_NotFound]++;
+			    
+			    for ( Frame frame : originalSentence.getFrames()) {
+				resultValues[ValidateResult.idxUnclassifiedFrameCount_SNotFound]++;
+				
+				for (FrameElement frameElement : frame.getFrameElements()) {
+				    resultValues[ValidateResult.idxUnclassifiedFrameElementCount_SNotFound]++;
+				    resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_SNotFound] += frameElement.getIdrefs().size();
+				}
+			    }
 			}
-
-
-			resultValues[ValidateResult.idxSentenceCount]++;
 		}
 
 		return resultValues;
 	}
-
-
-
-	/*private static void printStats(double[] stats, String label) {
-		System.out.println("Precision (" + label + "): \t" + stats[0]);
-		System.out.println("Recall (" + label + "): \t" + stats[1]);
-		System.out.println("F-Measure (" + label + "): \t" + stats[2]);
-		System.out.println();
-	} */
-
-
 }
