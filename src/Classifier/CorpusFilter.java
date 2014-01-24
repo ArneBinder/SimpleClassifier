@@ -3,7 +3,6 @@ package Classifier;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,6 +24,8 @@ public class CorpusFilter {
 				allowedFrameElements.add(zeile);
 				System.out.println(zeile);
 			}
+			in.close();
+			
 			System.out.println("--- Filter corpus data ---");
 			corpus.filter(allowedFrameElements);
 			System.out.println("--- Write corpus data to " + args[2] + " ---");
