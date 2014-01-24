@@ -136,6 +136,7 @@ public class FeatureTypes {
 				line = line.replaceAll("[\t ]+", "");
 			//System.out.println();
 		}
+		in.close();
 		System.out.println();
 	}
 
