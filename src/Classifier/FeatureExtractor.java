@@ -16,14 +16,6 @@ public class FeatureExtractor {
 		int priority = 0;
 		Map<String, Map<String, Map<String, Integer>>> headRules = new HashMap<String, Map<String, Map<String, Integer>>>();
 
-		public void addRule(List<String> categories, String edgeLabel, String childCategory) {
-			addRule(categories, Arrays.asList(new String[]{edgeLabel}), Arrays.asList(new String[]{childCategory}));
-		}
-
-		public void addRule(String categories, String edgeLabel, List<String> childCategories) {
-			addRule(Arrays.asList(new String[]{categories}), Arrays.asList(new String[]{edgeLabel}), childCategories);
-		}
-
 		public void addRule(String category, List<String> edgeLabels, List<String> childCategories) {
 			addRule(Arrays.asList(new String[]{category}), edgeLabels, childCategories);
 		}
