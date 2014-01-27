@@ -115,14 +115,15 @@
 		\begin{itemize}
 			\item<1->
 			Erstellt von der Universität Saarland %Referenz
+			% weiterentwicklung des SALSA 1.0
 			\item<2->
 			basiert auf dem TIGER-Korpus %Referenz
 			\begin{itemize}
-				\item<1->
-				Treebank über Zeitungsartikel
-				\item<2->
-				viele syntaktische Informationen:\\ 
-				Pos-Tag, morphologische \& lemma-Informationen
+				\item Treebank über Zeitungsartikel
+				\item NEGRA Tag-Set
+				\item
+					viele syntaktische Informationen:\\ 
+					Pos-Tag, morphologische \& lemma-Informationen
 			\end{itemize}
 			\item<3->
 			enthält: ~24.000 Sätze mit 648 Prädikaten %target-word
@@ -135,72 +136,239 @@
 	
 	\frame{
 		\frametitle{Corpus: Salsa 2.0}
-		%Beispielbild von Salt: kurzer Satz mit edge-labels
+		%Beispielbild von Salto: kurzer Satz mit edge-labels
 	}
 
-	
+
 \section{Umsetzung}
 	\frame{
 		\frametitle{Einschränkungen}
-
-		\includegraphics[scale=0.5]{role_frequency.jpg}
+		\begin{figure}
+		\centering
+		\caption{Verteilung der Rollen}
+		%@enrique: bitte einfügen!
+		%\includegraphics[scale=0.5]{images/role_frequency.jpg}
+		\end{figure}
+		%schöner Pfeil
+		 --> Betrachtung der Top-10 Rollen		
 	}
 	\frame{
-		\frametitle{Einschränkungen}
-		top 10 rollen
-		keine Frames
+		\frametitle{Einschränkungen (Forts.)}
+		\begin{itemize}
+			\item<1-> Top-10 Rollen
+
+			\vspace{1cm}
+			\item<2-> Keine Frames
+			\begin{itemize}
+				\item Disambiguierung zu komplex
+			\end{itemize}
+
+			\vspace{1cm}
+			\item<3->Target-Lemma muss bekannt sein
+			\begin{itemize}
+				\item Keine Abstraktion für ungesehene Targets
+			\end{itemize}
+		\end{itemize}
 	}
 	
 	\frame{
 		\frametitle{Herangehensweise}
-		Ansatz von jurafsky(und gildea)
-		Classifier - naive bayes classifier
-		features - anlehnend an jurafsky und gildea (aufzaehlen)
+		\begin{itemize}
+			\item Ansatz von Jurafsky und Gildea
+			\begin{itemize}
+				\item Classifier: Naïve Bayes Classifier
+				\item Angelehnte Features
+			\end{itemize}
+		\end{itemize}
 	}
+
 	\frame{
-		\frametitle{Probleme}
-		Deutsch erlaubt wesentlich freiere Verschiebung von Konstituenten im Satz - Subjekt nicht auf die Vorfeldposition beschr\"ankt....
-		Corpusannotation - 
-		1. Head nicht \"uberall definiert. Negra Tag Set vorentscheidungen. 
-		2. ich ging nach haus' und dr\"uckte die maus (sec-edges)
-		3. target identifizieren. gegebenenfalls mehrere woerter
-	}
-	
-	\frame{
-		\frametitle{SRL-Ablauf}
-		1. Corpus einlesen - aufgeteilt nach Saetzen
-		2. interne corpusrepraesentation mit informationen anreichern
-		%regelbasiert werden heads gesetzt pfade zum root ermitteln..............
-		3. model tranieren [h\"aufigkeiten auszaehlen und normieren]
-		%leerzeile
-		4. nicht frame annotiertes Corpus einlesen
-		5. konstituenten klassifizieren mithilfe des models.
-		[6. evaluieren]
-	}
-	\frame{
-		\frametitle{Ablauf des Trainings und der Klassifikation}
-		a)Training
-		wird alles gezaehlt und target lemmata extrahiert
-		b)Klassifikationen
-		Satz > Target lemma suchen > alle Konstituenten klassifizieren \& Frame bzg Target lemma speichern
+		\frametitle{Prinzipieller Ablauf}
+		\begin{itemize}
+			\begin{figure}
+				\caption{Training}
+				%@enrique: bitte einfügen!
+				%\includegraphics[scale=0.5]{images/ablauf_training.jpg}
+			\end{figure}
+			\begin{figure}
+				\caption{Klassifikation}
+				%@enrique: bitte einfügen!
+				%\includegraphics[scale=0.5]{images/ablauf_annotate.jpg}
+			\end{figure}
+		\end{itemize}
+		%Keine Rolle
 		%smoothing: 0.000001; threshold for frame: P(R1..Rk) > e^(-600)
 	}
 
-\section{Evaluieren}
 	\frame{
-		da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen 
-		beruecksichtigen wird bei der evaluation nur frame elements mit dem bezug auf ein (im Model) bekanntes target. 
-		counts erklaeren und ausgeben 
+ % Kommentar in der E-Mail an Leser: Features einzeln mit einem Bild kurz erklären statt KOmpakt + Beispiel danach
+		\frametitle{Features}
+		\begin{itemize}	
+			\item<1-> Synt. Kategorie
+			\begin{itemize}
+				\item Nonterminal: phrasale Kategorie
+				\item Terminal: POS-Tag
+			\end{itemize}
+			
+			\vspace{1cm}
+			\item<2-> Pfad: über synt. Kategorien
+			\begin{itemize}
+				\item Zusammenfassen von Replikaten 
+				\item Ignorieren von Konjunktionen
+			\end{itemize}
+
+			\vspace{1cm}
+			\item<3-> Position
+			\begin{itemize}
+				\item Position relativ zum Target
+			\end{itemize}
+		\end{itemize}
 	}
+
 	\frame{
-		\frametitle{Kreuzvalidierung}
-		fuenffach plus ergebnisse
+		\frametitle{Features (2)}
+		\begin{itemize}	
+			\item<1-> Kopf-Lemma
+			\begin{itemize}
+				\item Syntaktisches Zentrum einer Phrase %TODO
+				\item wird regelbasiert gesucht
+				%terminal =  eigenes lemma als head
+			\end{itemize}
+
+			\vspace{1cm}			
+			\item<2-> Nachbar-Kopf-Lemma
+			\begin{itemize}
+				\item Kopf der einbettenden Konstituente
+			\end{itemize}
+
+			\vspace{1cm}
+			\item<3-> Kombination: Synt. Kat. \& Pfad
+		\end{itemize}
+	}
+
+	\frame{
+		\frametitle{Features (3)}
+		%Features an Beispielsatz von Salsa-Corpus (Salto-Satz) erklären
+	}
+
+	\frame{ % ZEILENABSTAND
+		\frametitle{Probleme}
+		\begin{itemize}
+			\item Deutsch: relativ freie Verschiebung von Konstituenten %Subjekt nicht auf die Vorfeldposition beschränkt....
+			\item Kopf nicht überall definiert (NEGRA Tag-Set)
+			\item Querverbindung im Syntaxgraph % KOAN BAUM
+			\begin{itemize}
+				\item Ich ging nach Haus' und aß Abendbrot. (Bild?)
+			\end{itemize}			
+			\item Target im Satz identifizieren
+			\begin{itemize}
+				\item Den Vortrag \textit{auf die lange Bank schieben.}
+				\item Ich \textit{brach} den Ast \textit{ab.}
+			\end{itemize}			
+		\end{itemize}
+	}	
+
+
+\section{Evaluation}
+	\frame{
+		\frametitle{Evaluation}
+		\begin{itemize}
+			\item Target-Lemma muss vorhanden sein
+			\begin{itemize}
+				\item keines gefunden: Satz komplett ignoriert
+			\end{itemize}
+%da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen beruecksichtigen wird bei der evaluation nur frame elements mit dem bezug auf ein (im Model) bekanntes target. counts erklaeren und ausgeben 
+
+			\item Nutzung des F-Mesaure
+			\begin{itemize}
+				\item Sehr, sehr häufig: keine Rolle % accuracy dadurch unpassend
+			\end{itemize}
+
+			\item Precision
+			\begin{itemize}
+				\item P = #(Korrekte Rolle klassifiziert) / #(Klassifiziert mit Rolle)
+			\end{itemize}				
+
+			\item Recalll
+			\begin{itemize}
+				\item R = #(Korrekte Rolle klassifiziert) / #(Konstituenten mit Rolle)
+			\end{itemize}				
+		\end{itemize}
+	}
+
+	\frame{
+		\frametitle{Auswertung bezüglich dreier Kenngrößen}
+		\begin{enumerate}
+			\item Konstituente wurde korrekte Rolle zugewiesen
+			\begin{itemize}
+				\item Exakte Übereinstimmung
+			\end{itemize}	
+
+			\item Konstituente wurde eine bel. Rolle zugewiesen
+			\begin{itemize}
+				\item Unabhängig von der Rolle
+			\end{itemize}	
+			
+			\item Korrekte Rolle wurde im Satz gefunden
+			\begin{itemize}
+				\item Unabhängig der Position im Satz
+			\end{itemize}	
+		\end{enumerate}
+		% das letzte geht mehr auf die Rollenzählung ein, die ersten beiden sind für Konstituenten
+	}
+
+	\frame{
+		% Beispielsatz von Salto wieder nutzen, muss mind. 2 Rollen haben
+	}
+
+
+	\frame{
+		\frametitle{Durchführung}
+		\begin{itemize}
+			\item 5-fache Kreuzvalidierung % je ein paar weg
+
+			% Gesamtergebnis + Standardabweichung
+
+		\end{itemize}
+	}
+
+	\frame{
+		\frametitle{Einordnung der Ergebnisse}
+		\begin{itemize}
+			\item Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
+			\item Universität Saarland: Projekt auf dem SALSA 1.0 Korpus
+			\begin{itemize}
+				\item Prec.: 0.761 | Recall: 0.496 | F-Mesaure: 0.600
+				\item Vorgehen \& Evaluation unklar
+			\end{itemize}
+
+			\vspace{1cm}
+			\item Target-Lemma muss vorhanden sein
+			\begin{itemize}
+				\item xx \% an Konstituenten im Goldstandard wurden ignoriert %TODO
+				\item --> führt zu besserem Recall -> F-Measure
+			\end{itemize}	
+		\end{itemize}
+	}
+
+	\frame{
+		Vielen Dank für die Aufmerksamkeit!
+	}
+
+	\frame{
+		\frametitle{Referenzen}
+		...%todo
+	}
+
+	\frame{
+		%empty frame
 
 	}
-	\frame{
-		\frametitle{Evaluationsvergleich}
-	}
 
+	\frame{
+		\frametitle{Backup}
+
+	}	
 
 
 
