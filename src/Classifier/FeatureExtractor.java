@@ -361,6 +361,8 @@ public class FeatureExtractor {
 		return fv;
 	}
 
+	//private String extract
+
 	private String extractHead(String idref) throws IDrefNotInSentenceException {
 		String headIDref = sentence.getNode(idref).getHeadIDref();
 		if (headIDref != null)
@@ -380,23 +382,14 @@ public class FeatureExtractor {
 			for (String[] path : node.getPathsFromRoot()) {
 				if (path.length >= i) {
 					String curHeadIDref;
-					//try {
 					curHeadIDref = sentence.getNode(path[path.length - i]).getHeadIDref();
-					//} catch (Exception e) {
-					//	System.out.println(i + "; " + path.length);
-
-					//	throw e;
-					//}
 					if (curHeadIDref != null && !curHeadIDref.equals(sentence.getNode(idRef).getHeadIDref())) {
 						headIDref = curHeadIDref;
 					}
-
 				} else {
 					readyCount++;
 				}
-
 			}
-
 		}
 
 		if (headIDref != null) {
@@ -452,10 +445,6 @@ public class FeatureExtractor {
 					lastFunc = func;
 				}
 				daughterIDref = ownIdPath[j];
-				/*if(daughterIDref!=null){
-					grammaticalFunctionSmall = sentence.getNode(ownIdPath[j]).getEdges().get(daughterIDref);
-					daughterIDref = null;
-				} */
 			}
 
 			String parentIDref;
@@ -470,42 +459,10 @@ public class FeatureExtractor {
 				func = sentence.getNode(targetHeadIDref).getEdges().get(daughterIDref);
 				parentIDref = targetHeadIDref;
 			}
-			//} catch (Exception e) {
-			//	System.out.println();
-			//	throw e;
-			//}
-
 
 			if (func != null)
 				functionPath += func;
 			functionPath += "~";
-			//func = sentence.getNode(targetIdPath[i]).getEdges().get(daughterIDref);
-			/*
-			if(sentence.getNode(targetIdPath[i]).getEdges().containsKey(idref))
-				grammaticalFunctionSmall = sentence.getNode(targetIdPath[i]).getEdges().get(idref);
-
-			if (i < ownIdPath.length - 1) {
-				try {
-					grammaticalFunctionBig = sentence.getNode(targetIdPath[i]).getEdges().get(ownIdPath[i + 1]);
-					//System.out.println(idref + " (a): " + grammaticalFunctionBig + ", targetIdPath[i]: " + targetIdPath[i] + ", ownIdPath[i + 1]: " + ownIdPath[i + 1]);
-				} catch (Exception e) {
-					System.out.println();
-					throw new Exception("i: " + i + ", ownIdPath: " + ownIdPath);
-				}
-			} else {
-				if (!targetIdPath[i].equals(idref)) {
-					grammaticalFunctionBig = sentence.getNode(targetIdPath[i]).getEdges().get(idref);
-				} else {
-					try {
-					grammaticalFunctionBig = "X";//sentence.getNode(targetIdPath[i-1]).getEdges().get(targetIdPath[i]);
-					} catch (Exception e) {
-						System.out.println();
-						throw new Exception("i: " + i + ", ownIdPath: " + ownIdPath);
-					}
-				}
-				//System.out.println(idref + " (b): " + grammaticalFunctionBig + ", targetIdPath[i]: " + targetIdPath[i]);
-			}
-            */
 
 			lastCat = "";
 			lastFunc = "";

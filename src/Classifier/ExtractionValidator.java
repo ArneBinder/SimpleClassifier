@@ -27,7 +27,6 @@ public class ExtractionValidator {
 		if (args[0].equals("-cross")) {
 			if (args.length < 4) {
 				throw new IllegalArgumentException("3 arguments needed: -cross <originalCorpus> <resultFolder> <type:[single,(number)]>");
-
 			}
 			File originalCorpusFile = new File(args[1]);
 			File resultFolder = new File(args[2]);

@@ -1,7 +1,9 @@
 \documentclass[xcolor=x11names,compress]{beamer}
 
 %% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[german,polish,romanian,english]{babel}
+\usepackage{ucs}     % unicode 
+\usepackage[utf8x]{inputenc}  % utf-8
+\usepackage[ngerman, english]{babel}  % new german spelling 
 \usepackage[T1]{tipa}
 \usepackage{ragged2e}
 \usepackage{graphicx}
@@ -61,108 +63,143 @@
 
 \frame{\titlepage}
 
-%\tableofcontents?
-
-\section[Gliederung]{}
 \frame{
-\begin{itemize}
-	\item<1-> 1.
-	\item<1-> 2.
-\end{itemize}
+	\frametitle{Gliederung}
+	\tableofcontents
+	[pausesections]
 }
 
-\section{theoretischer Hintergrund und Motivation}
-\frame{
-\frametitle{Argumentstruktur von Verben}
-Beispielverb - zweiseitige Argumentstruktur
-}
-\frame{
-\frametitle{thematische Rollen}
-Abstraktion \"uber die semantische Seite der Argumentstruktur
-}
 
-\frame{
-\frametitle{Frames und Frame elements}
-Situationsverankerte Abstraktion \"uber die Argumentstruktur
-Frame element gleich Rolle
-target / praedikat
-}
-\frame{
-\frametitle{Motivation}
-%Anwendungsbeispiele 
-%Informationextraktion,...
-%Warum Rollen? theoretisches Beispiel
-%nicht aufschreiben, aber sagen - the linguists scarcity problem, zu viele daten zu wenige linguisten
+\section{Theoretischer Hintergrund und Motivation}
+	\frame{
+		\frametitle{Argumentstruktur von Verben}
+		%Beispielverb - zweiseitige Argumentstruktur
+	}
 
-}
+	\frame{
+		\frametitle{thematische Rollen}
+		%Abstraktion über die semantische Seite der Argumentstruktur		
+	}
+
+	\frame{
+		\frametitle{Frames und Frame elements}
+		%Situationsverankerte Abstraktion über die Argumentstruktur
+		%Frame element gleich Rolle
+		% --> target / praedikat
+	}
+	
+	\frame{
+		\frametitle{Motivation}
+		%Anwendungsbeispiele 
+		%Informationextraktion,...
+		%Warum Rollen? theoretisches Beispiel
+		%nicht aufschreiben, aber sagen - the linguists scarcity problem, zu viele daten zu wenige linguisten
+	}
 
 \section{Problemstellung}
 
+	\frame{
+		\frametitle{Problemstellung}
+		\centering
+		Automatische Bestimmung von Rollen
+		%\vspace{1cm} 
+		%\fbox{\parbox{\dimexpr \linewidth - 2\fboxrule - 2\fboxsep}{
+		\fbox{\parbox{\linewidth}{		
+		Lassen sich semantische Rollen anhand von lexikalischen und syntaktischen Informationen eines Satzes automatisch bestimmen?
+		}}
+		%box rum blauer Rahmen
+	}
 
-\frame{
-	\frametitle{Problemstellung}
-Automatische Bestimmung von Rollen 
-Lassen sich semantische Rollen anhand von lexikalischen und syntaktischen Informationen eines Satzes automatisch bestimmen?
-%box rum blauer Rahmen
+	\frame{
+		\frametitle{Corpus: Salsa 2.0}
+		\begin{itemize}
+			\item<1->
+			Erstellt von der Universität Saarland %Referenz
+			\item<2->
+			basiert auf dem TIGER-Korpus %Referenz
+			\begin{itemize}
+				\item<1->
+				Treebank über Zeitungsartikel
+				\item<2->
+				viele syntaktische Informationen:\\ 
+				Pos-Tag, morphologische \& lemma-Informationen
+			\end{itemize}
+			\item<3->
+			enthält: ~24.000 Sätze mit 648 Prädikaten %target-word
+			\item<4->
+			Prädikate: Nomen \& Verben
 
-}
-\frame{
-\frametitle{Corpus: Salsa}
-information zu salsa - Lust zu schreiben?
-annotierung genau beschreiben (saetzengrenzen etc...)
-}
+		\end{itemize}
+	%	annotierung genau beschreiben (saetzengrenzen etc...)
+	}	
+	
+	\frame{
+		\frametitle{Corpus: Salsa 2.0}
+		%Beispielbild von Salt: kurzer Satz mit edge-labels
+	}
+
+	
 \section{Umsetzung}
-\frame{
-\frametitle{Einschr\"ankung}
-top 10 rollen
-keine Frames
-}
-\frame{
-\frametitle{Herangehensweise}
-Ansatz von jurafsky(und gildea)
-Classifier - naive bayes classifier
-features - anlehnend an jurafsky und gildea (aufzaehlen)
-}
-\frame{
-\frametitle{Probleme}
-Deutsch erlaubt wesentlich freiere Verschiebung von Konstituenten im Satz - Subjekt nicht auf die Vorfeldposition beschr\"ankt....
-Corpusannotation - 
-1. Head nicht \"uberall definiert. Negra Tag Set vorentscheidungen. 
-2. ich ging nach haus' und dr\"uckte die maus (sec-edges)
-3. target identifizieren. gegebenenfalls mehrere woerter
+	\frame{
+		\frametitle{Einschränkungen}
 
-}
-\frame{
-\frametitle{SRL-Ablauf}
-1. Corpus einlesen - aufgeteilt nach Saetzen
-2. interne corpusrepraesentation mit informationen anreichern
-%regelbasiert werden heads gesetzt pfade zum root ermitteln..............
-3. model tranieren [h\"aufigkeiten auszaehlen und normieren]
-%leerzeile
-4. nicht frame annotiertes Corpus einlesen
-5. konstituenten klassifizieren mithilfe des models.
-[6. evaluieren]
-}
-\frame{
-\frametitle{Ablauf des Trainings und der Klassifikation}
-a)Training
-wird alles gezaehlt und target lemmata extrahiert
-b)Klassifikationen
-Satz > Target lemma suchen > alle Konstituenten klassifizieren \& Frame bzg Target lemma speichern
-%smoothing: 0.000001; threshold for frame: P(R1..Rk) > e^(-600)
-}
+		\includegraphics[scale=0.5]{role_frequency.jpg}
+	}
+	\frame{
+		\frametitle{Einschränkungen}
+		top 10 rollen
+		keine Frames
+	}
+	
+	\frame{
+		\frametitle{Herangehensweise}
+		Ansatz von jurafsky(und gildea)
+		Classifier - naive bayes classifier
+		features - anlehnend an jurafsky und gildea (aufzaehlen)
+	}
+	\frame{
+		\frametitle{Probleme}
+		Deutsch erlaubt wesentlich freiere Verschiebung von Konstituenten im Satz - Subjekt nicht auf die Vorfeldposition beschr\"ankt....
+		Corpusannotation - 
+		1. Head nicht \"uberall definiert. Negra Tag Set vorentscheidungen. 
+		2. ich ging nach haus' und dr\"uckte die maus (sec-edges)
+		3. target identifizieren. gegebenenfalls mehrere woerter
+	}
+	
+	\frame{
+		\frametitle{SRL-Ablauf}
+		1. Corpus einlesen - aufgeteilt nach Saetzen
+		2. interne corpusrepraesentation mit informationen anreichern
+		%regelbasiert werden heads gesetzt pfade zum root ermitteln..............
+		3. model tranieren [h\"aufigkeiten auszaehlen und normieren]
+		%leerzeile
+		4. nicht frame annotiertes Corpus einlesen
+		5. konstituenten klassifizieren mithilfe des models.
+		[6. evaluieren]
+	}
+	\frame{
+		\frametitle{Ablauf des Trainings und der Klassifikation}
+		a)Training
+		wird alles gezaehlt und target lemmata extrahiert
+		b)Klassifikationen
+		Satz > Target lemma suchen > alle Konstituenten klassifizieren \& Frame bzg Target lemma speichern
+		%smoothing: 0.000001; threshold for frame: P(R1..Rk) > e^(-600)
+	}
 
 \section{Evaluieren}
-\frame{
-da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen 
-beruecksichtigen wird bei der evaluation nur frame elements mit dem bezug auf ein (im Model) bekanntes target. 
-counts erklaeren und ausgeben 
-}
-\frame{
-\frametitle{Kreuzvalidierung}
-fuenffach plus ergebnisse
+	\frame{
+		da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen 
+		beruecksichtigen wird bei der evaluation nur frame elements mit dem bezug auf ein (im Model) bekanntes target. 
+		counts erklaeren und ausgeben 
+	}
+	\frame{
+		\frametitle{Kreuzvalidierung}
+		fuenffach plus ergebnisse
 
-}
+	}
+	\frame{
+		\frametitle{Evaluationsvergleich}
+	}
 
 
 
