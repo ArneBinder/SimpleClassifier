@@ -196,9 +196,9 @@ public class ExtractionValidator {
 		}
 
 		System.out.println();
-		System.out.println("AVG F-Measure (correct IDref): \t" + (result.getFMeasure(0) / crossValidationCount));
-		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (result.getFMeasure(1) / crossValidationCount));
-		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (result.getFMeasure(2) / crossValidationCount));
+		System.out.println("AVG F-Measure (correct IDref): \t" + result.getFMeasure(0));
+		System.out.println("AVG F-Measure (FE identified in sentence): \t" + result.getFMeasure(1));
+		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + result.getFMeasure(2));
 		
 		writeResultGlobal(singleResults, result, currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "globalResult.txt");
 		result.normalize(crossValidationCount);

@@ -82,20 +82,15 @@ public class ValidateResult {
 			result[i] += validateResult.getResult()[i];
 		}
 		
-		for (int i = 0; i < statistic.length; i++) {
-		    statistic[i] += validateResult.getStatistic()[i];
-		}
+		calculateStatistic();
 	}
 
 	public void normalize(int count) {
 		for (int i = 0; i < result.length; i++) {
 			result[i] /= count;
 		}
-		
-		for (int i = 0; i < statistic.length; i++) {
-		    statistic[i] /= count;
-		}
 
+		calculateStatistic();
 	}
 
 	// Getter
