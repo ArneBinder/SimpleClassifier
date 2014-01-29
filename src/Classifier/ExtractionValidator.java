@@ -124,6 +124,8 @@ public class ExtractionValidator {
 		String folderName = new Date().toString().replace(":", "-");
 		File currentCrossValidationFolder = new File(resultFolder.getAbsolutePath() + File.separatorChar + folderName);
 		currentCrossValidationFolder.mkdir();
+		
+		ValidateResult[] singleResults = new ValidateResult[crossValidationCount];
 
 		for (int i = 0; i < crossValidationCount; i++) {
 			System.gc();
@@ -186,8 +188,10 @@ public class ExtractionValidator {
 			//System.out.println("--- -- Finished validating annotated corpus " + (i + 1) + " ---");
 
 			System.out.println("--- -- Result for fold " + (i + 1) + " ---");
+			
 			validateResult.printResult();
-
+			writeResultSingle(validateResult, foldFolder.getAbsolutePath() + File.separatorChar + "validateResult" + (i + 1) + ".txt");
+			singleResults[i] = cloner.deepClone(validateResult);
 			System.out.println("--- -- finished fold " + (i + 1) + " ---");
 		}
 
@@ -196,10 +200,40 @@ public class ExtractionValidator {
 		System.out.println("AVG F-Measure (FE identified in sentence): \t" + (result.getFMeasure(1) / crossValidationCount));
 		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + (result.getFMeasure(2) / crossValidationCount));
 		
+		writeResultGlobal(singleResults, result, currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "globalResult.txt");
 		result.normalize(crossValidationCount);
+		writeResultGlobal(singleResults, result, currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "globalResultNormalized.txt");
+		
 		System.out.println("--- Finished cross validation ---");
 		
 		return result;
+	}
+
+	private void writeResultSingle(ValidateResult validateResult, String filepath) throws IOException {
+		BufferedWriter out = new BufferedWriter(new FileWriter(new File(filepath)));
+		out.write(ValidateResult.getCaption());
+		out.newLine();
+		
+		out.write(validateResult.toString());
+		out.newLine();
+		
+		out.close();
+	}
+	
+	private void writeResultGlobal(ValidateResult[] validateResultsSingle, ValidateResult globalResult, String filepath) throws IOException{
+	    BufferedWriter out = new BufferedWriter(new FileWriter(new File(filepath)));
+		out.write(ValidateResult.getCaption());
+		out.newLine();
+		
+		for (ValidateResult validateResult : validateResultsSingle) {
+		    out.write(validateResult.toString());
+		    out.newLine();
+		}
+		
+		out.newLine();
+		out.write(globalResult.toString());
+		
+		out.close();
 	}
 
 	private long[] validate(Corpus originalCorpus, Corpus annotatedCorpus) {
