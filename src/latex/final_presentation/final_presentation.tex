@@ -15,6 +15,8 @@
 \usepackage{soul}
 \usepackage{bbding}
 \usepackage{booktabs}
+\usepackage{color}
+\usepackage{fixltx2e}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -85,24 +87,56 @@
 
 \section{\scshape Theoretischer Hintergrund und Motivation}
 	\frame{
-		\frametitle{Argumentstruktur von Verben}
+		\frametitle{Argumentstruktur}
 		%Beispielverb - zweiseitige Argumentstruktur
+		% wie wir schon wissen, bestimmen Verben die zusaetzlichen Satzelementen zunachst hinsichtlich der Anzahl und Form. 
+		% das resultierende Verhaltniss lautet Praedikat-Argument.
+		\begin{itemize}[itemsep=3ex]
+		\item<1->  \glqq{}ich kam\grqq{} \only<2->{[\textsubscript{PP+Dat} \textit{nach Rom}]}\\
+						\vspace{0.7mm}
+				   \glqq{}ich sah\grqq{} \only<3->{[\textsubscript{NP+Acc} \textit{die Armee}]}\\
+				   		\vspace{0.7mm}
+				   \glqq{}ich siegte\grqq{} \only<4->{[\textsubscript{PP+Acc} \textit{\"uber Pompeius}]}\\
+
+		\item<5-> $\Longrightarrow$ Verben (als Pr\"adikate) bestimmen die Anzahl und Form ihrer Komplementen (Argumenten).
+		\end{itemize}
 	}
 
+	
 	\frame{
 		\frametitle{thematische Rollen}
-		%Abstraktion über die semantische Seite der Argumentstruktur		
+		% from the verb (lexical items) to the situation expressed thereby
+		\begin{itemize}[itemsep=2ex]
+			\item<1-> $\Longrightarrow$ Darüber hinaus bestimmen Verben die \glqq{}Art der Beteiligung\grqq{} der Mitspieler.
+			\begin{itemize}[itemsep=1.5ex]%[label=$-$]
+				\item<1-> \glqq{}ich\only<2-4>{\textsubscript{\textit{AGENS}}} kam nach Rom{\grqq{}}
+				\item<3->  \glqq{}ich\only<4->{\textsubscript{\textit{EXPERIENCIER}}} sah die Armee{\grqq{}}
+			\end{itemize}
+		\end{itemize}
 	}
 
 	\frame{
 		\frametitle{Frames und Frame elements}
-		%Situationsverankerte Abstraktion über die Argumentstruktur
-		%Frame element gleich Rolle
-		% --> target / praedikat
+		% from the situations to the verbs that evoke them
+		% more exhaustive description of situation, great possibility to generalize over linguistic data
+		% thematische Rollen sind Generalisierungen/abstraktionen \"uber die Bedeutung eines Satzgliedes in einer konkreten Verbverbindung.
+		% 
+			\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+				\item Fokus wird nicht auf die Argumentstruktur gelegt sondern auf die Situation (Frame), die durch Sprache hervorgerufen wird.
+				\item Auch andere Wortarten au\ss er Verben sind pr\"adikatwertig. 
+				\begin{itemize}[label=$-$,itemsep=1ex]
+					\item Bei Nominalisierung (Caesars Sieg \"uber Pompeius) 
+					\item auch nicht nominalisierte Nomina (Frau, Mann ...)
+				\end{itemize}
+			\end{itemize}
 	}
 	
 	\frame{
 		\frametitle{Motivation}
+			\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+				\item Rollen sind die letzten Bausteinen, auf die die semantische Information eines Satzes basiert.
+				\item Informationextraktion 
+			\end{itemize}
 		%Anwendungsbeispiele 
 		%Informationextraktion,...
 		%Warum Rollen? theoretisches Beispiel
@@ -117,9 +151,9 @@
 		$\Longrightarrow$Automatische Bestimmung von Rollen
 		%%\vspace{1cm} 
 		%\fbox{\parbox{\dimexpr \linewidth - 2\fboxrule - 2\fboxsep}{
-		\fbox{\parbox{\linewidth}{		
-		Lassen sich semantische Rollen anhand von lexikalischen und syntaktischen Informationen eines Satzes automatisch bestimmen?
-		}}
+		%\fbox{\parbox{\linewidth}{		
+		\alert{Lassen sich semantische Rollen anhand von lexikalischen und syntaktischen Informationen eines Satzes automatisch bestimmen?}
+		% }}
 		%box rum blauer Rahmen
 	}
 
@@ -159,12 +193,25 @@
 		\begin{figure}
 		\centering
 		%@enrique: bitte einfügen!
-		\includegraphics[scale=0.37]{images/rolefrequency.jpg}
+		\includegraphics[scale=0.37]{images/roleFrequency.jpg}
 		\caption{Verteilung der Rollen}
 		\end{figure}
 		%schöner Pfeil
 		$\Longrightarrow$Betrachtung der Top-10 Rollen		
 	}
+
+	\frame{
+		\frametitle{Herangehensweise}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item Ansatz von Jurafsky und Gildea
+			\begin{itemize}[label=$-$,itemsep=1ex]
+				\item Analyse des Korpus auf Struktur, Aufbau, Häufigkeitsverteilungen
+				\item Classifier: Naïve Bayes Classifier
+				\item Angelehnte Features
+			\end{itemize}
+		\end{itemize}
+	}
+
 	\frame{
 		\frametitle{Einschränkungen (Forts.)}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
@@ -184,16 +231,6 @@
 		\end{itemize}
 	}
 	
-	\frame{
-		\frametitle{Herangehensweise}
-		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
-			\item Ansatz von Jurafsky und Gildea
-			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item Classifier: Naïve Bayes Classifier
-				\item Angelehnte Features
-			\end{itemize}
-		\end{itemize}
-	}
 
 	\frame{
 		\frametitle{Prinzipieller Ablauf}
@@ -201,13 +238,13 @@
 			\item<1->
 			\begin{figure}
 				%@enrique: bitte einfügen!
-				\includegraphics[scale=0.5]{images/ablauflearning.png}
+				\includegraphics[scale=0.5]{images/ablaufLernen.png}
 				\caption{Training}
 			\end{figure}
 			\item<2->
 			\begin{figure}
 				%@enrique: bitte einfügen!
-				\includegraphics[scale=0.5]{images/ablaufannotate.png}
+				\includegraphics[scale=0.5]{images/ablaufAnnotate.png}
 				\caption{Klassifikation}
 			\end{figure}
 		\end{itemize}
@@ -333,7 +370,10 @@
 	}
 
 	\frame{
-		%TODO Beispielsatz von Salto wieder nutzen, muss mind. 2 Rollen haben
+		\begin{figure}
+			\includegraphics[scale=0.5]{images/s6544.png}
+			\caption{annotiertes Beispielsatz}
+		\end{figure}%TODO Beispielsatz von Salto wieder nutzen, muss mind. 2 Rollen haben
 	}
 
 
@@ -353,7 +393,7 @@
 			\caption{Ergebnisse einer 5-fach Kreuzvalidierung}
 			\begin{tabular}{r|c|c|c}
 			  	\toprule
-			  	Typ				& \textbf{Precision} & \textbf{Recall} & \textbf{F-Measure} \\
+			  	Typ						& \textbf{Precision} & \textbf{Recall} & \textbf{F-Measure} \\
 			  	\midrule
 				Exaktes Match 			&  0,51 $\pm$ 0,02 & 0,81 $\pm$ 0,02 & 0,62 $\pm$ 0,02 \\
 				Unabhängig (Rolle)		&  0,67 $\pm$ 0,03 & 0,85 $\pm$ 0,02 & 0,75 $\pm$ 0,02 \\
@@ -373,7 +413,6 @@
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
 			%\vspace{1cm}
-
 			\item Universität Saarland: Projekt auf dem SALSA 1.0 Korpus
 			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Mesaure: 0.600
@@ -385,8 +424,10 @@
 			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item 92\% der Konstituenten im Korpus ignoriert 
 				%TODO  = (IDrefs overall - classified idrefs) / idrefs overall * 100
-				\item $\Longrightarrow$ besserer Recall $\Longrightarrow$ besserer F-Measure
 			\end{itemize}	
+			\begin{itemize}
+				\item $\Longrightarrow$ besserer Recall $\Longrightarrow$ besserer F-Measure
+			\end{itemize}
 		\end{itemize}
 	}
 
