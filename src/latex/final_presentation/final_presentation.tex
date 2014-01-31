@@ -125,7 +125,7 @@
 			\item enthält: ~24.000 Sätze mit 648 Prädikaten %target-word
 			\item Prädikate: Nomen \& Verben
 		\end{itemize}
-	%	annotierung genau beschreiben (saetzengrenzen etc...)
+	%	annotierung genau beschreiben (Satzgrenzen etc...)
 	}	
 	
 	\frame{
@@ -136,7 +136,19 @@
 
 \section{Umsetzung}
 	\frame{
+		\frametitle{Herangehensweise}
+		\begin{itemize}
+			\item Analyse des Korpus auf Struktur, Aufbau, Häufigkeitsverteilungen
+			\item Ansatz von Jurafsky und Gildea %TODO: @Enrique: fallen dir hierzu noch ein zwei markante Punkte ein?
+			\begin{itemize}
+				\item Classifier: Naïve Bayes Classifier
+				\item Angelehnte Features
+			\end{itemize}
+		\end{itemize}
+	}
+	\frame{
 		\frametitle{Einschränkungen}
+		% viele Prädikate nur einzelne Beispielsätze. So verhält es sich auch mit den Rollen...
 		\begin{figure}
 		\centering
 		\caption{Verteilung der Rollen}
@@ -164,16 +176,7 @@
 		\end{itemize}
 	}
 	
-	\frame{
-		\frametitle{Herangehensweise}
-		\begin{itemize}
-			\item Ansatz von Jurafsky und Gildea
-			\begin{itemize}
-				\item Classifier: Naïve Bayes Classifier
-				\item Angelehnte Features
-			\end{itemize}
-		\end{itemize}
-	}
+
 
 	\frame{
 		\frametitle{Prinzipieller Ablauf}
@@ -249,7 +252,7 @@
 			\item Deutsch: relativ freie Verschiebung von Konstituenten %Subjekt nicht auf die Vorfeldposition beschränkt....
 			\item Kopf nicht überall definiert (NEGRA Tag-Set)
 
-			\item Querverbindung im Syntaxgraph % KOAN BAUM
+			\item Querverbindung im Syntaxgraph % --> KEIN Baum
 			\begin{itemize}
 				\item Ich ging nach Haus' und aß Abendbrot. (Bild?)
 			\end{itemize}	
