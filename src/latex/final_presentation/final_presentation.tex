@@ -14,7 +14,7 @@
 \usepackage{qtree}
 \usepackage{soul}
 \usepackage{bbding}
-
+\usepackage{booktabs}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -43,8 +43,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\title{Semantic Role Labeling}
-\author{Arne Binder, Robert B\"arhold, Enrique Manjavacas}
+\begin{document}
+
+%\documentclass{beamer}
+%\usepackage{beamerthemesplit} 
+%\usetheme{Goettingen}
+%\usecolortheme{seahorse}
+%\section{\scshape{\scshape Gliederung}
+\begin{frame}
+\title{\textbf{Semantic Role Labeling}}
+%subtitle{}
 \date{
 	\begin{tikzpicture}[decoration=Koch curve type 2] 
 		\draw[DeepSkyBlue4] decorate{ decorate{ decorate{ (0,0) -- (2,0) }}}; 
@@ -54,19 +62,28 @@
 	\today
 }
 
+% \author{Arne Binder, Robert B\"arhold,\\
+% 	{\it Humboldt Universität zu Berlin}\\
+% 	Enrique Manjavacas\\
+% 	{\it Freie Universität Berlin}\\
+% }
 
-\begin{document}
 
-\frame{\titlepage}
+\author[shortname]{Arne Binder \inst{1} \and Robert Bärhold \inst{1} \and Enrique Manjavacas \inst{2}}
+\institute[shortinst]{\inst{1} Humboldt Universität zu Berlin\and %
+                      \inst{2} Freie Universität Berlin}
 
-\frame{
+
+\titlepage
+\end{frame}
+\begin{frame}
 	\frametitle{Gliederung}
 	\tableofcontents
-	[pausesections]
-}
+	%[pausesections]
+\end{frame}
 
 
-\section{Theoretischer Hintergrund und Motivation}
+\section{\scshape Theoretischer Hintergrund und Motivation}
 	\frame{
 		\frametitle{Argumentstruktur von Verben}
 		%Beispielverb - zweiseitige Argumentstruktur
@@ -92,129 +109,132 @@
 		%nicht aufschreiben, aber sagen - the linguists scarcity problem, zu viele daten zu wenige linguisten
 	}
 
-\section{Problemstellung}
+\section{\scshape Problemstellung}
 
 	\frame{
 		\frametitle{Problemstellung}
 		\centering
-		Automatische Bestimmung von Rollen
-		
-		\vspace{1cm} 
+		$\Longrightarrow$Automatische Bestimmung von Rollen
+		%%\vspace{1cm} 
 		%\fbox{\parbox{\dimexpr \linewidth - 2\fboxrule - 2\fboxsep}{
-		\begin{center}
-			\fbox{\parbox{.9\linewidth}{		
-			Lassen sich semantische Rollen anhand von lexikalischen und syntaktischen Informationen eines Satzes automatisch bestimmen?
-			}}
-		\end{center}
-		%TODO: box rum blauer Rahmen
+		\fbox{\parbox{\linewidth}{		
+		Lassen sich semantische Rollen anhand von lexikalischen und syntaktischen Informationen eines Satzes automatisch bestimmen?
+		}}
+		%box rum blauer Rahmen
 	}
 
 	\frame{
 		\frametitle{Corpus: Salsa 2.0}
-		\begin{itemize}
-			\item Erstellt von der Universität Saarland %Referenz
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item<1->
+			Erstellt von der Universität Saarland %Referenz
 			% weiterentwicklung des SALSA 1.0
-			\item basiert auf dem TIGER-Korpus %Referenz
-			\begin{itemize}
+			\item<2->
+			Basiert auf dem TIGER-Korpus %Referenz
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Treebank über Zeitungsartikel
 				\item NEGRA Tag-Set
 				\item
 					viele syntaktische Informationen:\\ 
 					Pos-Tag, morphologische \& lemma-Informationen
 			\end{itemize}
-			\item enthält: ~24.000 Sätze mit 648 Prädikaten %target-word
-			\item Prädikate: Nomen \& Verben
+			\item<3->
+			Enthält: ~24.000 Sätze mit 648 Prädikaten %target-word
+			\item<4->
+			Prädikate: Nomen \& Verben
+
 		\end{itemize}
-	%	annotierung genau beschreiben (Satzgrenzen etc...)
+	%	annotierung genau beschreiben (saetzengrenzen etc...)
 	}	
 	
 	\frame{
 		\frametitle{Corpus: Salsa 2.0}
-		%TODO Beispielbild von Salto: kurzer Satz mit edge-labels
+		%Beispielbild von Salto: kurzer Satz mit edge-labels
 	}
 
 
-\section{Umsetzung}
-	\frame{
-		\frametitle{Herangehensweise}
-		\begin{itemize}
-			\item Analyse des Korpus auf Struktur, Aufbau, Häufigkeitsverteilungen
-			\item Ansatz von Jurafsky und Gildea %TODO: @Enrique: fallen dir hierzu noch ein zwei markante Punkte ein?
-			\begin{itemize}
-				\item Classifier: Naïve Bayes Classifier
-				\item Angelehnte Features
-			\end{itemize}
-		\end{itemize}
-	}
+\section{\scshape Umsetzung}
 	\frame{
 		\frametitle{Einschränkungen}
-		% viele Prädikate nur einzelne Beispielsätze. So verhält es sich auch mit den Rollen...
 		\begin{figure}
 		\centering
+		%@enrique: bitte einfügen!
+		\includegraphics[scale=0.37]{images/rolefrequency.jpg}
 		\caption{Verteilung der Rollen}
-		%TODO @enrique: bitte einfügen!
-		%\includegraphics[scale=0.5]{images/role_frequency.jpg}
 		\end{figure}
-		$\Rightarrow$ Betrachtung der Top-10 Rollen		
+		%schöner Pfeil
+		$\Longrightarrow$Betrachtung der Top-10 Rollen		
 	}
 	\frame{
 		\frametitle{Einschränkungen (Forts.)}
-		\begin{itemize}
-			\item Top-10 Rollen
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item<1-> Top-10 Rollen
 
-			\vspace{1cm}
-			\item Keine Frames
-			\begin{itemize}
+			%\vspace{1cm}
+			\item<2-> Keine Frames
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Disambiguierung zu komplex
 			\end{itemize}
 
-			\vspace{1cm}
-			\item Target-Lemma muss bekannt sein
-			\begin{itemize}
+			%\vspace{1cm}
+			\item<3->Target-Lemma muss bekannt sein
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Keine Abstraktion für ungesehene Targets
 			\end{itemize}
 		\end{itemize}
 	}
 	
-
+	\frame{
+		\frametitle{Herangehensweise}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item Ansatz von Jurafsky und Gildea
+			\begin{itemize}[label=$-$,itemsep=1ex]
+				\item Classifier: Naïve Bayes Classifier
+				\item Angelehnte Features
+			\end{itemize}
+		\end{itemize}
+	}
 
 	\frame{
 		\frametitle{Prinzipieller Ablauf}
-		\begin{figure}
-			\caption{Training}
-			%TODO @enrique: bitte einfügen!
-			%\includegraphics[scale=0.5]{images/ablauf_training.jpg}
-		\end{figure}
-		\begin{figure}
-			\caption{Klassifikation}
-			%TODO @enrique: bitte einfügen!
-			%\includegraphics[scale=0.5]{images/ablauf_annotate.jpg}
-		\end{figure}
+		\begin{itemize}
+			\item<1->
+			\begin{figure}
+				%@enrique: bitte einfügen!
+				\includegraphics[scale=0.5]{images/ablauflearning.png}
+				\caption{Training}
+			\end{figure}
+			\item<2->
+			\begin{figure}
+				%@enrique: bitte einfügen!
+				\includegraphics[scale=0.5]{images/ablaufannotate.png}
+				\caption{Klassifikation}
+			\end{figure}
+		\end{itemize}
 		%Keine Rolle
 		%smoothing: 0.000001; threshold for frame: P(R1..Rk) > e^(-600)
 	}
 
 	\frame{
- %TODO Kommentar in der E-Mail an Leser: Features einzeln mit einem Bild kurz
- % erklären statt KOmpakt + Beispiel danach
+ % Kommentar in der E-Mail an Leser: Features einzeln mit einem Bild kurz erklären statt KOmpakt + Beispiel danach
 		\frametitle{Features}
-		\begin{itemize}	
-			\item Synt. Kategorie
-			\begin{itemize}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item<1-> Synt. Kategorie
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Nonterminal: phrasale Kategorie
 				\item Terminal: POS-Tag
 			\end{itemize}
 			
-			\vspace{1cm}
-			\item Pfad: über synt. Kategorien
-			\begin{itemize}
+			%\vspace{1cm}
+			\item<2-> Pfad: über synt. Kategorien
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Zusammenfassen von Replikaten 
 				\item Ignorieren von Konjunktionen
 			\end{itemize}
 
-			\vspace{1cm}
-			\item Position
-			\begin{itemize}
+			%\vspace{1cm}
+			\item<3-> Position
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Position relativ zum Target
 			\end{itemize}
 		\end{itemize}
@@ -222,91 +242,90 @@
 
 	\frame{
 		\frametitle{Features (2)}
-		\begin{itemize}	
-			\item Kopf-Lemma
-			\begin{itemize}
-				\item Syntaktisches Zentrum einer Phrase %TODO sounds strage
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item<1-> Kopf-Lemma
+			\begin{itemize}[label=$-$,itemsep=1ex]
+				\item Syntaktisches Zentrum einer Phrase %TODO
 				\item wird regelbasiert gesucht
 				%terminal =  eigenes lemma als head
 			\end{itemize}
 
-			\vspace{1cm}			
-			\item Nachbar-Kopf-Lemma
-			\begin{itemize}
+			%\vspace{1cm}			
+			\item<2-> Nachbar-Kopf-Lemma
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Kopf der einbettenden Konstituente
 			\end{itemize}
 
-			\vspace{1cm}
-			\item Kombination: Synt. Kat. \& Pfad
+			%\vspace{1cm}
+			\item<3-> Kombination: Synt. Kat. \& Pfad
 		\end{itemize}
 	}
 
 	\frame{
 		\frametitle{Features (3)}
-		%TODO Features an Beispielsatz von Salsa-Corpus (Salto-Satz) erklären
+		%Features an Beispielsatz von Salsa-Corpus (Salto-Satz) erklären
 	}
 
 	\frame{ % ZEILENABSTAND
 		\frametitle{Probleme}
-		\begin{itemize}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item Deutsch: relativ freie Verschiebung von Konstituenten %Subjekt nicht auf die Vorfeldposition beschränkt....
 			\item Kopf nicht überall definiert (NEGRA Tag-Set)
-
-			\item Querverbindung im Syntaxgraph % --> KEIN Baum
-			\begin{itemize}
+			\item Querverbindung im Syntaxgraph % KOAN BAUM
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Ich ging nach Haus' und aß Abendbrot. (Bild?)
-			\end{itemize}	
-					
+			\end{itemize}			
 			\item Target im Satz identifizieren
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Den Vortrag \textit{auf die lange Bank schieben.}
-				\item Ich \textit{brach} den Ast \textit{ab}.
+				\item Ich \textit{brach} den Ast \textit{ab.}
 			\end{itemize}			
 		\end{itemize}
 	}	
 
-\section{Evaluation}
+
+\section{\scshape Evaluation}
 	\frame{
 		\frametitle{Evaluation}
-		\begin{itemize}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item Target-Lemma muss vorhanden sein
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item keines gefunden: Satz komplett ignoriert
 			\end{itemize}
-%da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen beruecksichtigen wird bei der evaluation nur frame elements mit dem bezug auf ein (im Model) bekanntes target. counts erklaeren und ausgeben 
-
+%da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen beruecksichtigen wird bei der evaluation nur 
+%frame elements mit dem bezug auf ein (im Model) bekanntes target. counts erklaeren und ausgeben 
 			\item Nutzung des F-Mesaure
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Sehr, sehr häufig: keine Rolle % accuracy dadurch unpassend
 			\end{itemize}
 
 			\item Precision
-			\begin{itemize}
-				\item P = \#(Korrekte Rolle klassifiziert) / \\ \#(Klassifiziert mit Rolle)
+			\begin{itemize}[label=$-$,itemsep=1ex]
+				\item P = \#(Korrekte Rolle klassifiziert) / \\ \#Klassifiziert mit Rolle)
 			\end{itemize}				
 
 			\item Recalll
-			\begin{itemize}
-				\item R = \#(Korrekte Rolle klassifiziert) / \\  \#(Konstituenten mit Rolle)
+			\begin{itemize}[label=$-$,itemsep=1ex]
+				\item R = \#(Korrekte Rolle klassifiziert) / \\ \#(Konstituenten mit Rolle)
 			\end{itemize}				
 		\end{itemize}
 	}
 
 	\frame{
 		\frametitle{Auswertung bezüglich dreier Kenngrößen}
-		\begin{itemize} %TODO: should be enumerate
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex] %TODO: should be enumerate
 			\item Konstituente wurde korrekte Rolle zugewiesen
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Exakte Übereinstimmung
 			\end{itemize}
 
 			\item Konstituente wurde eine bel. Rolle zugewiesen
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Unabhängig von der Rolle
 			\end{itemize}
 
 			\item Korrekte Rolle wurde im Satz gefunden
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Unabhängig der Position im Satz
 			\end{itemize}
 		\end{itemize}
@@ -320,29 +339,29 @@
 
 	\frame{
 		\frametitle{Ergebnisse}
-		\begin{itemize}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 		  \item Korpus: Top-10 Rollen
-		  \begin{itemize}
+		  \begin{itemize}[label=$-$,itemsep=1ex]
 			  \item $\sim$ 14000 Sätzen
 			  \item $\sim$ 22500 Konstituenten mit einer Rolle
 		  \end{itemize}
 		\end{itemize}
 
-		\vspace{1cm}
+		%\vspace{1cm}
 		\begin{table}
 			\small
 			\caption{Ergebnisse einer 5-fach Kreuzvalidierung}
 			\begin{tabular}{r|c|c|c}
-			  	Typ						& Precision & Recall & F-Mesaure \\
-			  	\hline
+			  	\toprule
+			  	Typ				& \textbf{Precision} & \textbf{Recall} & \textbf{F-Measure} \\
+			  	\midrule
 				Exaktes Match 			&  0,51 $\pm$ 0,02 & 0,81 $\pm$ 0,02 & 0,62 $\pm$ 0,02 \\
-				\hline
 				Unabhängig (Rolle)		&  0,67 $\pm$ 0,03 & 0,85 $\pm$ 0,02 & 0,75 $\pm$ 0,02 \\
-				\hline
-				Unabhängig (Position)	&  0,55 $\pm$ 0,02 & 0,88 $\pm$ 0,02 & 0,68 $\pm$ 0,02
+				Unabhängig (Position)	&  0,55 $\pm$ 0,02 & 0,88 $\pm$ 0,02 & 0,68 $\pm$ 0,02 \\
+				\bottomrule
 			\end{tabular}
 		\end{table}
-		
+
 		\begin{center}
 			\small
 			Angabe: Ergebniswert (gerundet) $\pm$ Standardabweichung
@@ -351,37 +370,37 @@
 
 	\frame{
 		\frametitle{Einordnung der Ergebnisse}
-		\begin{itemize}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
-			\vspace{1cm}
+			%\vspace{1cm}
 
 			\item Universität Saarland: Projekt auf dem SALSA 1.0 Korpus
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Mesaure: 0.600
 				\item Vorgehen \& Evaluation unklar
 			\end{itemize}
 
-			\vspace{1cm}
+			%\vspace{1cm}
 			\item Target-Lemma muss vorhanden sein
-			\begin{itemize}
+			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item 92\% der Konstituenten im Korpus ignoriert 
 				%TODO  = (IDrefs overall - classified idrefs) / idrefs overall * 100
-				\item $\Rightarrow$ besserer Recall $\Rightarrow$ besserer F-Measure
+				\item $\Longrightarrow$ besserer Recall $\Longrightarrow$ besserer F-Measure
 			\end{itemize}	
 		\end{itemize}
 	}
 
 	\frame{
 		\centering
+		\begin{Large} 
+			Vielen Dank für die Aufmerksamkeit! \\
+			%\vspace{1cm}
+		\end{Large}
+		\vspace{1cm}
 		\begin{tikzpicture}[decoration=Koch curve type 2] 
 			\draw[DeepSkyBlue4] decorate{ decorate{ decorate{ (0,0) -- (2,0) }}}; 
 		\end{tikzpicture} \\
-		\vspace{1cm}
-		\begin{Large} 
-			Vielen Dank für die Aufmerksamkeit! \\
-			\vspace{1cm}
 			Fragen?
-		\end{Large}
 	}
 
 	\frame{
@@ -400,113 +419,154 @@
 	}	
 
 
+	% \frame{
+	% 	\frametitle{Auswertung bezüglich dreier Kenngrößen}
+	% 	\begin{enumerate}
+	% 		\item Konstituente wurde korrekte Rolle zugewiesen
+	% 		\begin{itemize}
+	% 			\item Exakte Übereinstimmung
+	% 		\end{itemize}	
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\frame{
-\frametitle{What are semantic  roles?}
-\begin{itemize}
-	\item<2->
-			\begin{xlist}
-			\ex
-			\gll Peter gibt Karl Geld.\\
-			\footnotesize
-			\textcolor{blue}{\textit{SOURCE}}
-			\footnotesize
-			{}
-			\footnotesize
-			\textcolor{blue}{\textit{RECIPIENT} }
-			\footnotesize
-			\textcolor{blue}{\textit{THEMA}}
-			\\
-			\vspace{1cm}
-	\item<3->
+	% 		\item Konstituente wurde eine bel. Rolle zugewiesen
+	% 		\begin{itemize}
+	% 			\item Unabhängig von der Rolle
+	% 		\end{itemize}	
 			
-			\gll Karl bekommt Geld von Peter.\\
-			\footnotesize
-			\textcolor{blue}{\textit{RECIPIENT}}
-			\footnotesize
-			{}
-			\footnotesize
-			\textcolor{blue}{\textit{THEMA}}
-			\footnotesize
-			\textcolor{blue}{\textit{SOURCE}}
-			\\
-			\end{xlist}
+	% 		\item Korrekte Rolle wurde im Satz gefunden
+	% 		\begin{itemize}
+	% 			\item Unabhängig der Position im Satz
+	% 		\end{itemize}	
+	% 	\end{enumerate}
+	% 	% das letzte geht mehr auf die Rollenzählung ein, die ersten beiden sind für Konstituenten
+	% }
+
+	% \frame{
+	% 	% Beispielsatz von Salto wieder nutzen, muss mind. 2 Rollen haben
+	% }
+
+
+	% \frame{
+	% 	\frametitle{Durchführung}
+	% 	\begin{itemize}
+	% 		\item 5-fache Kreuzvalidierung % je ein paar weg
+
+	% 		% Gesamtergebnis + Standardabweichung
+
+	% 	\end{itemize}
+	% }
+
+	% \frame{
+	% 	\frametitle{Einordnung der Ergebnisse}
+	% 	\begin{itemize}
+	% 		\item Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
+	% 		\item Universität Saarland: Projekt auf dem SALSA 1.0 Korpus
+	% 		\begin{itemize}
+	% 			\item Prec.: 0.761 | Recall: 0.496 | F-Mesaure: 0.600
+	% 			\item Vorgehen \& Evaluation unklar
+	% 		\end{itemize}
+
+	% 		%\vspace{1cm}
+	% 		\item Target-Lemma muss vorhanden sein
+	% 		\begin{itemize}
+	% 			\item xx \% an Konstituenten im Goldstandard wurden ignoriert %TODO
+	% 			\item --> führt zu besserem Recall -> F-Measure
+	% 		\end{itemize}	
+	% 	\end{itemize}
+	% }
+
+	% \frame{
+	% 	Vielen Dank für die Aufmerksamkeit!
+	% }
+
+	% \frame{
+	% 	\frametitle{Referenzen}
+	% 	...%todo
+	% }
+
+	% \frame{
+	% 	%empty frame
+
+	% }
+
+	% \frame{
+	% 	\frametitle{Backup}
+
+	% }	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+% \frame{
+% \frametitle{What are semantic  roles?}
+% \begin{itemize}
+% 	\item<2->
+% 			\begin{xlist}
+% 			\ex
+% 			\gll Peter gibt Karl Geld.\\
+% 			\footnotesize
+% 			\textcolor{blue}{\textit{SOURCE}}
+% 			\footnotesize
+% 			{}
+% 			\footnotesize
+% 			\textcolor{blue}{\textit{RECIPIENT} }
+% 			\footnotesize
+% 			\textcolor{blue}{\textit{THEMA}}
+% 			\\
+% 			%\vspace{1cm}
+% 	\item<3->
+			
+% 			\gll Karl bekommt Geld von Peter.\\
+% 			\footnotesize
+% 			\textcolor{blue}{\textit{RECIPIENT}}
+% 			\footnotesize
+% 			{}
+% 			\footnotesize
+% 			\textcolor{blue}{\textit{THEMA}}
+% 			\footnotesize
+% 			\textcolor{blue}{\textit{SOURCE}}
+% 			\\
+% 			\end{xlist}
 
 			
-\end{itemize}
-}
+% \end{itemize}
+% }
 
 
 
-\section[Why Semantic Roles?]{}
-\frame{
-\frametitle{Why Semantic Roles?}
-\begin{itemize}
-	\item<1-> \begin{block}{\textbf{Information Extraction}}
-	\begin{itemize}
-		\item "Paul hat seine Mutter get\"otet."
-	\end{itemize}
-	\end{block}
-	\vspace{1cm}
-	\item<2-> \begin{block}{\textbf{Metaphernanalyse}}
-	\begin{itemize}
-		\item "Paul hat seine Mutter unter die Erde gebracht."
-	\end{itemize}
-	\end{block}
-\end{itemize}
-}
+% \section{\scshape[Why Semantic Roles?]{}
+% \frame{
+% \frametitle{Why Semantic Roles?}
+% \begin{itemize}
+% 	\item<1-> \begin{block}{\textbf{Information Extraction}}
+% 	\begin{itemize}
+% 		\item "Paul hat seine Mutter get\"otet."
+% 	\end{itemize}
+% 	\end{block}
+% 	%\vspace{1cm}
+% 	\item<2-> \begin{block}{\textbf{Metaphernanalyse}}
+% 	\begin{itemize}
+% 		\item "Paul hat seine Mutter unter die Erde gebracht."
+% 	\end{itemize}
+% 	\end{block}
+% \end{itemize}
+% }
 
-\section[Our goal]{}
-\frame{
-\frametitle{Our goal}
-\begin{itemize}
-	\item<1-> Automatic Semantic Role Labeling
-	\item<2-> Language: German
-	\item<3-> Corpus: SALSA 2.0 (based on TIGER Corpus \& FrameNet)
-	\item<4-> Framework: LingPipe 
-	\vspace{1cm}
-	\item<5-> \textbf{References:} C.J. Fillmore (Frame Semantics), D. Jurafsky \& D. Gildea (first implementation of a Semantic Role Labeler)
+% \section{\scshape[Our goal]{}
+% \frame{
+% \frametitle{Our goal}
+% \begin{itemize}
+% 	\item<1-> Automatic Semantic Role Labeling
+% 	\item<2-> Language: German
+% 	\item<3-> Corpus: SALSA 2.0 (based on TIGER Corpus \& FrameNet)
+% 	\item<4-> Framework: LingPipe 
+% 	%\vspace{1cm}
+% 	\item<5-> \textbf{References:} C.J. Fillmore (Frame Semantics), D. Jurafsky \& D. Gildea (first implementation of a Semantic Role Labeler)
 	
-\end{itemize}
-}
+% \end{itemize}
+% }
 
 
 
-\end{document}
+ \end{document}
