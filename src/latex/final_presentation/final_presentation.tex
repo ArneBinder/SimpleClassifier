@@ -203,6 +203,10 @@
 		\frametitle{Corpus: Salsa 2.0}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item<1-> Erstellt von der Universität Saarland \cite{rehbeinadding2012}
+			\begin{itemize}[label=$-$,itemsep=1ex]
+			  	% http://www.coli.uni-saarland.de/projects/salsa/corpus/doc/license.html
+				\item frei für akademische Zwecke
+			\end{itemize}
 			% weiterentwicklung des SALSA 1.0
 			\item<2-> Basiert auf dem TIGER-Korpus \cite{tiger}
 			\begin{itemize}[label=$-$,itemsep=1ex]
@@ -442,30 +446,34 @@
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 		  \item Korpus: Top-10 Rollen
 		  \begin{itemize}[label=$-$,itemsep=1ex]
-			  \item $\sim$ 14000 Sätzen
-			  \item $\sim$ 22500 Konstituenten mit einer Rolle
+			  \item $\sim$ 14000 Sätzen \& $\sim$ 22500 Konstituenten mit Rolle
 		  \end{itemize}
 		\end{itemize}
 
-		%\vspace{1cm}
-		\begin{table}
-			\small
-			\caption{Ergebnisse einer 5-fach Kreuzvalidierung}
-			\begin{tabular}{r|c|c|c}
-			  	\toprule
-			  	Typ						& \textbf{Precision} & \textbf{Recall} & \textbf{F-Measure} \\
-			  	\midrule
-				Exaktes Match 			&  0,51 $\pm$ 0,02 & 0,81 $\pm$ 0,02 & 0,62 $\pm$ 0,02 \\
-				Unabhängig (Rolle)		&  0,67 $\pm$ 0,03 & 0,85 $\pm$ 0,02 & 0,75 $\pm$ 0,02 \\
-				Unabhängig (Position)	&  0,55 $\pm$ 0,02 & 0,88 $\pm$ 0,02 & 0,68 $\pm$ 0,02 \\
-				\bottomrule
-			\end{tabular}
-		\end{table}
+		\begin{figure}
+			\includegraphics[width=0.8\textwidth]{images/ergebnisseKreuzvalidierung.png}
+			\caption{Ergebnisse der 5-fach Kreuzvalidierung}
+		\end{figure}
 
-		\begin{flushright}
-			\small
-			\textit{Angabe: Ergebniswert (gerundet) $\pm$ Standardabweichung}
-		\end{flushright}
+		%\vspace{1cm}
+% 		\begin{table}
+% 			\small
+% 			\caption{Ergebnisse einer 5-fach Kreuzvalidierung}
+% 			\begin{tabular}{r|c|c|c}
+% 			  	\toprule
+% 			  	Typ						& \textbf{Precision} & \textbf{Recall} & \textbf{F-Measure} \\
+% 			  	\midrule
+% 				Exaktes Match 			&  0,51 $\pm$ 0,02 & 0,81 $\pm$ 0,02 & 0,62 $\pm$ 0,02 \\
+% 				Unabhängig (Rolle)		&  0,67 $\pm$ 0,03 & 0,85 $\pm$ 0,02 & 0,75 $\pm$ 0,02 \\
+% 				Unabhängig (Position)	&  0,55 $\pm$ 0,02 & 0,88 $\pm$ 0,02 & 0,68 $\pm$ 0,02 \\
+% 				\bottomrule
+% 			\end{tabular}
+% 		\end{table}
+% 
+% 		\begin{flushright}
+% 			\small
+% 			\textit{Angabe: Ergebniswert (gerundet) $\pm$ Standardabweichung}
+% 		\end{flushright}
 	}
 
 	\frame{
@@ -473,8 +481,10 @@
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
 			%\vspace{1cm}
-			\item Universität Saarland: Projekt auf dem SALSA 1.0 Korpus
+			\item SHALMANESER \cite{erk2006shalmaneser}
+				% Universität Saarland
 			\begin{itemize}[label=$-$,itemsep=1ex]
+			  \item Grundlage: SALSA 1.0 \cite{burchardt2006salsa} 
 				\item Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Mesaure: 0.600
 				\item Vorgehen \& Evaluation unklar
 			\end{itemize}
@@ -488,6 +498,9 @@
 			\begin{itemize}
 				\item $\Longrightarrow$ besserer Recall $\Longrightarrow$ besserer F-Measure
 			\end{itemize}
+			
+			\item Bedeutenste Featurs: Pfad \& Nachbar-Kopf
+				% im Durchschnitt: 20% bzw. 15%
 		\end{itemize}
 	}
 
