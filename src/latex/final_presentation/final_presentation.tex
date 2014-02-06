@@ -478,32 +478,9 @@
 % 			\textit{Angabe: Ergebniswert (gerundet) $\pm$ Standardabweichung}
 % 		\end{flushright}
 	}
-	\frame{
-		\frametitle{Einordnung der Ergebnisse}
-		\centering
-        \begin{table}
-		\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
-          		   max width=\textwidth}{
-		\begin{tabular}{cc|cccccccc}
-		\toprule
-		\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
-		\midrule
-		 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
-		 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
-		 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
-		 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
-		 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
-		 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
-		 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
-		\bottomrule
-		\end{tabular}
-		}
-		\caption{Closed Challenge, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
-		\end{table}
-	}
 
 	\frame{
-		\frametitle{Einordnung der Ergebnisse (1)}
+		\frametitle{Einordnung der Ergebnisse}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
 			%\vspace{1cm}
@@ -527,8 +504,35 @@
 			
 		\end{itemize}
 	}
+	
+	\frame{
+		% 2 Task: dependency parsing + semantic role labeling (zur Verfügung:
+		% Head, Dependency-Graph, Syntaktische + Morph Informationen: Lemma, POS,
+		% others) Tabelle: Nur Semantic Role Labeling Task
+		\frametitle{Einordnung der Ergebnisse (1)}
+		\centering
+        \begin{table}
+		\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
+          		   max width=\textwidth}{
+		\begin{tabular}{cc|cccccccc}
+		\toprule
+		\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
+		\midrule
+		 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
+		 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
+		 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
+		 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
+		 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
+		 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
+		 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
+		\bottomrule
+		\end{tabular}
+		}
+		\caption{Closed Challenge, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
+		\end{table}
+	}	
 
-\frame{
+	\frame{
 		\frametitle{Einordnung der Ergebnisse (2)}
 		
 		\begin{figure}
