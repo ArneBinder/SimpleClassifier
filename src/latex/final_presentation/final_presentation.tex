@@ -82,7 +82,8 @@
 \end{frame}
 
 
-\section{\scshape Theoretischer Hintergrund und Motivation}
+\section{\scshape Theoretischer Hintergrund und Motivation}	
+	\frame{\frametitle{Gliederung} \tableofcontents[currentsection]}
 	\frame{
 		\frametitle{Argumentstruktur}
 		% Beispielverb - zweiseitige Argumentstruktur
@@ -95,7 +96,7 @@
 				   		\vspace{0.7mm}
 				   \glqq{}ich siegte\grqq{} \only<4->{[\textsubscript{PP+Acc} \textit{\"uber Vercingetorix}]}\\
 
-		\item<5-> $\Longrightarrow$ Verben (als Pr\"adikate) bestimmen die Anzahl und Form ihrer Komplementen (Argumenten).
+		\item<5-> $\Longrightarrow$ Verben (als Pr\"adikate) bestimmen die Anzahl und Form ihrer Komplementen (Argumenten)
 		\end{itemize}
 	}
 
@@ -105,11 +106,11 @@
 		\begin{itemize}[itemsep=2ex]
 			%\item<1-> $\Longrightarrow$ Darüber hinaus bestimmen Verben die \glqq{}Art der Beteiligung\grqq{} der Mitspieler.
 			%\begin{itemize}[itemsep=1.5ex]%[label=$-$]
-				\item<1-> \glqq{}ich\only<2-4>{\textsubscript{\textit{AGENS}}} kam nach Gallien{\grqq{}}
+				\item<1-> \glqq{}ich\only<2-5>{\textsubscript{\textit{AGENS}}} kam nach Gallien{\grqq{}}
 				\item<3->  \glqq{}ich\only<4->{\textsubscript{\textit{EXPERIENCIER}}} sah den Feind{\grqq{}}
 			%\end{itemize}
 				\item<5-> $\Longrightarrow$ thematische Rollen sind Generalisierungen \"uber die Bedeutung 
-					eines Satzgliedes in einer konkreten Verbverbindung. 
+					eines Satzgliedes in einer konkreten Verbverbindung
 		\end{itemize}
 	}
 
@@ -120,12 +121,12 @@
 		% thematische Rollen sind Generalisierungen/abstraktionen \"uber die Bedeutung eines Satzgliedes in einer konkreten Verbverbindung.
 			\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 				\item<1-> Fokus nicht auf die Argumentstruktur sondern auf die globale Situation (Frame), 
-				die durch Sprache hervorgerufen wird.\cite{fillmore1985}
-				\item<2-> Rollen (Frame Elements) bzgl dieser au\ss ersprachlichen Situation definiert.
-				\item<3-> Nicht nur Verben sind pr\"adikatwertig (target-words): 
+				die durch Sprache hervorgerufen wird \cite{fillmore1985}
+				\item<2-> Rollen (Frame Elements) bzgl. dieser au\ss ersprachlichen Situation definiert
+				\item<3-> Nicht nur Verben sind pr\"adikatwertig (\textbf{target-words}): 
 				\begin{itemize}[label=$-$,itemsep=1ex]
-					\item<4-> Bei Nominalisierung (Caesars Sieg \"uber die Gallier) 
-					\item<5-> auch nicht nominalisierte Nomina (Frau, Mann ...)
+					\item<4-> Bei Nominalisierung (\textit{Caesars Sieg} \"uber die Gallier) 
+					\item<5-> auch nicht nominalisierte Nomina ((\textit{Frau}, (\textit{Mann}, ...)
 				\end{itemize}
 			\end{itemize}
 	}
@@ -153,18 +154,18 @@
 	\frame{
 		\frametitle{Motivation}
 			\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
-				\item<1-> Rollen sind die letzten Bausteinen, auf die die semantische Information eines Satzes basiert.
-				\item<2-> Annotation von semantischen Rollen ist sehr hilfreich f\"ur alle \textbf{sprachverstehen}-bezogenen Aufgaben.
+				\item<1-> Rollen sind die letzten Bausteine, auf denen die semantische Information eines Satzes basiert
+				\item<2-> Annotation von semantischen Rollen ist sehr hilfreich f\"ur alle \textbf{sprachverstehen}-bezogenen Aufgaben
 			\end{itemize}
 						\begin{columns}
 							\onslide<3->{
 							\begin{column}[c]{.4\textwidth}
-								\textit{Dialogsysteme}
+								\textit{Opinion Mining}
 				   			\end{column}
 				   			}
 			   				\onslide<4->{
 			   				\begin{column}[c]{.4\textwidth}
-								\textit{Information Extraction}
+								\textit{Watson (IBM)}
 							\end{column}
 							}
 							\onslide<5->{
@@ -174,9 +175,9 @@
 						    }
 						\end{columns}
 				\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
-				\item<6-> Linguistische Forschung mit Bezug auf lexikalische Semantik.
+				\item<6-> Linguistische Forschung mit Bezug auf lexikalische Semantik
 					\begin{itemize}[label=$-$,itemsep=1ex]
-						\item<7-> Metapherntheorie. Ein Frame wird in Form eines anderen konzipiert.
+						\item<7-> Metapherntheorie: Ein Frame wird in Form eines anderen konzipiert
 					\end{itemize}
 			\end{itemize}
 		%Anwendungsbeispiele 
@@ -187,6 +188,8 @@
 
 \section{\scshape Problemstellung}
 
+	\frame{\frametitle{Gliederung} \tableofcontents[currentsection]}
+	
 	\frame{
 		\frametitle{Problemstellung}
 		\centering
@@ -216,11 +219,12 @@
 				\item Treebank über Zeitungsartikel
 				\item NEGRA Tag-Set
 				\item
-					viele syntaktische Informationen:\\ % Syntax: Phrasenkategorien, Syntaktische Funktionen, POS
-					Pos-Tag, morphologische \& lemma-Informationen % Morphologie: Kasus-Genus usw... Lemma
+					viele morpho-syntaktische Informationen:\\ % Syntax: Phrasenkategorien, Syntaktische Funktionen, POS
+					Pos-Tag, morphologische \& lemma-Informationen % Morphologie: Kasus-Genus usw... Lemma, POS
 			\end{itemize}
-			\item<3-> Enthält: ~24.000 Sätze mit 648 Prädikaten %target-word
-			\item<4-> Prädikate: Nomen \& Verben
+			\item<3-> Frame-annortiertes Korpus
+			\item<4-> Enthält: ~24.000 Sätze mit 648 Targets %target-word
+			\item<5-> Targets: Nomen \& Verben
 		\end{itemize}
 	%	annotierung genau beschreiben (saetzengrenzen etc...)
 	}	
@@ -236,6 +240,8 @@
 
 
 \section{\scshape Umsetzung}
+	
+	\frame{\frametitle{Gliederung} \tableofcontents[currentsection]}
 
 	\frame{
 		\frametitle{Herangehensweise}
@@ -255,7 +261,7 @@
 		\includegraphics[scale=0.37]{images/roleFrequency.jpg}
 		\caption{Verteilung der Rollen}
 		\end{figure}
-		$\Longrightarrow$Betrachtung der Top-10 Rollen		
+		\only<2->{$\Longrightarrow$Betrachtung der Top-10 Rollen}		
 	}
 
 	\frame{
@@ -297,7 +303,6 @@
 	}
 
 	\frame{
- % Kommentar in der E-Mail an Leser: Features einzeln mit einem Bild kurz erklären statt KOmpakt + Beispiel danach
 		\frametitle{Features}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item<1-> Synt. Kategorie
@@ -305,50 +310,136 @@
 				\item Nonterminal: phrasale Kategorie
 				\item Terminal: POS-Tag
 			\end{itemize}
-			
-			%\vspace{1cm}
-			\item<2-> Pfad: über synt. Kategorien
+		\end{itemize}
+
+		\begin{figure}
+			\includegraphics[scale=0.5]{images/s6544.png}
+		\caption{semantisch annotierter Beispielsatz}
+		\end{figure}
+	}	
+	\frame{
+		\frametitle{Features (2)}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item<1-> Pfad: über synt. Kategorien
 			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Zusammenfassen von Replikaten 
 				\item Ignorieren von Konjunktionen
 			\end{itemize}
+		\end{itemize}
+		\begin{figure}
+			\includegraphics[scale=0.5]{images/s6544.png}
+		\caption{semantisch annotierter Beispielsatz}
+		\end{figure}
+	}	
+	\frame{
+		\frametitle{Features (3)}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 
-			%\vspace{1cm}
-			\item<3-> Position
+			\item<1-> Position
 			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Position relativ zum Target
 			\end{itemize}
 		\end{itemize}
-	}
-
+		\begin{figure}
+			\includegraphics[scale=0.5]{images/s6544.png}
+		\caption{semantisch annotierter Beispielsatz}
+		\end{figure}
+	}	
 	\frame{
-		\frametitle{Features (2)}
-		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+		\frametitle{Features (4)}
+\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item<1-> Kopf-Lemma
 			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Syntaktisches Zentrum einer Phrase %TODO
 				\item wird regelbasiert gesucht
 				%terminal =  eigenes lemma als head
 			\end{itemize}
-
-			%\vspace{1cm}			
-			\item<2-> Nachbar-Kopf-Lemma
+		\end{itemize}
+		\begin{figure}
+			\includegraphics[scale=0.5]{images/s6544.png}
+		\caption{semantisch annotierter Beispielsatz}
+		\end{figure}
+	}	
+	\frame{
+		\frametitle{Features (5)}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]		
+			\item<1-> Nachbar-Kopf-Lemma
 			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item Kopf der einbettenden Konstituente
 			\end{itemize}
 
-			%\vspace{1cm}
-			\item<3-> Kombination: Synt. Kat. \& Pfad
+			
 		\end{itemize}
-	}
-
-	\frame{
-		\frametitle{Features (3)}
 		\begin{figure}
-			\includegraphics[scale=0.65]{images/s6544.png}
+			\includegraphics[scale=0.5]{images/s6544.png}
 		\caption{semantisch annotierter Beispielsatz}
 		\end{figure}
 	}	
+	\frame{
+		\frametitle{Features (6)}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+
+			\item<1-> Kombination: Synt. Kat. \& Pfad
+		\end{itemize}
+		\begin{figure}
+			\includegraphics[scale=0.5]{images/s6544.png}
+		\caption{semantisch annotierter Beispielsatz}
+		\end{figure}
+	}	
+
+%	\frame{
+% % Kommentar in der E-Mail an Leser: Features einzeln mit einem Bild kurz erklären statt KOmpakt + Beispiel danach
+%		\frametitle{Features}
+%		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+%			\item<1-> Synt. Kategorie
+%			\begin{itemize}[label=$-$,itemsep=1ex]
+%				\item Nonterminal: phrasale Kategorie
+%				\item Terminal: POS-Tag
+%			\end{itemize}
+%			
+%			%\vspace{1cm}
+%			\item<2-> Pfad: über synt. Kategorien
+%			\begin{itemize}[label=$-$,itemsep=1ex]
+%				\item Zusammenfassen von Replikaten 
+%				\item Ignorieren von Konjunktionen
+%			\end{itemize}
+%
+%			%\vspace{1cm}
+%			\item<3-> Position
+%			\begin{itemize}[label=$-$,itemsep=1ex]
+%				\item Position relativ zum Target
+%			\end{itemize}
+%		\end{itemize}
+%	}
+%
+%	\frame{
+%		\frametitle{Features (2)}
+%		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+%			\item<1-> Kopf-Lemma
+%			\begin{itemize}[label=$-$,itemsep=1ex]
+%				\item Syntaktisches Zentrum einer Phrase %TODO
+%				\item wird regelbasiert gesucht
+%				%terminal =  eigenes lemma als head
+%			\end{itemize}
+%
+%			%\vspace{1cm}			
+%			\item<2-> Nachbar-Kopf-Lemma
+%			\begin{itemize}[label=$-$,itemsep=1ex]
+%				\item Kopf der einbettenden Konstituente
+%			\end{itemize}
+%
+%			%\vspace{1cm}
+%			\item<3-> Kombination: Synt. Kat. \& Pfad
+%		\end{itemize}
+%	}
+%
+%	\frame{
+%		\frametitle{Features (3)}
+%		\begin{figure}
+%			\includegraphics[scale=0.65]{images/s6544.png}
+%		\caption{semantisch annotierter Beispielsatz}
+%		\end{figure}
+%	}	
 
 	\frame{ % ZEILENABSTAND
 		\frametitle{Probleme}
@@ -391,28 +482,30 @@
 
 
 \section{\scshape Evaluation}
+	\frame{\frametitle{Gliederung} \tableofcontents[currentsection]}
+
 	\frame{
 		\frametitle{Evaluation}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
-			\item Target-Lemma muss vorhanden sein
+			\item<1-> Target-Lemma muss vorhanden sein
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item keines gefunden: Satz komplett ignoriert
+				\item<1-> keines gefunden: Satz komplett ignoriert
 			\end{itemize}
 %da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen beruecksichtigen wird bei der evaluation nur 
 %frame elements mit dem bezug auf ein (im Model) bekanntes target. counts erklaeren und ausgeben 
-			\item Nutzung des F-Measure
+			\item<2-> Nutzung des F-Measure
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item Sehr, sehr häufig: keine Rolle % accuracy dadurch unpassend
+				\item<2-> Sehr, sehr häufig: keine Rolle % accuracy dadurch unpassend
 			\end{itemize}
 
-			\item Precision
+			\item<3-> Precision
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item P = $\dfrac{\#\text{(Korrekte Rolle klassifiziert)}}{\#\text{Klassifiziert mit Rolle)}}$
+				\item<3-> P = $\dfrac{\#\text{(Korrekte Rolle klassifiziert)}}{\#\text{(Klassifiziert mit Rolle)}}$
 			\end{itemize}				
 
-			\item Recalll
+			\item<3-> Recall
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item R = $\dfrac{\#\text{(Korrekte Rolle klassifiziert)}}{\#\text{(Konstituenten mit Rolle)}}$
+				\item<3-> R = $\dfrac{\#\text{(Korrekte Rolle klassifiziert)}}{\#\text{(Konstituenten mit Rolle)}}$
 			\end{itemize}				
 		\end{itemize}
 	}
@@ -420,17 +513,17 @@
 	\frame{
 		\frametitle{Auswertung bezüglich dreier Kenngrößen}
 		\begin{itemize}[itemsep=1.5ex] %TODO: should be enumerate
-			\item[1.] Konstituente wurde korrekte Rolle zugewiesen
+			\item<1->[1.] Konstituente wurde korrekte Rolle zugewiesen
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item Exakte Übereinstimmung
+				\item<1-> Exakte Übereinstimmung
 			\end{itemize}
-			\item[2.] Konstituente wurde eine bel. Rolle zugewiesen
+			\item<2->[2.] Konstituente wurde eine bel. Rolle zugewiesen
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item Unabhängig von der Rolle
+				\item<2-> Unabhängig von der Rolle
 			\end{itemize}
-			\item[3.] Korrekte Rolle wurde im Satz gefunden
+			\item<3->[3.] Korrekte Rolle wurde im Satz gefunden
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item Unabhängig der Position im Satz
+				\item<3-> Unabhängig von der Position im Satz
 			\end{itemize}
 		\end{itemize}
 		% das letzte geht mehr auf die Rollenzählung ein, die ersten beiden sind für Konstituenten
@@ -448,14 +541,14 @@
 		\frametitle{Ergebnisse}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 		  \item Korpus: Top-10 Rollen
-		  \begin{itemize}[label=$-$,itemsep=1ex]
+		  \begin{itemize}[itemsep=1ex]
 			  \item $\sim$ 14000 Sätzen \& $\sim$ 22500 Konstituenten mit Rolle
 		  \end{itemize}
 		\end{itemize}
 
 		\begin{figure}
 			\includegraphics[width=0.8\textwidth]{images/ergebnisseKreuzvalidierung.png}
-			\caption{Ergebnisse der 5-fach Kreuzvalidierung}
+			\caption{5-fach Kreuzvalidierung [F1=0,62 $\vert$ P=0,51 $\vert$ R=0,81]}
 		\end{figure}
 
 		%\vspace{1cm}
@@ -482,58 +575,31 @@
 	\frame{
 		\frametitle{Einordnung der Ergebnisse}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
-			\item Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
+			\item<1-> Erstes SRL-Projekt auf dem SALSA 2.0 Korpus
 			%\vspace{1cm}
-			\item SHALMANESER \cite{erk2006shalmaneser}
+			\item<2-> SHALMANESER \cite{erk2006shalmaneser}
 				% Universität Saarland
 			\begin{itemize}[label=$-$,itemsep=1ex]
-			  \item Grundlage: SALSA 1.0 \cite{burchardt2006salsa} 
-				\item Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Measure: 0.600
-				\item Vorgehen \& Evaluation unklar
+				\item<2-> Grundlage: SALSA 1.0 \cite{burchardt2006salsa} 
+				\item<2-> Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Measure: 0.600
+				\item<2-> Vorgehen \& Evaluation unklar
 			\end{itemize}
 
 			%\vspace{1cm}
-			\item Target-Lemma muss vorhanden sein
+			\item<3-> Target-Lemma muss vorhanden sein
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item 92\% der Konstituenten im Korpus ignoriert 
+				\item<3-> 92\% der Konstituenten im Korpus ignoriert 
 				%TODO  = (IDrefs overall - classified idrefs) / idrefs overall * 100
 			\end{itemize}	
 			\begin{itemize}
-				\item $\Longrightarrow$ besserer Recall $\Longrightarrow$ besserer F-Measure
+				\item<4-> $\Longrightarrow$ besserer Recall $\Longrightarrow$ besserer F-Measure
 			\end{itemize}
 			
 		\end{itemize}
 	}
-	
-	\frame{
-		% 2 Task: dependency parsing + semantic role labeling (zur Verfügung:
-		% Head, Dependency-Graph, Syntaktische + Morph Informationen: Lemma, POS,
-		% others) Tabelle: Nur Semantic Role Labeling Task
-		\frametitle{Einordnung der Ergebnisse (1)}
-		\centering
-        \begin{table}
-		\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
-          		   max width=\textwidth}{
-		\begin{tabular}{cc|cccccccc}
-		\toprule
-		\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
-		\midrule
-		 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
-		 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
-		 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
-		 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
-		 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
-		 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
-		 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
-		\bottomrule
-		\end{tabular}
-		}
-		\caption{Closed Challenge, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
-		\end{table}
-	}	
 
 	\frame{
-		\frametitle{Einordnung der Ergebnisse (2)}
+		\frametitle{Einordnung der Ergebnisse (fort.)}
 		
 		\begin{figure}
 			\includegraphics[scale=0.65]{images/featureImpact.jpg}
@@ -541,6 +607,20 @@
 		\end{figure}
 		%\item Bedeutendste Features: Pfad \& Nachbar-Kopf
 				% im Durchschnitt: 20% bzw. 15%
+	}
+	
+	\frame{
+		\frametitle{Mögliche Verbesserungen}
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item<1-> Vorverarbeitungsschritt: Dependenzgraph erzeugen
+			\item<2-> Frames disambiguieren
+			\item<3-> Semantische Abstraktion mit GermaNet
+			\item<4-> Nutzung von Tree-Kernels
+		\end{itemize}
+		\vspace{0.5cm}
+		\begin{itemize}	
+			\item<5-> $\Longrightarrow$ mehr \& bessere Features!
+		\end{itemize}
 		
 	}
 
@@ -548,7 +628,6 @@
 		\centering
 		\begin{Large} 
 			Vielen Dank für die Aufmerksamkeit! \\
-			%\vspace{1cm}
 		\end{Large}
 		\vspace{1cm}
 		\begin{tikzpicture}[decoration=Koch curve type 2] 
@@ -571,16 +650,36 @@
 
 %%%%%
 
-
-	\frame{
-		%empty frame
-
-	}
-
 	\frame{
 		\frametitle{Backup}
-
 	}	
+
+	\frame{
+		% 2 Task: dependency parsing + semantic role labeling (zur Verfügung:
+		% Head, Dependency-Graph, Syntaktische + Morph Informationen: Lemma, POS,
+		% others) Tabelle: Nur Semantic Role Labeling Task
+		\frametitle{Einordnung der Ergebnisse}
+		\centering
+        \begin{table}
+		\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
+          		   max width=\textwidth}{
+		\begin{tabular}{cc|cccccccc}
+		\toprule
+		\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
+		\midrule
+		 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
+		 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
+		 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
+		 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
+		 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
+		 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
+		 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
+		\bottomrule
+		\end{tabular}
+		}
+		\caption{CoNLL-2009 Shared Task, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
+		\end{table}
+	}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
