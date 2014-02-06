@@ -6,6 +6,7 @@
 \usepackage[ngerman, english]{babel}  % new german spelling 
 \usepackage[T1]{tipa}
 \usepackage{ragged2e}
+\usepackage{adjustbox}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usetikzlibrary{decorations.fractals}
@@ -17,6 +18,7 @@
 \usepackage{booktabs}
 \usepackage{color}
 \usepackage{fixltx2e}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -476,6 +478,29 @@
 % 			\textit{Angabe: Ergebniswert (gerundet) $\pm$ Standardabweichung}
 % 		\end{flushright}
 	}
+	\frame{
+		\frametitle{Einordnung der Ergebnisse}
+		\centering
+        \begin{table}
+		\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
+          		   max width=\textwidth}{
+		\begin{tabular}{cc|cccccccc}
+		\toprule
+		\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
+		\midrule
+		 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
+		 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
+		 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
+		 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
+		 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
+		 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
+		 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
+		\bottomrule
+		\end{tabular}
+		}
+		\caption{Closed Challenge, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
+		\end{table}
+	}
 
 	\frame{
 		\frametitle{Einordnung der Ergebnisse}
@@ -486,7 +511,7 @@
 				% Universität Saarland
 			\begin{itemize}[label=$-$,itemsep=1ex]
 			  \item Grundlage: SALSA 1.0 \cite{burchardt2006salsa} 
-				\item Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Mesaure: 0.600
+				\item Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Measure: 0.600
 				\item Vorgehen \& Evaluation unklar
 			\end{itemize}
 
@@ -500,7 +525,7 @@
 				\item $\Longrightarrow$ besserer Recall $\Longrightarrow$ besserer F-Measure
 			\end{itemize}
 			
-			\item Bedeutenste Featurs: Pfad \& Nachbar-Kopf
+			\item Bedeutenste Features: Pfad \& Nachbar-Kopf
 				% im Durchschnitt: 20% bzw. 15%
 		\end{itemize}
 	}
@@ -523,11 +548,10 @@
 
 
 %%%% Referenzen
-
+% \section*{\scshape Referenzen}
 \scriptsize
-%\section{\scshape Referenzen}
 \begin{frame}{Referenzen}
-\bibliographystyle{apalike}
+\tiny{\bibliographystyle{abbvr} }
 \bibliography{biblio}
 \end{frame}
 
