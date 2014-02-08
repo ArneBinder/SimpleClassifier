@@ -51,30 +51,29 @@
 
 \begin{document}
 
-%\documentclass{beamer}
-%\usepackage{beamerthemesplit} 
-%\usetheme{Goettingen}
-%\usecolortheme{seahorse}
-%\section{\scshape{\scshape Gliederung}
-\begin{frame}
-\title{\textbf{Semantic Role Labeling}}
-%subtitle{}
-\date{
-	\begin{tikzpicture}[decoration=Koch curve type 2] 
-		\draw[DeepSkyBlue4] decorate{ decorate{ decorate{ (0,0) -- (2,0) }}}; 
-	\end{tikzpicture}  
-	\\
-	\vspace{0cm}
-	\today
+{
+	\setbeamertemplate{footline}{} 
+	\begin{frame}
+	\title{\textbf{Semantic Role Labeling}}
+	%subtitle{}
+	\date{
+		\begin{tikzpicture}[decoration=Koch curve type 2] 
+			\draw[DeepSkyBlue4] decorate{ decorate{ decorate{ (0,0) -- (2,0) }}}; 
+		\end{tikzpicture}  
+		\\
+		\vspace{0cm}
+		\today
+	}
+	
+	\author[shortname]{Arne Binder \inst{1} \and Robert Bärhold \inst{1} \and Enrique Manjavacas \inst{2}}
+	\institute[shortinst]{\inst{1} Humboldt-Universität zu Berlin\and %
+	                      \inst{2} Freie Universität Berlin}
+	
+	
+	\titlepage
+	\end{frame}
 }
 
-\author[shortname]{Arne Binder \inst{1} \and Robert Bärhold \inst{1} \and Enrique Manjavacas \inst{2}}
-\institute[shortinst]{\inst{1} Humboldt Universität zu Berlin\and %
-                      \inst{2} Freie Universität Berlin}
-
-
-\titlepage
-\end{frame}
 \begin{frame}
 	\frametitle{Gliederung}
 	\tableofcontents
@@ -125,8 +124,8 @@
 				\item<2-> Rollen (Frame Elements) bzgl. dieser au\ss ersprachlichen Situation definiert
 				\item<3-> Nicht nur Verben sind pr\"adikatwertig (\textbf{target-words}): 
 				\begin{itemize}[label=$-$,itemsep=1ex]
-					\item<4-> Bei Nominalisierung (\textit{Caesars Sieg} \"uber die Gallier) 
-					\item<5-> auch nicht nominalisierte Nomina ((\textit{Frau}, (\textit{Mann}, ...)
+					\item<4-> Nominalisierung (\textit{Caesars Sieg} \"uber die Gallier) 
+					\item<5-> nicht nominalisierte Nomina (\textit{Frau}, \textit{Mann}, ...)
 				\end{itemize}
 			\end{itemize}
 	}
@@ -136,6 +135,7 @@
 		\centering
 		\begin{figure}
 			\includegraphics[scale=0.62]{images/frau1.png}
+			\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}
 	% \frame{
@@ -155,7 +155,8 @@
 		\frametitle{Motivation}
 			\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 				\item<1-> Rollen sind die letzten Bausteine, auf denen die semantische Information eines Satzes basiert
-				\item<2-> Annotation von semantischen Rollen ist sehr hilfreich f\"ur alle \textbf{sprachverstehen}-bezogenen Aufgaben
+				\item<2-> Annotation von semantischen Rollen ist sehr hilfreich f\"ur alle
+				\textbf{Sprachverstehen}-bezogenen Aufgaben
 			\end{itemize}
 						\begin{columns}
 							\onslide<3->{
@@ -234,7 +235,7 @@
 		%Beispielbild von Salto: kurzer Satz mit edge-labels
 		\begin{figure}
 			\includegraphics[scale=0.65]{images/s6544.png}
-		\caption{semantisch annotierter Beispielsatz}
+		\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}
 
@@ -314,7 +315,7 @@
 
 		\begin{figure}
 			\includegraphics[scale=0.5]{images/s6544.png}
-		\caption{semantisch annotierter Beispielsatz}
+		\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}	
 	\frame{
@@ -328,7 +329,7 @@
 		\end{itemize}
 		\begin{figure}
 			\includegraphics[scale=0.5]{images/s6544.png}
-		\caption{semantisch annotierter Beispielsatz}
+		\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}	
 	\frame{
@@ -342,7 +343,7 @@
 		\end{itemize}
 		\begin{figure}
 			\includegraphics[scale=0.5]{images/s6544.png}
-		\caption{semantisch annotierter Beispielsatz}
+		\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}	
 	\frame{
@@ -357,7 +358,7 @@
 		\end{itemize}
 		\begin{figure}
 			\includegraphics[scale=0.5]{images/s6544.png}
-		\caption{semantisch annotierter Beispielsatz}
+		\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}	
 	\frame{
@@ -372,7 +373,7 @@
 		\end{itemize}
 		\begin{figure}
 			\includegraphics[scale=0.5]{images/s6544.png}
-		\caption{semantisch annotierter Beispielsatz}
+		\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}	
 	\frame{
@@ -383,7 +384,7 @@
 		\end{itemize}
 		\begin{figure}
 			\includegraphics[scale=0.5]{images/s6544.png}
-		\caption{semantisch annotierter Beispielsatz}
+		\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}
 	}	
 
@@ -456,13 +457,15 @@
 			\end{itemize}			
 		\end{itemize}
 	}
+	
 	\frame{
 		\frametitle{Probleme}
 				\begin{figure}
 					\includegraphics[scale=.7]{images/s2382.png}
-					\caption{Querverbindung}
+					\caption{Beispiel einer Querverbindung}
 				\end{figure}
 	}
+	
 	\frame{
 		\frametitle{Probleme}
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
@@ -474,8 +477,8 @@
 			% \end{itemize}			
 			\item<2-> Target im Satz identifizieren
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item<3-> Den Vortrag \textit{auf die lange Bank schieben.}
-				\item<4-> Ich \textit{brach} den Ast \textit{ab.}
+				\item<3-> Den Vortrag \textit{auf die lange Bank schieben}.
+				\item<4-> Ich \textit{brach} den Ast \textit{ab}.
 			\end{itemize}			
 		\end{itemize}
 	}	
@@ -489,7 +492,7 @@
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 			\item<1-> Target-Lemma muss vorhanden sein
 			\begin{itemize}[label=$-$,itemsep=1ex]
-				\item<1-> keines gefunden: Satz komplett ignoriert
+				\item<1-> Keines gefunden: Satz komplett ignoriert
 			\end{itemize}
 %da wir eine feste liste von target lemmata nutzen und nicht auf ungesehene targets abstrahieren koennen beruecksichtigen wird bei der evaluation nur 
 %frame elements mit dem bezug auf ein (im Model) bekanntes target. counts erklaeren und ausgeben 
@@ -532,7 +535,7 @@
 	\frame{
 		\begin{figure}
 			\includegraphics[scale=0.65]{images/s6544.png}
-			\caption{semantisch annotierter Beispielsatz}
+			\caption{Semantisch-annotierter Beispielsatz}
 		\end{figure}%TODO Beispielsatz von Salto wieder nutzen, muss mind. 2 Rollen haben
 	}
 
@@ -542,7 +545,7 @@
 		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
 		  \item Korpus: Top-10 Rollen
 		  \begin{itemize}[itemsep=1ex]
-			  \item $\sim$ 14000 Sätzen \& $\sim$ 22500 Konstituenten mit Rolle
+			  \item $\sim$ 14000 Sätze \& $\sim$ 22500 Konstituenten mit Rolle
 		  \end{itemize}
 		\end{itemize}
 
@@ -581,7 +584,7 @@
 				% Universität Saarland
 			\begin{itemize}[label=$-$,itemsep=1ex]
 				\item<2-> Grundlage: SALSA 1.0 \cite{burchardt2006salsa} 
-				\item<2-> Prec.: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Measure: 0.600
+				\item<2-> Precision: 0.761  $\vert$ Recall: 0.496  $\vert$ F-Measure: 0.600
 				\item<2-> Vorgehen \& Evaluation unklar
 			\end{itemize}
 
@@ -597,13 +600,41 @@
 			
 		\end{itemize}
 	}
+	
+	\frame{
+		% 2 Task: dependency parsing + semantic role labeling (zur Verfügung:
+		% Head, Dependency-Graph, Syntaktische + Morph Informationen: Lemma, POS,
+		% others) Tabelle: Nur Semantic Role Labeling Task
+		\frametitle{Einordnung der Ergebnisse (2)}
+		\centering
+        \begin{table}
+		\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
+          		   max width=\textwidth}{
+		\begin{tabular}{cc|cccccccc}
+		\toprule
+		\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
+		\midrule
+		 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
+		 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
+		 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
+		 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
+		 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
+		 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
+		 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
+		\bottomrule
+		\end{tabular}
+		}
+		\caption{CoNLL-2009 Shared Task, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
+		\end{table}
+	}
+	
 
 	\frame{
-		\frametitle{Einordnung der Ergebnisse (fort.)}
+		\frametitle{Einordnung der Ergebnisse (3)}
 		
 		\begin{figure}
 			\includegraphics[scale=0.65]{images/featureImpact.jpg}
-			\caption{Bedeutendste Features: Pfad \& Nachbar-Kopf}
+			\caption{Bedeutendste Features: Pfad \& Nachbar-Kopf-Lemma}
 		\end{figure}
 		%\item Bedeutendste Features: Pfad \& Nachbar-Kopf
 				% im Durchschnitt: 20% bzw. 15%
@@ -649,38 +680,6 @@
 \end{frame}
 
 %%%%%
-
-	\frame{
-		\frametitle{Backup}
-	}	
-
-	\frame{
-		% 2 Task: dependency parsing + semantic role labeling (zur Verfügung:
-		% Head, Dependency-Graph, Syntaktische + Morph Informationen: Lemma, POS,
-		% others) Tabelle: Nur Semantic Role Labeling Task
-		\frametitle{Einordnung der Ergebnisse}
-		\centering
-        \begin{table}
-		\adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
-          		   max width=\textwidth}{
-		\begin{tabular}{cc|cccccccc}
-		\toprule
-		\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
-		\midrule
-		 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
-		 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
-		 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
-		 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
-		 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
-		 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
-		 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
-		\bottomrule
-		\end{tabular}
-		}
-		\caption{CoNLL-2009 Shared Task, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
-		\end{table}
-	}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
