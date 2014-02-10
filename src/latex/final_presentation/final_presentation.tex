@@ -1,4 +1,4 @@
-\documentclass[xcolor=x11names,compress]{beamer}
+\documentclass[xcolor=x11names,compress, handout]{beamer}
 
 %% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{ucs}     % unicode 
@@ -195,7 +195,7 @@
 	\frame{
 		\frametitle{Problemstellung}
 		\centering
-		$\Longrightarrow$Automatische Bestimmung von Rollen:\\
+		$\Longrightarrow$ Automatische Bestimmung von Rollen:\\
 		\vspace{1cm} 
 		%\fbox{\parbox{\dimexpr \linewidth - 2\fboxrule - 2\fboxsep}{
 		%\fbox{\parbox{\linewidth}{		
@@ -263,7 +263,7 @@
 		\includegraphics[scale=0.37]{images/roleFrequency.jpg}
 		\caption{Verteilung der Rollen}
 		\end{figure}
-		\only<2->{$\Longrightarrow$Betrachtung der Top-10 Rollen}		
+		\only<2->{$\Longrightarrow$ Betrachtung der Top-10 Rollen}		
 	}
 
 	\frame{
@@ -627,6 +627,10 @@
 		}
 		\caption{CoNLL-2009 Shared Task, SRL-only Task, Semantic Labeled F1 \cite{hajivc2009conll}}
 		\end{table}
+
+		\begin{itemize}[label=$\bullet$,itemsep=1.5ex]
+			\item Gegeben: Kopf \& Dependency-Graph
+		\end{itemize}				
 	}
 	
 
