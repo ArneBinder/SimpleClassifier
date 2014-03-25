@@ -78,25 +78,131 @@
 - warum SRL? Motivation
 - was gibt es schon? related work
 \subsection{Semantische Rollen}
+
+Prädikate zeichnen sich dadurch aus, dass sie die Komplementationsstruktur einer
+überge-ordneten syntaktischen Einheit (nämlich des Satzes) bestimmen. Zum
+Beispiel verlangt ein ditransitives Verb wie \glqq{}geben\grqq{} drei weitere Satzkonstituenten mit konkreten syntaktischen Eigenschaften:
+
+\begin{center}
+	\begin{tikzpicture}
+		\Tree [.geben
+				[.Subjekt Paul ]
+				[.{} gibt ]
+				[.Akk-Objekt {die Jacke} ]
+				[.Dativ-Objekt {seiner Freundin} ]
+			]
+			
+		%\Tree [.geben
+		%		[.\textbf{Subjekt} Paul ]
+		%		[.{} gibt ]
+		%		[.\textbf{Akk-Objekt} {die Jacke} ]
+		%		[.\textbf{Dativ-Objekt} {seiner Freundin} ]
+		%	]
+	\end{tikzpicture}
+\end{center}
+
+Aber das Bedingtheitsverhältnis zwischen dem Verb und seinen Komplementen 
+endet nicht in der Syntax. Diese sind durch das Prädikat auch hinsichtlich ihrer 
+\textit{semantischen} Integrierung in den Satz determiniert. Dem Komplement \glqq{}Paul\grqq{}
+wird einmal die syntaktische Funktion des Subjekts zugewiesen, es wird aber auch
+durch die konkrete Semantik der Handlung \glqq{}geben\grqq{} als 
+\glqq{}Geber\grqq{} charakterisiert. Man spricht von den Argumenten
+eines Verbs und sagt, dass sie \textit{semantische Rollen} realisieren. So realisiert \glqq{}Paul\grqq{} im obigen Beispiel die semantische Rolle \glqq{}Geber\grqq{}.
+
 \subsection{Frame Semantik}
+
+Die traditionelle Semantik [TODO: evtl. welche traditionelle Sem.? Referenz?] war versucht, eine möglichst abstrakte und
+allgemeine, intersprachliche Formulierung von semantischen Rollen zu
+finden - bei der man z. B. nicht von \glqq{}Geber\grqq{} sondern allgemein
+von \glqq{}Agens\grqq{} sprechen würde. Demgegenüber steht die von C.J. Fillmore
+ab den 70er Jahren entwickelte Theorie der Frame-Semantik (FS)
+[\cite{fillmore1985}]. Das Fundament der Theorie ist mit dem traditionellen
+Ansatz in höchstem Maße inkompatibel, für unser Vorhaben reicht es aber, die
+partikuläre Auffassung von semantischen Rollen zu erwähnen, die der
+Frame-semantische Ansatz mit sich bringt.
+
+Rollen bzw. Frame-Elemente (FE) in Termini der FS werden nicht in Bezug auf die
+Argumentstruktur von Verben formuliert, sondern hinsichtlich der globalen
+Situation (oder des \textit{Frames}), die durch das Prädikat evoziert wird. Aufgrund
+des situationellen Charakters der Frames sind nicht nur Verben sondern auch
+Nomina (\textit{Mord}, \textit{Auge}\footnote{beispielsweise als Indikator für ein Ereignis der Wahrnehmung: \glqq{}Vor seinen Augen zerrissen sie die Bücher.\grqq{}}, \textit{Frau} von jemandem) oder Adjektive (\textit{stolz} auf etwas sein) potentielle
+Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch annotierten SALSA 2.0 Korpus [\cite{rehbein_adding_2012}] zu finden ist:
+\begin{quote}
+A Reviewer offers his or her assessment of a work of art or performance (e.g. a play, a novel, a piece of music composition etc). The Reviewer typically bases his judgment on their own expertise and uses some set of criteria for evaluating works as to their relative merit.
+
+\textbf{Example Sentences:}
+\begin{enumerate}
+\item Ich hab absichtlich auch noch keine anderen \textbf{Kritiken} gelesen und möglicherweise hab ich ein paar Dinge in dem Film übersehen.
+
+\item Ich bin auf das Buch durch die \lbrack lobende\rbrack \textsuperscript{Valence} \textbf{Kritik} \lbrack in der FAZ\rbrack \textsuperscript{Medium} aufmerksam geworden.
+
+\item \lbrack Olaf Storbecks Jahrhundertkrise\rbrack \textsuperscript{Evaluee} \lbrack erntet\rbrack \textsuperscript{Support} erste \lbrack gute\rbrack \textsuperscript{Valence} \textbf{Kritiken}.
+
+\item Star Dreck - \lbrack Negative\rbrack \textsuperscript{Valence} \textbf{Kritiken} \lbrack von Fans\rbrack \textsuperscript{Reviewer}  \lbrack zum neuen Star Trek\rbrack \textsuperscript{Evaluee}
+\end{enumerate}
+
+
+\textbf{FEs}
+
+
+\textbf{FE1(Reviewer)}: The person assessing the Evaluee for its merit.
+
+\textbf{FE2(Evaluee)}: The cultural artifact that is evaluated.
+
+\textbf{FE3(Medium)}: The venue or publication in which the review is distributed.
+
+\textbf{FE4(Valence)}: The positive or negative nature of the evaluation, if specified. 
+\end{quote}
+
 \subsection{Semantic Role Labeling}
+
+Mit Semantic Role Labeling (SRL) ist die automatisierte Erkennung und
+Annotierung von semantischen Rollen innerhalb eines Satzes gemeint. Die primäre
+Aufgabe von SRL ist die genaue Identifizierung der semantischen Beziehung
+zwischen einem Prädikat und seinen assoziierten Elementen und Eigenschaften
+(siehe \cite{SRL2008} für eine allgemeine Darstellung). In Bezug auf eine FS lässt
+sich folgendes feststellen. Da FE Frame-spezifisch sind, stellen sie eine
+Zwischenstufe in der semantischen Abstraktion zwischen der rein lexikalischen
+Bedeutung und den traditionellen Verbenübergreifenden [@Enrique: was meinst hier mit Verb..übergr.?] semantischen Rollen dar.
+Die dadurch erreichte \glqq{}mildere\grqq{} Stufe der Abstraktion über die
+Rollen der verschiedenen Verben, Nomina und Adjektive eignet sich besonders gut
+für die Lösung unterschiedlicher Aufgabenstellungen in Bereichen des
+Sprachverstehens [TODO: ?] wie der Informationsextraktion oder Dialogsystemen [TODO: Verweis/Erklärung].
+
+[TODO: The relationship between such surface manifestations and
+semantic roles is the subject of linking theory—see \cite{levinrappaport}
+for a synthesis of work in this area. In general, linking theory argues that the syntactic
+realization of arguments of a predicate is predictable from semantics—exactly how this
+relationship works is the subject of much debate. Regardless of the underlying mechanisms
+used to generate syntax from semantics, the relationship between the two suggests
+that it may be possible to learn to recognize semantic relationships from syntactic
+cues, given examples with both types of information.]
+
+Die Aufgabenstellung eines FS-orientierten SRL-Systems lässt sich 
+wie folgt untergliedern [\cite{gildea}]:
+\begin{enumerate}
+\item Zunächst wird der Frame, der durch den Satz oder die Phrase realisiert wird, bestimmt.
+\item Es folgt die Bestimmung der Frame-Elemente bezüglich des Frames. 
+\item Schließlich erfolgt die Klassifizierung der einzelnen Frame-Elemente.
+\end{enumerate}
 \section{Problemstellung}
-Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} für das Deutsche adaptieren lässt.
+Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} für das Deutsche adaptieren lässt(TODO: und der SALSA 2.0 Korpus eine geeignete Datenbasis darstellt?).
+
 \subsection{Hypothese}
-Die an Hand einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache zur Verfügung stehenden lexikalischen und syntaktischen Informationen ermöglichen verlässliche Annahmen über die Erfüllung von semantischen Rollen durch Konstituenten eines Satzes. Das lässt sich dazu nutzen, ein automatisiertes statistisches Lernverfahren basierend auf einem zusätzlich Rollen-annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz erfüllten semantischen Rollen mit akzeptabler Genauigkeit(oder anderer Ausdruck?) ermöglicht.
+Die an Hand einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache zur Verfügung stehenden lexikalischen und syntaktischen Informationen ermöglichen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes. Das lässt sich dazu nutzen, ein automatisiertes statistisches Lernverfahren basierend auf einem zusätzlich Rollen-annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit(TODO: oder anderer Ausdruck?) ermöglicht.
+
 \subsection{Korpus: Salsa 2.0}
-Die SALSA Korpora sind für akademische Zwecke frei zugängliche, framesemantisch annotierte Korpora der deutschen Sprache. Sie basieren auf TIGER, einer Baumbank aus deutschen Zeitungsartikeln (siehe \cite{tiger}). 
+Die SALSA Korpora sind für akademische Zwecke frei zugängliche, framesemantisch annotierte Korpora der deutschen Sprache. Sie basieren auf TIGER [\cite{tiger}], einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags und syntaktischen Strukturen annotiert wurde.\footnote{siehe http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}
 
-[The TIGER Corpus (versions 2.1 and 2.2) consists of app. 900,000 tokens (50,000 sentences) of German newspaper text, taken from the Frankfurter Rundschau. The corpus was semi-automatically POS-tagged and annotated with syntactic structure. Moreover, it contains morphological and lemma information for terminal nodes. For details, see the annotation page. Version 2.2 is a cleaned up version of release 2.1.]
+SALSA erweitert TIGER um semantische Informationen. Jeder Satz kann einen oder mehrere Frames besitzen. Diese bestehen aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen. Das sind die Elemente des Satzes, welche eine semantische Rolle innerhalb des Frames erfüllen. Frame und Frame-Elemente werden durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
 
-SALSA erweitert TIGER um semantische Informationen. Jeder Satz kann einen oder mehrere Frames besitzen. Diese bestehen aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen, die Elemente des Satzes, welche eine semantische Rolle innerhalb des Frames erfüllen. Frame und Frame-Elemente werden durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
+Das vorige Release des SALSA Korpus, SALSA 1.0 [\cite{burchardt_salsa_2006}], enthält Frames dessen Target ein Verb ist. In SALSA 2.0 [\cite{rehbein_adding_2012}] sind außerdem durch Nomen realisierte Prädikate und deren zugehörige Frames annotiert. 
 
-Das vorige Release des SALSA Korpus, SALSA 1.0 [\cite{burchardt_salsa_2006}], enthält Frames dessen Target ein Verb ist. In SALSA 2.0 [\cite{rehbein_adding_2012}] sind außerdem durch Nomen realisierte Prädikate und deren implizierte Frames annotiert. 
-
-[SALSA 2.0 roughly 20.000 verbal instances and more than 17.000 nominal instances. 24.000 Sätze mit 648 Targets]
+SALSA 2.0 besteht aus circa 24.000 (TODO: vs. 36251??) Sätzen. Es enthält rund 20.000 verbale und mehr als 17.000 nominale Instanzen, welche durch 648 verschiedene Targets ausgelöst werden.
 \section{Implementierung des SRL-Klassifikators}
 hier
 \subsection{Einschränkungen}
+- keine Frames über mehrere Sätze
 \subsection{Features}
 \subsection{Arbeitsweise des Klassifikators}
 \subsubsection{Erstellung des Modells}
