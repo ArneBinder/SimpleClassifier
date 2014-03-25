@@ -75,16 +75,25 @@
 \pagenumbering{arabic}
 
 \section{Einleitung}
-- warum SRL? 'Motivation'
-- was gibt es schon? 'related work'
+- warum SRL? Motivation
+- was gibt es schon? related work
 \subsection{Semantische Rollen}
 \subsection{Frame Semantik}
 \subsection{Semantic Role Labeling}
 \section{Problemstellung}
 Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} für das Deutsche adaptieren lässt.
 \subsection{Hypothese}
-Die an Hand einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache zur Verfügung stehenden lexikalischen und syntaktischen Informationen ermöglichen verlässliche Annahmen über die Erfüllung von semantischen Rollen durch Konstituenten eines Satzes. Das lässt sich dazu nutzen, ein automatisiertes statistisches Lernverfahren basierend auf einem zusätzlich Rollen-annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz erfüllten semantischen Rollen mit akzeptabler Genauigkeit(?) ermöglicht.
+Die an Hand einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache zur Verfügung stehenden lexikalischen und syntaktischen Informationen ermöglichen verlässliche Annahmen über die Erfüllung von semantischen Rollen durch Konstituenten eines Satzes. Das lässt sich dazu nutzen, ein automatisiertes statistisches Lernverfahren basierend auf einem zusätzlich Rollen-annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz erfüllten semantischen Rollen mit akzeptabler Genauigkeit(oder anderer Ausdruck?) ermöglicht.
 \subsection{Korpus: Salsa 2.0}
+Die SALSA Korpora sind für akademische Zwecke frei zugängliche, framesemantisch annotierte Korpora der deutschen Sprache. Sie basieren auf TIGER, einer Baumbank aus deutschen Zeitungsartikeln (siehe \cite{tiger}). 
+
+[The TIGER Corpus (versions 2.1 and 2.2) consists of app. 900,000 tokens (50,000 sentences) of German newspaper text, taken from the Frankfurter Rundschau. The corpus was semi-automatically POS-tagged and annotated with syntactic structure. Moreover, it contains morphological and lemma information for terminal nodes. For details, see the annotation page. Version 2.2 is a cleaned up version of release 2.1.]
+
+SALSA erweitert TIGER um semantische Informationen. Jeder Satz kann einen oder mehrere Frames besitzen. Diese bestehen aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen, die Elemente des Satzes, welche eine semantische Rolle innerhalb des Frames erfüllen. Frame und Frame-Elemente werden durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
+
+Das vorige Release des SALSA Korpus, SALSA 1.0 [\cite{burchardt_salsa_2006}], enthält Frames dessen Target ein Verb ist. In SALSA 2.0 [\cite{rehbein_adding_2012}] sind außerdem durch Nomen realisierte Prädikate und deren implizierte Frames annotiert. 
+
+[SALSA 2.0 roughly 20.000 verbal instances and more than 17.000 nominal instances. 24.000 Sätze mit 648 Targets]
 \section{Implementierung des SRL-Klassifikators}
 hier
 \subsection{Einschränkungen}
