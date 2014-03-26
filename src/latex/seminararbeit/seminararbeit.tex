@@ -65,12 +65,12 @@
 \renewcommand{\footrulewidth}{0pt} %untere Trennlinie 
 \fancyfoot[C]{\thepage} %Seitennummer
 
-% \newpage
-% \tableofcontents
-% \vspace{1cm}
-% \listoffigures
-% \vspace{1cm}
-% \listoftables
+ \newpage
+ \tableofcontents
+ \vspace{1cm}
+ \listoffigures
+ \vspace{1cm}
+ \listoftables
 
 \newpage
 \pagenumbering{arabic}
@@ -78,10 +78,11 @@
 \section{Einleitung}
 - warum SRL? Motivation
 - was gibt es schon? related work
+[Shalmaneser, gildea \& jurafski, SEMAFOR, LTH, ...]
 \subsection{Semantische Rollen}
 
 Prädikate zeichnen sich dadurch aus, dass sie die Komplementationsstruktur einer
-überge-ordneten syntaktischen Einheit (nämlich des Satzes) bestimmen. Zum
+übergeordneten syntaktischen Einheit (nämlich des Satzes) bestimmen. Zum
 Beispiel verlangt ein ditransitives Verb wie \glqq{}geben\grqq{} drei weitere Satzkonstituenten mit konkreten syntaktischen Eigenschaften:
 
 \begin{center}
@@ -190,21 +191,33 @@ Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \ci
 Die an Hand einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache zur Verfügung stehenden lexikalischen und syntaktischen Informationen ermöglichen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes. Das lässt sich dazu nutzen, ein automatisiertes statistisches Lernverfahren basierend auf einem zusätzlich Rollen-annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit(TODO: oder anderer Ausdruck?) ermöglicht.
 
 \subsection{Korpus: Salsa 2.0}
-Die SALSA Korpora sind für akademische Zwecke frei zugängliche, framesemantisch annotierte Korpora der deutschen Sprache. Sie basieren auf TIGER [\cite{tiger}], einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags und syntaktischen Strukturen annotiert wurde.\footnote{siehe http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}
+Die SALSA Korpora sind für akademische Zwecke frei zugängliche, framesemantisch annotierte Korpora der deutschen Sprache. Sie basieren auf TIGER [\cite{tiger}], einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags, Lemma-Informationen und syntaktischen Strukturen annotiert wurde.\footnote{siehe http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}
 
-SALSA erweitert TIGER um semantische Informationen. Jeder Satz kann einen oder mehrere Frames besitzen. Diese bestehen aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen. Das sind die Elemente des Satzes, welche eine semantische Rolle innerhalb des Frames erfüllen. Frame und Frame-Elemente werden durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
+SALSA erweitert TIGER um semantische Informationen. Jeder Satz kann einen oder mehrere Frames besitzen. Diese bestehen aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen, also den Elementen des Satzes, welche eine semantische Rolle innerhalb des Frames realisieren. Frame und Frame-Elemente werden durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
 
-Das vorige Release des SALSA Korpus, SALSA 1.0 [\cite{burchardt_salsa_2006}], enthält Frames dessen Target ein Verb ist. In SALSA 2.0 [\cite{rehbein_adding_2012}] sind außerdem durch Nomen realisierte Prädikate und deren zugehörige Frames annotiert. 
+Der Großteil der Frames wurde vom englischsprachigen FrameNet-Projekt [\cite{baker_berkeley_1998}]\footnote{Siehe auch https://framenet.icsi.berkeley.edu/fndrupal/ für weitere Informationen.} übernommen. Diese wurden um einige deutschsprachliche Frames ergänzt. Einzelne Frames und auch Frame-Elemente sind über verschiedenste Relationen miteinander verknüpft.
+
+Das vorige Release des SALSA Korpus, SALSA 1.0 [\cite{burchardt_salsa_2006}], enthält Frames dessen Target ein Verb ist. In SALSA 2.0 [\cite{rehbein_adding_2012}] sind außerdem durch Nomen realisierte Prädikate und deren zugehörige Frames annotiert.
 
 SALSA 2.0 besteht aus circa 24.000 (TODO: vs. 36251??) Sätzen. Es enthält rund 20.000 verbale und mehr als 17.000 nominale Instanzen, welche durch 648 verschiedene Targets ausgelöst werden.
-\section{Implementierung des SRL-Klassifikators}
+
+\section{Realisierung des SRL-Klassifikators}
+Da die Frame-Elemente als relevante Informationsträger angesehen werden, wurde analog zu \cite{gildea} die Identifikation des durch einen Satz beziehungsweise eine Phrase realisierten Frames sehr vereinfacht. Es wird die Annahme verfolgt, dass gleiche Rollen auch in verschiedenen Frames ähnlich morphosyntaktisch realisiert werden. So lassen sich die nur sehr spärlich zur Verfügung stehenden Trainingsdaten\footnote{Für den Gesamtkorpus gilt: es gibt pro FE durchschnittlich 100 Instanzen} besser ausschöpfen. Einzig über das Prädikat werden implizit künstlich Superframes[TODO: oder Hyper-...?] erzeugt, die alle Frames mit dem gleichen Target zusammenfassen.
+
+Um die Hypothese zu verifizieren wurde ein Naive-Bayes-Klassifikator implementiert. Dieses statistische Lernverfahren wurde gewählt, da es im Vergleich zu anderen relativ transparent ist. Die dem trainierten Modell inhärenten Wahrscheinlichkeitsverteilungen liefern meist auch vom Menschen leicht interpretierbare Informationen, welche bei der Entwicklung des Klassifizierers sehr hilfreich waren. 
+
+Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind 
+
+ Auf Grund der geringen Trainingsdatenmenge würde es sehr häufig vorkommen, dass eine konkrete Kombination von Features beim Klassifizieren    
+Back-off
 
 \subsection{Einschränkungen}
-- keine Frames über mehrere Sätze
+Um die Komplexität des Projekts handhabbar zu halten und nicht den Umfang einer Seminararbeit zu sprengen wurden einige Einschränkungen getroffen.
+- keine Frames über mehrere Sätze, keine Bestimmung der Frames an sich, keine Abstraktion für ungesehene Targets 
 \subsection{Features}
 \subsection{Arbeitsweise des Klassifikators}
-\subsubsection{Erstellung des Modells}
-\subsubsection{Klassifikation der Konstituenten}
+\subsubsection*{Erstellung des Modells}
+\subsubsection*{Klassifikation der Konstituenten}
 \section{Evaluation des xxxxx} %TODO
 
 Der entwickelte Ansatz der automatischen Rollenannotation wurde nach Abschluss
