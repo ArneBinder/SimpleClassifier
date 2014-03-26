@@ -62,7 +62,14 @@ public class FeatureTypes {
 						roleIdent + splitChar + "funcSmall"));
         */
 
-
+		/*usedFeatures = new ArrayList<String>();
+		usedFeatures.add(roleIdent);
+		for(List<String> backOffValues: backOffRules.values()){
+			for(String backOffValue: backOffValues){
+				usedFeatures.add(backOffValue);
+				usedFeatures.add(backOffValue.replaceFirst(roleIdent + splitChar, ""));
+			}
+		}*/
 		//used while training: in model.addFeatureVector and model.calculateRelativeFrequenciesPerRole
 		usedFeatures = Arrays.asList(
 				roleIdent,
@@ -70,11 +77,11 @@ public class FeatureTypes {
 				"target" + splitChar + "synCat",
 				"target" + splitChar + "synCat" + splitChar + "path",
 				"synCat",
-				"position",
+				//"position",
 				"path",
 				"path" + splitChar + "synCat",
 				"head",
-				"head" + splitChar + "synCat",
+				//"head" + splitChar + "synCat",
 				"head" + splitChar + "target",
 				"head" + splitChar + "synCat" + splitChar + "target",
 				"nextHead",
@@ -83,14 +90,15 @@ public class FeatureTypes {
 				//"funcBig",
 				//"funcSmall",
 				//"funcBig"+ splitChar + "funcSmall",
+				////roleIdent + splitChar + "target",   //decreases F-Measure by 12% !
 				roleIdent + splitChar + "target" + splitChar + "synCat",
 				roleIdent + splitChar + "target" + splitChar + "synCat" + splitChar + "path",
 				roleIdent + splitChar + "synCat",
-				roleIdent + splitChar + "position",
+				//roleIdent + splitChar + "position",
 				roleIdent + splitChar + "path",
 				roleIdent + splitChar + "path" + splitChar + "synCat",
 				roleIdent + splitChar + "head",
-				roleIdent + splitChar + "head" + splitChar + "synCat",
+				//roleIdent + splitChar + "head" + splitChar + "synCat",
 				roleIdent + splitChar + "head" + splitChar + "target",
 				roleIdent + splitChar + "head" + splitChar + "synCat" + splitChar + "target",
 				roleIdent + splitChar + "nextHead"
@@ -136,7 +144,7 @@ public class FeatureTypes {
 						valueStrings = pair[1].split(splitList);
 					} else {
 						if(!pair[1].isEmpty()){
-							valueStrings = (pair[1] + splitList + Const.targetTypeIdentifier).split(splitList);
+							valueStrings = pair[1].split(splitList);
 						}else{
 							valueStrings = new String[1];
 							valueStrings[0] = Const.targetTypeIdentifier;
@@ -172,6 +180,7 @@ public class FeatureTypes {
 			//System.out.println();
 		}
 		in.close();
+		Collections.sort(usedFeatures);
 		System.out.println();
 	}
 
