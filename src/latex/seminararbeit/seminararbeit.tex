@@ -13,6 +13,7 @@
 \usepackage{a4wide}
 \usepackage{natbib}	% bibstyle 
 \usepackage[section]{placeins}	% \FloatBarrier
+\usepackage[T1]{fontenc} %enable hyphenation for words including umlaute
 
 
 \setcounter{tocdepth}{2}
@@ -133,11 +134,8 @@ A Reviewer offers his or her assessment of a work of art or performance (e.g. a 
 \textbf{Example Sentences:}
 \begin{enumerate}
 \item Ich hab absichtlich auch noch keine anderen \textbf{Kritiken} gelesen und möglicherweise hab ich ein paar Dinge in dem Film übersehen.
-
 \item Ich bin auf das Buch durch die \lbrack lobende\rbrack \textsuperscript{Valence} \textbf{Kritik} \lbrack in der FAZ\rbrack \textsuperscript{Medium} aufmerksam geworden.
-
-\item \lbrack Olaf Storbecks Jahrhundertkrise\rbrack \textsuperscript{Evaluee} \lbrack erntet\rbrack \textsuperscript{Support} erste \lbrack gute\rbrack \textsuperscript{Valence} \textbf{Kritiken}.
-
+\item \lbrack Olaf Storbecks Jahrhundertkrise\rbrack\textsuperscript{Evaluee}\lbrack erntet\rbrack\textsuperscript{Support} erste\lbrack gute\rbrack \textsuperscript{Valence} \textbf{Kritiken}.
 \item Star Dreck - \lbrack Negative\rbrack \textsuperscript{Valence} \textbf{Kritiken} \lbrack von Fans\rbrack \textsuperscript{Reviewer}  \lbrack zum neuen Star Trek\rbrack \textsuperscript{Evaluee}
 \end{enumerate}
 
@@ -200,7 +198,7 @@ Das vorige Release des SALSA Korpus, SALSA 1.0 [\cite{burchardt_salsa_2006}], en
 
 SALSA 2.0 besteht aus circa 24.000 (TODO: vs. 36251??) Sätzen. Es enthält rund 20.000 verbale und mehr als 17.000 nominale Instanzen, welche durch 648 verschiedene Targets ausgelöst werden.
 \section{Implementierung des SRL-Klassifikators}
-hier
+
 \subsection{Einschränkungen}
 - keine Frames über mehrere Sätze
 \subsection{Features}
