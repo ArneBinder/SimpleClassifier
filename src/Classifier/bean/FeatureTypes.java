@@ -16,14 +16,19 @@ public class FeatureTypes {
 	static {
 		String splitChar = Const.splitChar;
 		String roleIdent = Const.roleTypeIdentifier;
+
+		//// Back-Off-Lattice Jurafsk @P20 Fig. 8c ///
 		//used while classification: in model.classify and
 		backOffRules.put("",
 				Arrays.asList(
-						roleIdent + splitChar + "target",
-						roleIdent + splitChar + "position",
-						roleIdent + splitChar + "path" + splitChar + "synCat",
-						roleIdent + splitChar + "head",
+						roleIdent + splitChar + "head" + splitChar + "synCat" + splitChar + "target",
+						roleIdent + splitChar + "target" + splitChar + "synCat" + splitChar + "path",
 						roleIdent + splitChar + "nextHead"
+						//roleIdent + splitChar + "target",
+						//roleIdent + splitChar + "position",
+						//roleIdent + splitChar + "path" + splitChar + "synCat",
+						//roleIdent + splitChar + "head",
+						//roleIdent + splitChar + "nextHead"
 
 						//roleIdent + splitChar + "terminal"
 						//roleIdent + splitChar + "funcPath"
@@ -31,6 +36,22 @@ public class FeatureTypes {
 						//roleIdent + splitChar + "funcSmall",
 						//roleIdent + splitChar + "funcBig"+ splitChar + "funcSmall"
 				));
+		backOffRules.put(roleIdent + splitChar + "head" + splitChar + "synCat" + splitChar + "target",
+				Arrays.asList(
+						roleIdent + splitChar + "head" + splitChar + "target",
+						roleIdent + splitChar + "target" + splitChar + "synCat"));
+		backOffRules.put(roleIdent + splitChar + "target" + splitChar + "synCat" + splitChar + "path",
+				Arrays.asList(
+						roleIdent + splitChar + "target" + splitChar + "synCat",
+						roleIdent + splitChar + "path" + splitChar + "synCat"));
+		backOffRules.put(roleIdent + splitChar + "head" + splitChar + "target",
+				Arrays.asList(
+						roleIdent + splitChar + "head",
+						roleIdent + splitChar + "target"));
+		backOffRules.put(roleIdent + splitChar + "target" + splitChar + "synCat",
+				Arrays.asList(
+						roleIdent + splitChar + "target"));
+
 		backOffRules.put(roleIdent + splitChar + "path" + splitChar + "synCat",
 				Arrays.asList(
 						roleIdent + splitChar + "path",
@@ -43,27 +64,35 @@ public class FeatureTypes {
 
 
 		//used while training: in model.addFeatureVector and model.calculateRelativeFrequenciesPerRole
-		// TODO complete rule set @ P17 @ Jurafsky
 		usedFeatures = Arrays.asList(
 				roleIdent,
 				"target",
+				"target" + splitChar + "synCat",
+				"target" + splitChar + "synCat" + splitChar + "path",
 				"synCat",
 				"position",
 				"path",
 				"path" + splitChar + "synCat",
 				"head",
+				"head" + splitChar + "synCat",
+				"head" + splitChar + "target",
+				"head" + splitChar + "synCat" + splitChar + "target",
 				"nextHead",
 				//"terminal",
 				//"funcPath",
 				//"funcBig",
 				//"funcSmall",
 				//"funcBig"+ splitChar + "funcSmall",
-				roleIdent + splitChar + "target",
+				roleIdent + splitChar + "target" + splitChar + "synCat",
+				roleIdent + splitChar + "target" + splitChar + "synCat" + splitChar + "path",
 				roleIdent + splitChar + "synCat",
 				roleIdent + splitChar + "position",
 				roleIdent + splitChar + "path",
 				roleIdent + splitChar + "path" + splitChar + "synCat",
 				roleIdent + splitChar + "head",
+				roleIdent + splitChar + "head" + splitChar + "synCat",
+				roleIdent + splitChar + "head" + splitChar + "target",
+				roleIdent + splitChar + "head" + splitChar + "synCat" + splitChar + "target",
 				roleIdent + splitChar + "nextHead"
 				//roleIdent + splitChar + "terminal"
 				//roleIdent + splitChar + "funcPath"
