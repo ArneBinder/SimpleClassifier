@@ -115,7 +115,7 @@ public class FeatureTypes {
 		backOffRules = new HashMap<String, List<String>>();
 		usedFeatures = new LinkedList<String>();
 		usedFeatures.add(Const.roleTypeIdentifier);
-		usedFeatures.add(Const.targetTypeIdentifier);
+		//usedFeatures.add(Const.targetTypeIdentifier);
 		String line = in.readLine().replaceAll("\\s+", "");
 		while (line != null) {
 			if (!line.isEmpty() && line.charAt(0) != commentIndicator) {
@@ -144,10 +144,16 @@ public class FeatureTypes {
 					}
 
 					for (int i = 0; i < valueStrings.length; i++) {
+						if(!usedFeatures.contains(valueStrings[i])) {
+							usedFeatures.add(valueStrings[i]);
+						}
 						valueStrings[i] = Const.roleTypeIdentifier + Const.splitChar + valueStrings[i];
+						if(!usedFeatures.contains(valueStrings[i])) {
+							usedFeatures.add(valueStrings[i]);
+						}
 					}
 					backOffRules.put(key, Arrays.asList(valueStrings));
-				} else {
+				} /*else {
 					if (line.contains(splitList)) {
 						for (String featureType : line.split(splitList)) {
 							usedFeatures.add(featureType);
@@ -157,7 +163,7 @@ public class FeatureTypes {
 						usedFeatures.add(line);
 						usedFeatures.add(Const.roleTypeIdentifier + Const.splitChar + line);
 					}
-				}
+				} */
 			}
 
 			line = in.readLine();

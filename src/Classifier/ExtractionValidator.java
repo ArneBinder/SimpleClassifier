@@ -1,9 +1,6 @@
 package Classifier;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import Classifier.bean.*;
@@ -88,7 +85,11 @@ public class ExtractionValidator {
 					File featureFile = new File(args[5]);
 					File[] featureFiles;
 					if (featureFile.isDirectory()) {
-						featureFiles = featureFile.listFiles();
+						featureFiles = featureFile.listFiles(new FilenameFilter() {
+							public boolean accept(File dir, String name) {
+								return name.toLowerCase().endsWith(".txt");
+							}
+						});
 					} else {
 						featureFiles = new File[args.length - 5];
 						for (int i = 5; i < args.length; i++) {
