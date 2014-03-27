@@ -1,0 +1,6 @@
+%BackOffRules: Back-Off-Lattice Jurafsky @P20 Fig. 8c (modified)
+> head#synCat#target, target#synCat#path, nextHead
+head#synCat#target > head#target, target#synCat
+target#synCat#path > target#synCat, path#synCat
+head#target > head, target
+path#synCat > path, synCat
