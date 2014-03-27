@@ -3,6 +3,8 @@ package Classifier.bean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import Classifier.bean.Exceptions.*;
 
 public class FeatureVector {
@@ -18,7 +20,7 @@ public class FeatureVector {
     //    return roleTypeIdentifier;
     //}
 
-    public Map<String, String> getFilteredPowerSet(List<String> usedFeatures)
+    public Map<String, String> getFilteredPowerSet(Set<String> usedFeatures)
 			throws FeatureTypeNotFoundException {
 		Map<String, String> newFeatures = new HashMap<String, String>();
 		for (String usedFeature : usedFeatures) {
@@ -41,7 +43,7 @@ public class FeatureVector {
 					featureValue += Const.splitChar + features.get(singleFeatureType);
 				}
 			} else {
-				throw new FeatureTypeNotFoundException("FeatureType: " + featureType
+				throw new FeatureTypeNotFoundException("FeatureType: " + singleFeatureType
 						+ " is missing on current FeatureVector. "
 						+ this.toString());
 			}

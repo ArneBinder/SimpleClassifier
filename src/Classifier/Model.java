@@ -119,11 +119,11 @@ public class Model {
 
 		for (String role : featureValueRelativeRoleFrequency.get(Const.roleTypeIdentifier).keySet()) {
 			featureVector.addFeature(Const.roleTypeIdentifier, role);
-			if(featureValueRelativeRoleFrequency.get(Const.roleTypeIdentifier).containsKey(role)){
+			//if(featureValueRelativeRoleFrequency.get(Const.roleTypeIdentifier).containsKey(role)){
 				roleProbability = featureValueRelativeRoleFrequency.get(Const.roleTypeIdentifier).get(role) + getRoleProbability(startingFeatureTypes, featureVector);
-			} else{
-				roleProbability = smoothingValue + getRoleProbability(startingFeatureTypes, featureVector);
-		}
+			//} else{
+			//	roleProbability = smoothingValue + getRoleProbability(startingFeatureTypes, featureVector);
+			//}
 			if (bestRoleProbability < roleProbability) {
 				bestRoleProbability = roleProbability;
 				bestRoleName = role;
@@ -143,13 +143,13 @@ public class Model {
 		double probability = 0.0;
 
 		for (String featureType : featureTypes) {
+			String fullFeatureType = Const.roleTypeIdentifier + Const.splitChar + featureType;
+			if (featureValueRelativeRoleFrequency.containsKey(fullFeatureType)) {
+				String featureValue = featureVector.getFeatureValue(fullFeatureType);
 
-			if (featureValueRelativeRoleFrequency.containsKey(featureType)) {
-				String featureValue = featureVector.getFeatureValue(featureType);
+				if (featureValueRelativeRoleFrequency.get(fullFeatureType).containsKey(featureValue)) {
 
-				if (featureValueRelativeRoleFrequency.get(featureType).containsKey(featureValue)) {
-
-					probability += featureValueRelativeRoleFrequency.get(featureType).get(featureValue);
+					probability += featureValueRelativeRoleFrequency.get(fullFeatureType).get(featureValue);
 
 				} else {
 					//try{
