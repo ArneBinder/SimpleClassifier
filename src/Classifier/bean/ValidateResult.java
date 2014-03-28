@@ -120,6 +120,7 @@ public class ValidateResult {
 	
 	public void printResult() {
 		System.out.println("SentenceCount: \t" + result[idxSentenceCount]);
+		System.out.println("idxUnclassifiedSentenceCount_NoAnnotation: \t" + result[idxUnclassifiedSentenceCount_NoAnnotation]);
 		System.out.println("TruePositiveFrameElementIDrefCount: \t" + result[idxTruePositiveFrameElementIDrefCount]);
 		//System.out.println("TruePositiveFrameElementIDrefCount_check: \t" + resultValues[idxTruePositiveFrameElementIDrefCount_check]);
 		System.out.println("GoldFrameElementIDrefCount: \t" + result[idxGoldFrameElementIDrefCount]);

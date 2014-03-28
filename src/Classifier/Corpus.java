@@ -234,6 +234,9 @@ public class Corpus {
 					if (bestAnnotationProb > threshold) {
 						bestAnnotationFrame.setProbability(bestAnnotationProb);
 						sentence.addFrame(bestAnnotationFrame);
+					}else{
+						Frame dummyFrame = new Frame("annotationID", "annotatedFrameElements_dummy");
+						sentence.addFrame(dummyFrame);
 					}
 				}
 
