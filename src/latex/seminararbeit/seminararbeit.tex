@@ -128,7 +128,7 @@ Argumentstruktur von Verben formuliert, sondern hinsichtlich der globalen
 Situation (oder des \textit{Frames}), die durch das Prädikat evoziert wird. Aufgrund
 des situationellen Charakters der Frames sind nicht nur Verben sondern auch
 Nomina (\textit{Mord}, \textit{Auge}\footnote{beispielsweise als Indikator für ein Ereignis der Wahrnehmung: \glqq{}Vor seinen Augen zerrissen sie die Bücher.\grqq{}}, \textit{Frau} von jemandem) oder Adjektive (\textit{stolz} auf etwas sein) potentielle
-Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch annotierten SALSA 2.0 Korpus [\cite{rehbein_adding_2012}] zu finden ist:
+Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch annotierten SALSA 2.0 Korpus [\cite{rehbein_adding_2012}] definiert ist:
 \begin{quote}
 A Reviewer offers his or her assessment of a work of art or performance (e.g. a play, a novel, a piece of music composition etc). The Reviewer typically bases his judgment on their own expertise and uses some set of criteria for evaluating works as to their relative merit.
 
@@ -206,15 +206,19 @@ Da die Frame-Elemente als relevante Informationsträger angesehen werden, wurde 
 
 Um die Hypothese zu verifizieren wurde ein Naive-Bayes-Klassifikator implementiert. Dieses statistische Lernverfahren wurde gewählt, da es im Vergleich zu anderen relativ transparent ist. Die dem trainierten Modell inhärenten Wahrscheinlichkeitsverteilungen liefern meist auch vom Menschen leicht interpretierbare Informationen, welche bei der Entwicklung des Klassifizierers sehr hilfreich waren. 
 
-Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind 
+Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die Einzelwahrscheinlichkeiten multipliziert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt und beim klassifizieren nachgeschlagen. Nur Falls diese für die aktuell zu klassifizierende Konstituente im Modell nicht gefunden wird, werden die Einzelwahrscheinlichkeiten genutzt. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt.
 
- Auf Grund der geringen Trainingsdatenmenge würde es sehr häufig vorkommen, dass eine konkrete Kombination von Features beim Klassifizieren    
-Back-off
-
-\subsection{Einschränkungen}
-Um die Komplexität des Projekts handhabbar zu halten und nicht den Umfang einer Seminararbeit zu sprengen wurden einige Einschränkungen getroffen.
+%\subsection{Einschränkungen}
+%Um die Komplexität des Projekts handhabbar zu halten und nicht den Umfang einer Seminararbeit zu sprengen wurden einige Einschränkungen getroffen.
 - keine Frames über mehrere Sätze, keine Bestimmung der Frames an sich, keine Abstraktion für ungesehene Targets 
 \subsection{Features}
+Im Folgenden sollen kurz die genutzten Einzel-Features vorgestellt werden.
+\subsubsection*{Syntaktische Kategorie}
+\subsubsection*{Pfad}
+\subsubsection*{Position}
+\subsubsection*{Kopf-Lemma}
+\subsubsection*{Nachbar-Kopf-Lemma}
+\subsubsection*{Target-Lemma}
 \subsection{Arbeitsweise des Klassifikators}
 \subsubsection*{Erstellung des Modells}
 \subsubsection*{Klassifikation der Konstituenten}
