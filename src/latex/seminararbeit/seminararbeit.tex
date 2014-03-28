@@ -20,7 +20,10 @@
 \usepackage{nameref} %Verweise auf sections
 \usepackage{amsmath}
 
+% Settings
 \hyphenation{TIGER} % do not hyphenize
+\bibpunct{[}{]}{,}{a}{}{;}
+
 
 \setcounter{tocdepth}{2}
 \begin{document}
@@ -134,8 +137,10 @@ Argumentstruktur von Verben formuliert, sondern hinsichtlich der globalen
 Situation (oder des \textit{Frames}), die durch das Prädikat evoziert wird. Aufgrund
 des situationellen Charakters der Frames sind nicht nur Verben sondern auch
 Nomina (\textit{Mord}, \textit{Auge}\footnote{beispielsweise als Indikator für ein Ereignis der Wahrnehmung: \glqq{}Vor seinen Augen zerrissen sie die Bücher.\grqq{}}, \textit{Frau} von jemandem) oder Adjektive (\textit{stolz} auf etwas sein) potentielle
-Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch annotierten SALSA 2.0 Korpus [\cite{rehbein_adding_2012}] definiert ist:
+Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch-annotierten SALSA 2.0 Korpus [\cite{rehbein_adding_2012}] definiert ist:
+
 \begin{quote}
+\textbf{Definition:}
 A Reviewer offers his or her assessment of a work of art or performance (e.g. a play, a novel, a piece of music composition etc). The Reviewer typically bases his judgment on their own expertise and uses some set of criteria for evaluating works as to their relative merit.
 
 \textbf{Example Sentences:}
@@ -172,7 +177,7 @@ Bedeutung und den traditionellen Verbenübergreifenden [@Enrique: was meinst hie
 Die dadurch erreichte \glqq{}mildere\grqq{} Stufe der Abstraktion über die
 Rollen der verschiedenen Verben, Nomina und Adjektive eignet sich besonders gut
 für die Lösung unterschiedlicher Aufgabenstellungen in Bereichen des
-Sprachverstehens [TODO: Leser konnte hiermit nichts anfangen :-( kann man das irgendwie erläutern/konkretisieren?] wie der Informationsextraktion oder Dialogsystemen [TODO: Verweis/Erklärung].
+Sprachverstehens [TODO: Leser konnte hiermit nichts anfangen :-( kann man das irgendwie erläutern/konkretisieren?] wie der Informationsextraktion oder Dialogsystemen [TODO: Verweis/Erklärung]. [\cite{gildea}]
 
 [TODO kürzen und einbauen(an richtiger Stelle): The relationship between such surface manifestations and
 semantic roles is the subject of linking theory—see \cite{levinrappaport}
@@ -183,49 +188,44 @@ used to generate syntax from semantics, the relationship between the two suggest
 that it may be possible to learn to recognize semantic relationships from syntactic
 cues, given examples with both types of information.]
 
-Die Aufgabenstellung eines FS-orientierten SRL-Systems lässt sich 
-wie folgt untergliedern [\cite{gildea}]:
+Die Aufgabenstellung eines FS-orientierten SRL-Systems lässt sich im Allgemeinen
+wie folgt untergliedern:
 \begin{enumerate}
 \item Zunächst wird der Frame, der durch den Satz oder die Phrase realisiert wird, bestimmt.
 \item Es folgt die Bestimmung der Frame-Elemente bezüglich des Frames. 
 \item Schließlich erfolgt die Klassifizierung der einzelnen Frame-Elemente.
 \end{enumerate}
-\section{Problemstellung}
-Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} für das Deutsche adaptieren lässt(TODO: und der SALSA 2.0 Korpus eine geeignete Datenbasis darstellt?).
 
-\subsection{Hypothese}
-Die an Hand einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache zur Verfügung stehenden lexikalischen und syntaktischen Informationen ermöglichen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes. Das lässt sich dazu nutzen, ein automatisiertes statistisches Lernverfahren basierend auf einem zusätzlich Rollen-annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit(TODO: oder anderer Ausdruck?) ermöglicht.
+
+\section{Problemstellung}
+Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} auf einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache adaptieren lässt. Dieser Ansatz besagt, dass mithilfe lexikalischer und syntaktischer Informationen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes getroffen werden können. Die Annahme lässt sich dazu nutzen, ein automatisiertes, statistisches Lernverfahren basierend auf einem zusätzlich mit Rollen annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit ermöglicht.
 
 \subsection{Korpus: Salsa 2.0}
-Die SALSA Korpora sind für akademische Zwecke frei zugängliche, framesemantisch annotierte Korpora der deutschen Sprache. Sie basieren auf TIGER [\cite{brants_tiger_2002} und \cite{tiger}], einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags, Lemma-Informationen und syntaktischen Strukturen annotiert wurde.\footnote{siehe http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}
+Grundlage dieser Arbeit bildet das SALSA Korpus in der Version 2.0. Das SALSA Korpus ist ein für akademische Zwecke frei zugängliches, framesemantisch annotiertes Korpus der deutschen Sprache. Es basiert auf TIGER\citep{brants_tiger_2002, tiger}, einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags, Lemma-Informationen und syntaktischen Strukturen annotiert wurde.\footnote{Für weitere Informationen siehe \url{http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}.}
 
-SALSA erweitert TIGER um semantische Informationen. Jeder Satz kann einen oder mehrere Frames besitzen. Diese bestehen aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen, also den Elementen des Satzes, welche eine semantische Rolle innerhalb des Frames realisieren. Frame und Frame-Elemente werden durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
+SALSA erweitert TIGER um semantische Informationen. Jedem Satz sind ein oder mehrere Frames zugeordnet. Ein Frame besteht aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen, also den Elementen des Satzes, die eine semantische Rolle innerhalb des Frames realisieren. Frame und Frame-Elemente werden innerhalb des Korpus durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
 
-Der Großteil der Frames wurde vom englischsprachigen FrameNet-Projekt [\cite{baker_berkeley_1998}]\footnote{Siehe auch https://framenet.icsi.berkeley.edu/fndrupal/ für weitere Informationen.} übernommen. Diese wurden um einige deutschsprachliche Frames ergänzt. Einzelne Frames und auch Frame-Elemente sind über verschiedenste Relationen miteinander verknüpft.
+Der Großteil der Frames wurde vom englischsprachigen FrameNet-Projekt\citep{baker_berkeley_1998} übernommen.\footnote{Für weitere Informationen siehe \url{https://framenet.icsi.berkeley.edu/fndrupal/}.} Diese wurden um einige deutschsprachliche Frames ergänzt. Einzelne Frames und auch Frame-Elemente sind über verschiedenste Relationen miteinander verknüpft. Durch solche Relationen werden beispielsweise Hyperonomie, Meronymie, Synonymie sowie kausative Zusammenhänge abgebildet.
+%Hyperonomie: Oberbegriff # Meronymie: Teil-Ganzes-Beziehung
 
-Das vorige Release des SALSA Korpus, SALSA 1.0 [\cite{burchardt_salsa_2006}], enthält Frames dessen Target ein Verb ist. In SALSA 2.0 [\cite{rehbein_adding_2012}] sind außerdem durch Nomen realisierte Prädikate und deren zugehörige Frames annotiert.
-
-SALSA 2.0 besteht aus circa 24.000 (TODO: vs. 36251??) Sätzen. Es enthält rund 20.000 verbale und mehr als 17.000 nominale Instanzen, welche durch 648 verschiedene Targets ausgelöst werden.
+Die Version 1.0 des SALSA Korpus\citep{burchardt_salsa_2006} enthält Frames dessen Targets ausschließlich Verben sind. Mit der Weiterentwicklung zur Version SALSA 2.0\citep{rehbein_adding_2012} sind außerdem durch Nomen realisierte Prädikate und deren zugehörige Frames annotiert worden. Das SALSA Korpus 2.0 besteht aus circa 24.000 Sätzen. Es enthält rund 20.000 verbale und mehr als 17.000 nominale Instanzen, welche durch 648 verschiedene Targets ausgelöst werden.
 
 \section{Realisierung des SRL-Klassifikators}
-Da die Frame-Elemente als relevante Informationsträger angesehen werden, wurde analog zu \cite{gildea} die Identifikation des durch einen Satz beziehungsweise eine Phrase realisierten Frames sehr vereinfacht. Es wird die Annahme verfolgt, dass gleiche Rollen auch in verschiedenen Frames ähnlich morphosyntaktisch realisiert werden. So lassen sich die nur sehr spärlich zur Verfügung stehenden Trainingsdaten\footnote{Für den Gesamtkorpus gilt: es gibt pro FE durchschnittlich 100 Instanzen} besser ausschöpfen. Einzig über das Prädikat werden implizit künstlich Superframes erzeugt, die alle Frames mit dem gleichen Target zusammenfassen. Die Schritte 2 und 3 der in Abschnitt \ref{subsec:introduction_SRL} eingeführten Untergliederung des SRL-Prozesses werden im Unterschied zu \cite{gildea} in einem Zug durchgeführt, da ein kompaktes automatisiertes Lernverfahren in der Regel qualitativ besser abschneidet als hintereinandergeschaltete Teilsysteme.
+In diesem Abschnitt wird die Realisierung des entwickelten Klassifikators zur automatischen Annotation von semantischen Rollen genauer beschrieben. Hierfür werden zunächst die getroffenen Annahmen dargelegt. Im Anschluss werden die von \cite{gildea} adaptierten sowie zusätzlich verwendete Features erläutert. Abschließend wird die Arbeitsweise des Klassifikators veranschaulicht.
 
-Um die Hypothese zu verifizieren wurde ein Naive-Bayes-Klassifikator implementiert. Dieses statistische Lernverfahren wurde gewählt, da es im Vergleich zu anderen relativ transparent ist. Die dem trainierten Modell inhärenten Wahrscheinlichkeitsverteilungen liefern meist auch vom Menschen leicht interpretierbare Informationen, welche bei der Entwicklung des Klassifizierers und der Auswahl der Features sehr hilfreich waren. 
+\subsection{Annahmen}
 
-Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die Einzelwahrscheinlichkeiten multipliziert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt und beim klassifizieren nachgeschlagen. Nur Falls diese für die aktuell zu klassifizierende Konstituente im Modell nicht gefunden werden, kommen die Einzelwahrscheinlichkeiten zum Einsatz. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt. Wann genau durch dieses Back-Off-Modell auf welche Einzelfeatures zurückgegriffen wird, ist im Abschnitt \nameref{subsubsec:classify} genauer erläutert.
+Analog zu \cite{gildea} wurde die Annahme verfolgt, dass gleiche Rollen auch in verschiedenen Frames ähnlich morphosyntaktisch realisiert werden. Es werden daher nur die im Frame enthaltenen Frame-Elemente als relevante Informationsträger betrachtet - unabhängig vom einbettenden Frame. Eine Disambiguierung der verschiedenen Frames, die durch das selbe Prädikat evoziert werden, ist daher nicht möglich. Bezogen auf die Trainingsdaten entfällt somit eine Abstraktionsebene, so dass die nur sehr spärlich zur Verfügung stehenden Trainingsdaten\footnote{Für den Gesamtkorpus gilt: es gibt pro FE durchschnittlich 100 Instanzen} besser ausgeschöpft werden können.
 
-%\subsection{Einschränkungen}
-%Um die Komplexität des Projekts handhabbar zu halten und nicht den Umfang einer Seminararbeit zu sprengen wurden einige Einschränkungen getroffen.
-% keine Bestimmung der Frames an sich 
+Im Hinblick auf den in Abschnitt\ref{subsec:introduction_SRL} vorgestellten allgemeinen SRL-Prozess entfällt der erste Schritt. Die Schritte zwei und drei werden im Unterschied zu \cite{gildea} in einem Zug durchgeführt, da ein kompaktes automatisiertes Lernverfahren in der Regel qualitativ besser abschneidet als hintereinandergeschaltete Teilsysteme.
+
+Da einzelne syntaktische Features nur im Bezug zu einem Target existieren und aus Gründen der Komplexität keine Abstraktion auf ungesehene Targets vorgenommen wird, wurde einschränkend festgelegt, dass das Target bekannt sein muss.
+
 \subsection{Features}
 Die genutzten lexikalischen und syntaktischen Features sind, bis auf das Feature \textit{Nachbar-Kopf-Lemma}, ebenfalls stark an \cite{gildea} orientiert. Sie werden für jede atomare sowie komplexe Konstituente (Phrase) extrahiert.
 
-Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure/Precision/Recall an, wenn das jeweilige Feature nicht genutzt wird. Die bedeutendsten Features sind der Pfad und das Nachbar-Kopf-Lemma. [TODO: Grafik übersetzen!]
-\begin{figure}[Einfluss der Features]
-			\includegraphics[scale=1.0]{images/featureImpact_sorted.jpg}
-			\caption{Der Einfluss der Syntaktischen (Syntaktische Kategorie, Pfad \& das aus dem Pfad und der syntaktischen Kategorie zusammengesetzte Feature) und lexikalischen Features (Kopf-Lemma \& Nachbar-Kopf-Lemma)}
-			\label{featureImpact}
-\end{figure}
+[TODO: kein voice-feature]
+
 
 \subsubsection*{Syntaktische Kategorie}
 Für komplexe Konstituenten entspricht dieses Feature der phrasalen Kategorie, bei atomaren Konstituenten wird das POS-Tag genutzt.
@@ -243,21 +243,32 @@ Hierzu wird das Lemma des Kopfes der kleinsten Konstituente herangezogen, die al
 \subsubsection*{Nachbar-Kopf-Lemma}
 An Hand von Experimenten hat sich herausgestellt, dass der Kopf der kleinsten Konstituente, welche die aktuell betrachtete überdeckt und dessen Kopf außerhalb dieser liegt, relevante Informationen für die SRL-Klassifikation liefert.
 
+
+
 \subsection{Arbeitsweise des Klassifikators}
 
+Analog zu \cite{gildea} stellt ein Naïve-Bayes-Klassifikator die Grundlage der Implementierung dar. Wie bei statistischen Klassifikationsverfahren üblich, gliedert sich diese in eine Trainingsphase, also die Erstellung des Modells, und eine Klassifikationsphase, in der das eigentliche Semantic Role Labeling stattfindet. Die Vorteile des Naïve-Bayes-Klassifikators liegen in der Einfachheit und Transparenz der Funktionsweise. Die dem trainierten Modell inhärenten Wahrscheinlichkeitsverteilungen liefern meist auch vom Menschen leicht interpretierbare Informationen, welche bei der Entwicklung des Klassifikators und der Auswahl der Features sehr hilfreich waren. 
 
-\begin{align}
-P(r|c)&=P(r|f_1,...,f_n)\\
-&=\underbrace{P(r)}_{\approx \frac{\#(r)}{\#(all)}}\prod_{i=1}^n \underbrace{P(f_i|r)}_{\substack{=\frac{P(f_i\cap r)}{P(r)}\\\approx\frac{\#(f_i, r)}{\#(r)}}}\\
-log(P(r|c))&\approx log\left(\frac{\#(r)}{\#(all)}\right) + \sum_{i=1}^n log\left(\frac{\#(f_i, r)}{\#(r)}\right)
-\end{align}
+
+
+%\begin{align}
+%P(r|c)&=P(r|f_1,...,f_n)\\
+%&=\underbrace{P(r)}_{\approx \frac{\#(r)}{\#(all)}}\prod_{i=1}^n \underbrace{P(f_i|r)}_{\substack{=\frac{P(f_i\cap r)}{P(r)}\\\approx\frac{\#(f_i, r)}{\#(r)}}}\\
+%log(P(r|c))&\approx log\left(\frac{\#(r)}{\#(all)}\right) + \sum_{i=1}^n log\left(\frac{\#(f_i, r)}{\#(r)}\right)
+%\end{align}
 
 \subsubsection*{Erstellung des Modells}
 %- keine Frames über mehrere Sätze
 
+Beiden Phasen ist gemein, dass das jeweils genutzte Korpus geparst und vorverarbeitet werden. Dabei werden für alle Konstituenten die Start- und Endpositionen im Satz und die Köpfe wie zuvor beschrieben bestimmt.
+
+
+Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die Einzelwahrscheinlichkeiten multipliziert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt[ und beim klassifizieren nachgeschlagen]. Nur Falls diese für die aktuell zu klassifizierende Konstituente im Modell nicht gefunden werden, kommen die Einzelwahrscheinlichkeiten zum Einsatz. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt. Wann genau [durch dieses Back-Off-Modell] auf welche Einzelfeatures zurückgegriffen wird, ist im Abschnitt \nameref{subsubsec:classify} genauer erläutert.
+
 \subsubsection*{Klassifikation der Konstituenten}\label{subsubsec:classify}
 %keine Abstraktion für ungesehene Targets
-%
+
+Back-Off-Model
 
 smoothing-value $= 10^{-6}$
 \section{Evaluation des xxxxx} %TODO
@@ -266,6 +277,14 @@ Der entwickelte Ansatz der automatischen Rollenannotation wurde nach Abschluss
 der Entwickelung einer Evaluation unterzogen. Diese sollte Aufschluss über die
 Qualität der entwickelten Anwendung geben, so dass ein Vergleich mit ähnlichen
 Systemen gezogen werden kann.
+
+Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure/Precision/Recall an, wenn das jeweilige Feature nicht genutzt wird. Die bedeutendsten Features sind der Pfad und das Nachbar-Kopf-Lemma. [TODO: Grafik übersetzen!]
+\begin{figure}[Einfluss der Features]
+			\includegraphics[scale=1.0]{images/featureImpact_sorted.jpg}
+			\caption{Der Einfluss der Syntaktischen (Syntaktische Kategorie, Pfad \& das aus dem Pfad und der syntaktischen Kategorie zusammengesetzte Feature) und lexikalischen Features (Kopf-Lemma \& Nachbar-Kopf-Lemma)}
+			\label{featureImpact}
+\end{figure}
+
 
 \newpage
 \bibliography{biblio}
