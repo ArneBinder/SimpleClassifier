@@ -57,7 +57,7 @@ public class Model {
 	}
 
 	public void addFeatureVector(FeatureVector featureVector) throws Exceptions.FeatureTypeNotFoundException {
-		for (Entry<String, String> pair : featureVector.getFilteredPowerSet(featureExtractor.getFeatureTypes().getUsedFeatures()).entrySet()) {
+		for (Entry<String, String> pair : featureVector.getFilteredPowerSet(FeatureTypes.getUsedFeatures()).entrySet()) {
 			incCount(pair.getKey(), pair.getValue());
 			totalCount++;
 		}
@@ -68,7 +68,7 @@ public class Model {
 
 		featureValueFrequency.put("all", new MultiSet<String>());
 		featureValueFrequency.get("all").add("all", totalCount);
-		for (String featureType : featureExtractor.getFeatureTypes().getUsedFeatures()) {
+		for (String featureType : FeatureTypes.getUsedFeatures()) {
 			if (featureType.contains(Const.roleTypeIdentifier)) {
 				int roleIndex = 0;
 				String role = "";
