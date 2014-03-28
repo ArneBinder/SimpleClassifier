@@ -20,8 +20,7 @@ public class FeatureTypes {
 		try {
 			readFeatureTypesFromFile(new File(fn));
 		} catch (IOException e) {
-			System.out.println("ERROR: couldn't read default featureTypes from \"" + fn + "\"\n" + e.getMessage());
-			System.exit(-1);
+			System.out.println("WARNING: couldn't read default featureTypes from \"" + fn + "\". Ensure you have loaded own featureTypes via -featureTypes flag!\n" + e.getMessage());
 		}
 	}
 
