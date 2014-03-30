@@ -274,44 +274,50 @@ public class ExtractionValidator {
 						for (FrameElement origFrameElement : origFrame.getFrameElements()) {
 							resultValues[ValidateResult.idxGoldFrameElementCount]++;
 							resultValues[ValidateResult.idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
+							for (String origIDref : origFrameElement.getIdrefs()) {
 
-							List<Frame> annotatedFramesForTarget = annotatedSentence.getFramesForTargetLemma(origFrame.getTargetLemma());
-							if (annotatedFramesForTarget != null) {
+								boolean foundIDref = false;
+								boolean foundFE = false;
+								List<Frame> annotatedFramesForTarget = annotatedSentence.getFramesForTargetLemma(origFrame.getTargetLemma());
+								if (annotatedFramesForTarget != null) {
 
 
-								for (Frame annotatedFrame : annotatedFramesForTarget) {
+									for (Frame annotatedFrame : annotatedFramesForTarget) {
 
-									for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
-										if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
-											for (String origIDref : origFrameElement.getIdrefs()) {
-												if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
+										for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
+											if (!annotatedFrameElement.getName().equals(Const.dummyRole) && !foundFE) {
+												//for (String origIDref : origFrameElement.getIdrefs()) {
+												if (annotatedFrameElement.getIdrefs().contains(origIDref) && !foundFE) {
+													foundFE = true;
 													resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCountNameIndependent]++;
 												}
+												//}
 											}
 										}
-									}
 
-									// check only for FE-Name...
-									FrameElement annotatedFrameElement = annotatedFrame.getFrameElement(origFrameElement.getName());
-									if (annotatedFrameElement != null) {
-										resultValues[ValidateResult.idxTruePositiveFrameElementCount]++;
-										for (String origIDref : origFrameElement.getIdrefs()) {
-											if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
+										// check only for FE-Name...
+										FrameElement annotatedFrameElement = annotatedFrame.getFrameElement(origFrameElement.getName());
+										if (annotatedFrameElement != null && !foundIDref) {
+											resultValues[ValidateResult.idxTruePositiveFrameElementCount]++;
+											//for (String origIDref : origFrameElement.getIdrefs()) {
+											if (annotatedFrameElement.getIdrefs().contains(origIDref) && !foundIDref) {
+												foundIDref = true;
 												resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCount]++;
 												annotatedFrameElement.setCorrect(origIDref);
 											}
+											//}
 										}
 									}
-								}
 
 
-							} else {
-								//resultValues[ValidateResult.idxUnclassifiedFrameCount_TargetNotFound]++;
+								} else {
+									//resultValues[ValidateResult.idxUnclassifiedFrameCount_TargetNotFound]++;
 
-								//for (FrameElement frameElement : origFrame.getFrameElements()) {
+									//for (FrameElement frameElement : origFrame.getFrameElements()) {
 									resultValues[ValidateResult.idxUnclassifiedFrameElementCount_FTargetNotFound]++;
 									resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_FTargetNotFound] += origFrameElement.getIdrefs().size();
-								//}
+									//}
+								}
 							}
 						}
 					}
