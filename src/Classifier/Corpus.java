@@ -19,7 +19,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * Created by Arne on 09.12.13.
  */
 public class Corpus {
-	private static double threshold = -400.0; //Double.NEGATIVE_INFINITY;
+	private static double threshold = -400.0 - Math.log(35); //25: ca durchschnittliche Anzahl Konstituenten pro Satz
 
 	private List<Sentence> sentences;
 	private FeatureExtractor featureExtractor;
@@ -231,7 +231,7 @@ public class Corpus {
 
 				// no target word detected?
 				if (bestAnnotationFrame != null) {
-					if (bestAnnotationProb > threshold) {
+					if (bestAnnotationProb > threshold + Math.log(sentence.getNonterminals().size() + sentence.getTerminals().size())) {
 						bestAnnotationFrame.setProbability(bestAnnotationProb);
 						sentence.addFrame(bestAnnotationFrame);
 					}else{

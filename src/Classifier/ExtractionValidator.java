@@ -15,7 +15,7 @@ import com.rits.cloning.Cloner;
  * @author Robert
  */
 public class ExtractionValidator {
-    
+
 	public static void main(String[] args) throws SRLException, IOException, InterruptedException {
 		if (args.length < 3) {
 			throw new IllegalArgumentException("3 arguments needed:\n\t\t\t-cross <originalCorpus> <resultFolder> <type:[single,(number)]>\n\t\t\t-single <orignalCorpus> <annotatedCorpus>\n\t\t\t-featureTypes <corpusFileName> <validateOutFolder> <crossFoldCount> <validationStatisticOutFileName> [<featureTypeFileName>]*");
@@ -100,7 +100,7 @@ public class ExtractionValidator {
 					out.close();
 					for (int i = 0; i < featureFiles.length; i++) {
 						System.out.println();
-						System.out.println("Read featureTypes from File: "+featureFiles[i].getName());
+						System.out.println("Read featureTypes from File: " + featureFiles[i].getName());
 						FeatureTypes.readFeatureTypesFromFile(featureFiles[i]);
 						validateResult = extractionValidator.performCrossValidation(corpus, crossFoldCount, valOut);
 						//validateResult.normalize(crossFoldCount);
@@ -125,14 +125,14 @@ public class ExtractionValidator {
 		String folderName = new Date().toString().replace(":", "-");
 		File currentCrossValidationFolder = new File(resultFolder.getAbsolutePath() + File.separatorChar + folderName);
 		currentCrossValidationFolder.mkdir();
-		
+
 		ValidateResult[] singleResults = new ValidateResult[crossValidationCount];
 
 		for (int i = 0; i < crossValidationCount; i++) {
 			System.gc();
 			Thread.sleep(5000);
-		    
-		    	File foldFolder = new File(currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "Fold " + (i + 1));
+
+			File foldFolder = new File(currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "Fold " + (i + 1));
 			foldFolder.mkdir();
 
 			startTime = System.currentTimeMillis();
@@ -189,7 +189,7 @@ public class ExtractionValidator {
 			//System.out.println("--- -- Finished validating annotated corpus " + (i + 1) + " ---");
 
 			System.out.println("--- -- Result for fold " + (i + 1) + " ---");
-			
+
 			validateResult.printResult();
 			writeResultSingle(validateResult, foldFolder.getAbsolutePath() + File.separatorChar + "validateResult" + (i + 1) + ".txt");
 			singleResults[i] = cloner.deepClone(validateResult);
@@ -200,13 +200,13 @@ public class ExtractionValidator {
 		System.out.println("AVG F-Measure (correct IDref): \t" + result.getFMeasure(0));
 		System.out.println("AVG F-Measure (FE identified in sentence): \t" + result.getFMeasure(1));
 		System.out.println("AVG F-Measure (IDrefs FE-name independent): \t" + result.getFMeasure(2));
-		
+
 		writeResultGlobal(singleResults, result, currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "globalResult.txt");
 		result.normalize(crossValidationCount);
 		writeResultGlobal(singleResults, result, currentCrossValidationFolder.getAbsolutePath() + File.separatorChar + "globalResultNormalized.txt");
-		
+
 		System.out.println("--- Finished cross validation ---");
-		
+
 		return result;
 	}
 
@@ -214,26 +214,26 @@ public class ExtractionValidator {
 		BufferedWriter out = new BufferedWriter(new FileWriter(new File(filepath)));
 		out.write(ValidateResult.getCaption());
 		out.newLine();
-		
+
 		out.write(validateResult.toString());
 		out.newLine();
-		
+
 		out.close();
 	}
-	
-	private void writeResultGlobal(ValidateResult[] validateResultsSingle, ValidateResult globalResult, String filepath) throws IOException{
-	    BufferedWriter out = new BufferedWriter(new FileWriter(new File(filepath)));
+
+	private void writeResultGlobal(ValidateResult[] validateResultsSingle, ValidateResult globalResult, String filepath) throws IOException {
+		BufferedWriter out = new BufferedWriter(new FileWriter(new File(filepath)));
 		out.write(ValidateResult.getCaption());
 		out.newLine();
-		
+
 		for (ValidateResult validateResult : validateResultsSingle) {
-		    out.write(validateResult.toString());
-		    out.newLine();
+			out.write(validateResult.toString());
+			out.newLine();
 		}
-		
+
 		out.newLine();
 		out.write(globalResult.toString());
-		
+
 		out.close();
 	}
 
@@ -243,18 +243,18 @@ public class ExtractionValidator {
 
 		// loop for statistical reasons
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
-		    resultValues[ValidateResult.idxSentenceCount]++;
+			resultValues[ValidateResult.idxSentenceCount]++;
 
-		    for ( Frame frame : originalSentence.getFrames()) {
-			resultValues[ValidateResult.idxFrameCount]++;
-			
-			for (FrameElement frameElement : frame.getFrameElements()) {
-			    resultValues[ValidateResult.idxFrameElementCount]++;
-			    resultValues[ValidateResult.idxFrameElementIDrefCount] += frameElement.getIdrefs().size();
+			for (Frame frame : originalSentence.getFrames()) {
+				resultValues[ValidateResult.idxFrameCount]++;
+
+				for (FrameElement frameElement : frame.getFrameElements()) {
+					resultValues[ValidateResult.idxFrameElementCount]++;
+					resultValues[ValidateResult.idxFrameElementIDrefCount] += frameElement.getIdrefs().size();
+				}
 			}
-		    }		    
 		}
-		
+
 		// real validate
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
 
@@ -271,42 +271,47 @@ public class ExtractionValidator {
 
 					// check if all FEs are found...
 					for (Frame origFrame : originalFrames) {
-						Frame annotatedFrame = annotatedSentence.getFrameForTargetLemma(origFrame.getTargetLemma());
-						if (annotatedFrame != null) {
-							for (FrameElement origFrameElement : origFrame.getFrameElements()) {
-								resultValues[ValidateResult.idxGoldFrameElementCount]++;
-								resultValues[ValidateResult.idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
+						for (FrameElement origFrameElement : origFrame.getFrameElements()) {
+							resultValues[ValidateResult.idxGoldFrameElementCount]++;
+							resultValues[ValidateResult.idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
 
-								for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
-									if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
+							List<Frame> annotatedFramesForTarget = annotatedSentence.getFramesForTargetLemma(origFrame.getTargetLemma());
+							if (annotatedFramesForTarget != null) {
+
+
+								for (Frame annotatedFrame : annotatedFramesForTarget) {
+
+									for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
+										if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
+											for (String origIDref : origFrameElement.getIdrefs()) {
+												if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
+													resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCountNameIndependent]++;
+												}
+											}
+										}
+									}
+
+									// check only for FE-Name...
+									FrameElement annotatedFrameElement = annotatedFrame.getFrameElement(origFrameElement.getName());
+									if (annotatedFrameElement != null) {
+										resultValues[ValidateResult.idxTruePositiveFrameElementCount]++;
 										for (String origIDref : origFrameElement.getIdrefs()) {
 											if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
-												resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCountNameIndependent]++;
+												resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCount]++;
+												annotatedFrameElement.setCorrect(origIDref);
 											}
 										}
 									}
 								}
 
-								// check only for FE-Name...
-								FrameElement annotatedFrameElement = annotatedFrame.getFrameElement(origFrameElement.getName());
-								if (annotatedFrameElement != null) {
-									resultValues[ValidateResult.idxTruePositiveFrameElementCount]++;
-									for (String origIDref : origFrameElement.getIdrefs()) {
-										if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
-											resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCount]++;
-											annotatedFrameElement.setCorrect(origIDref);
-										}
-									}
-								}
-							}
 
+							} else {
+								//resultValues[ValidateResult.idxUnclassifiedFrameCount_TargetNotFound]++;
 
-						} else {
-							resultValues[ValidateResult.idxUnclassifiedFrameCount_TargetNotFound]++;
-							
-							for (FrameElement frameElement : origFrame.getFrameElements()) {
-							    resultValues[ValidateResult.idxUnclassifiedFrameElementCount_FTargetNotFound]++;
-							    resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_FTargetNotFound] += frameElement.getIdrefs().size();
+								//for (FrameElement frameElement : origFrame.getFrameElements()) {
+									resultValues[ValidateResult.idxUnclassifiedFrameElementCount_FTargetNotFound]++;
+									resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_FTargetNotFound] += origFrameElement.getIdrefs().size();
+								//}
 							}
 						}
 					}
@@ -320,27 +325,27 @@ public class ExtractionValidator {
 						}
 				} else {
 					resultValues[ValidateResult.idxUnclassifiedSentenceCount_NoAnnotation]++;
-					
-					for ( Frame frame : originalSentence.getFrames()) {
+
+					for (Frame frame : originalSentence.getFrames()) {
 						resultValues[ValidateResult.idxUnclassifiedFrameCount_SNoAnnotation]++;
-						
+
 						for (FrameElement frameElement : frame.getFrameElements()) {
-						    resultValues[ValidateResult.idxUnclassifiedFrameElementCount_SNoAnnotation]++;
-						    resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_SNoAnnotation] += frameElement.getIdrefs().size();
+							resultValues[ValidateResult.idxUnclassifiedFrameElementCount_SNoAnnotation]++;
+							resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_SNoAnnotation] += frameElement.getIdrefs().size();
 						}
-					    }
+					}
 				}
-			}else{
-			    resultValues[ValidateResult.idxUnclassifiedSentenceCount_NotFound]++;
-			    
-			    for ( Frame frame : originalSentence.getFrames()) {
-				resultValues[ValidateResult.idxUnclassifiedFrameCount_SNotFound]++;
-				
-				for (FrameElement frameElement : frame.getFrameElements()) {
-				    resultValues[ValidateResult.idxUnclassifiedFrameElementCount_SNotFound]++;
-				    resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_SNotFound] += frameElement.getIdrefs().size();
+			} else {
+				resultValues[ValidateResult.idxUnclassifiedSentenceCount_NotFound]++;
+
+				for (Frame frame : originalSentence.getFrames()) {
+					resultValues[ValidateResult.idxUnclassifiedFrameCount_SNotFound]++;
+
+					for (FrameElement frameElement : frame.getFrameElements()) {
+						resultValues[ValidateResult.idxUnclassifiedFrameElementCount_SNotFound]++;
+						resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_SNotFound] += frameElement.getIdrefs().size();
+					}
 				}
-			    }
 			}
 		}
 

@@ -123,11 +123,13 @@ public class Sentence implements Comparable<Sentence> {
 		getFrames().add(frame);
 	}
 
-	public Frame getFrameForTargetLemma(String targetLemma){
+	public List<Frame> getFramesForTargetLemma(String targetLemma){
+		List<Frame> result = new ArrayList<Frame>();
 		for(Frame frame: frames){
 			if(frame.getTargetLemma().equals(targetLemma))
-				return frame;
+				result.add(frame);
 		}
+		if(result.size()>0) return result;
 		return null;
 	}
 
