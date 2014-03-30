@@ -236,6 +236,7 @@ public class Corpus {
 						sentence.addFrame(bestAnnotationFrame);
 					}else{
 						Frame dummyFrame = new Frame("annotationID", "annotatedFrameElements_dummy");
+						dummyFrame.setTargetLemma(bestAnnotationFrame.getTargetLemma());
 						sentence.addFrame(dummyFrame);
 					}
 				}
