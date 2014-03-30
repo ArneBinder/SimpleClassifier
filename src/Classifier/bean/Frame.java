@@ -11,6 +11,7 @@ public class Frame {
 	private double probability = Double.NEGATIVE_INFINITY;
 
 	private String targetLemma = "";
+	private String targetLemmaIDref = "";
 	private List<String> targetIDs = new ArrayList<String>();
 
 	// frameElement name > [idrefs]
@@ -49,6 +50,8 @@ public class Frame {
 		for (String targetID : targetIDs) {
 			result += "\n\t\t\t\t\t\t\t<fenode idref=\"" + targetID + "\"/>";
 		}
+		if(!targetLemmaIDref.equals(""))
+			result += "\n\t\t\t\t\t\t\t<fenode idref=\"" + targetLemmaIDref + "\" targetLemmaIDref=\"true\"/>";
 		result += "\n\t\t\t\t\t\t</target>";
 
 		for(FrameElement frameElement: frameElements.values()){
@@ -70,6 +73,14 @@ public class Frame {
 	//public void setTarget(String lemma) {
 	//	this.setTargetLemma(lemma);
 	//}
+
+	public String getTargetLemmaIDref() {
+		return targetLemmaIDref;
+	}
+
+	public void setTargetLemmaIDref(String targetLemmaIDref) {
+		this.targetLemmaIDref = targetLemmaIDref;
+	}
 
 	public void addTargetID(String idref) {
 		targetIDs.add(idref);
@@ -155,6 +166,11 @@ public class Frame {
 	}
 	public FrameElement getFrameElement(String frameElementName){
 		return frameElements.get(frameElementName);
+	}
+
+	public void deleteFrameElements(){
+		frameElements = new HashMap<String, FrameElement>();
+
 	}
 
 	//public List<String> getFrameElementIDrefs(String frameElement){ return frameElements.get(frameElement);	}

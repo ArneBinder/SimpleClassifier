@@ -75,7 +75,7 @@ public class Corpus {
 	}
 
 
-	public Model trainModel() throws SRLException  {
+	public Model trainModel() throws SRLException {
 		Model model = new Model(featureExtractor);
 
 		List<String> frameElementIDRefs;
@@ -176,13 +176,17 @@ public class Corpus {
 					Node targetNode = sentence.getNode(targetConstituentIDRef);
 					if (targetNode.getHeadIDref() != null) {
 						annotationProbability = 0.0;
+						Node target;
 						String targetLemma;
 						if (targetNode.isTerminal()) {
-							targetLemma = sentence.getNode(targetConstituentIDRef).getAttributes().get("lemma");
+							target = sentence.getNode(targetConstituentIDRef);
 						} else {
-							targetLemma = sentence.getNode(targetNode.getHeadIDref()).getAttributes().get("lemma");
+							target = sentence.getNode(targetNode.getHeadIDref());
 						}
+						targetLemma = target.getAttributes().get("lemma");
 						annotationFrame = new Frame("annotationID", "annotatedFrameElements_" + targetLemma);
+						//annotationFrame.addTargetID(target.getId());
+						annotationFrame.setTargetLemmaIDref(target.getId());
 						annotationFrame.setTargetLemma(targetLemma);
 						sentence.setTarget(targetConstituentIDRef);
 						// classify all terminals
@@ -231,14 +235,13 @@ public class Corpus {
 
 				// no target word detected?
 				if (bestAnnotationFrame != null) {
-					if (bestAnnotationProb > threshold + Math.log(sentence.getNonterminals().size() + sentence.getTerminals().size())) {
-						bestAnnotationFrame.setProbability(bestAnnotationProb);
-						sentence.addFrame(bestAnnotationFrame);
-					}else{
-						Frame dummyFrame = new Frame("annotationID", "annotatedFrameElements_dummy");
-						dummyFrame.setTargetLemma(bestAnnotationFrame.getTargetLemma());
-						sentence.addFrame(dummyFrame);
+					if (bestAnnotationProb <= threshold + Math.log(sentence.getNonterminals().size() + sentence.getTerminals().size())) {
+						bestAnnotationFrame.deleteFrameElements();
+						//bestAnnotationFrame.setTargetLemmaIDref("");  //evaluate only frames with "good" probability
 					}
+					bestAnnotationFrame.setProbability(bestAnnotationProb);
+					sentence.addFrame(bestAnnotationFrame);
+
 				}
 
 			} // for targetLemmaIdRefs

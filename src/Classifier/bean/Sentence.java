@@ -123,14 +123,23 @@ public class Sentence implements Comparable<Sentence> {
 		getFrames().add(frame);
 	}
 
-	public List<Frame> getFramesForTargetLemma(String targetLemma){
+	public List<Frame> getFramesForTargetLemma(String targetLemma){   //depricated
 		List<Frame> result = new ArrayList<Frame>();
 		for(Frame frame: frames){
-			if(frame.getTargetLemma().equals(targetLemma))
+			if(frame.getTargetLemmaIDref().equals(targetLemma))
 				result.add(frame);
 		}
 		if(result.size()>0) return result;
 		return null;
+	}
+
+	public List<Frame> getFramesForTargetHeadIDref(String targetIDref){
+		List<Frame> result = new ArrayList<Frame>();
+		for(Frame frame: frames){
+			if(frame.getTargetLemmaIDref().equals(targetIDref))
+				result.add(frame);
+		}
+		return (result.size()>0?result:null);
 	}
 
 	public void setRootID(String rootID) {

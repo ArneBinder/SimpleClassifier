@@ -241,7 +241,7 @@ public class ExtractionValidator {
 		long[] resultValues = new long[ValidateResult.resultSize];
 		List<Sentence> annotatedSentenceList = annotatedCorpus.getSentences();
 
-		// loop for statistical reasons
+// loop for statistical reasons
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
 			resultValues[ValidateResult.idxSentenceCount]++;
 
@@ -255,9 +255,13 @@ public class ExtractionValidator {
 			}
 		}
 
-		// real validate
+// real validate
 		for (Sentence originalSentence : originalCorpus.getSentences()) {
-
+			try {
+				originalSentence.enrichInformation();
+			} catch (IDrefNotInSentenceException e) {
+				System.out.println("WARNING: could not enrichInformation for originalSentence!");
+			}
 			int index = annotatedSentenceList.indexOf(originalSentence);
 
 			if (index > -1) {
@@ -266,58 +270,72 @@ public class ExtractionValidator {
 				List<Frame> originalFrames = originalSentence.getFrames();
 				List<Frame> annotatedFrames = annotatedSentence.getFrames();
 
-				// check only sentences with found target...
+// check only sentences with found target...
 				if (annotatedSentence.getFrames().size() > 0) {
 
-					// check if all FEs are found...
+// check if all FEs are found...
 					for (Frame origFrame : originalFrames) {
-						for (FrameElement origFrameElement : origFrame.getFrameElements()) {
-							resultValues[ValidateResult.idxGoldFrameElementCount]++;
-							resultValues[ValidateResult.idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
-							for (String origIDref : origFrameElement.getIdrefs()) {
 
-								boolean foundIDref = false;
-								boolean foundFE = false;
-								List<Frame> annotatedFramesForTarget = annotatedSentence.getFramesForTargetLemma(origFrame.getTargetLemma());
-								if (annotatedFramesForTarget != null) {
+						Node targetNode = null;
+						try {
+							int[] indices = originalSentence.calculateRootOfSubtree(origFrame.getTargetIDs());
+
+							String targetIDref;
+							if (originalSentence.getNode(origFrame.getTargetIDs().get(0)).getPathsFromRoot().get(indices[1]).length > indices[0])
+								targetIDref = originalSentence.getNode(origFrame.getTargetIDs().get(0)).getPathsFromRoot().get(indices[1])[indices[0]];
+							else
+								targetIDref = origFrame.getTargetIDs().get(0);
+							targetNode = annotatedSentence.getNode(targetIDref);
+						} catch (SRLException e) {
+							System.out.println("WARNING: no node in the original sentence can be figured out to span all its targetIDrefs!");
+						}
+
+						Frame annotatedFrame = null;
+						if (targetNode != null) {
+							List<Frame> annotatedFromesForTargetIDref = annotatedSentence.getFramesForTargetHeadIDref(targetNode.getHeadIDref());
+							if (annotatedFromesForTargetIDref != null && annotatedFromesForTargetIDref.size() > 0) {
+								annotatedFrame = annotatedFromesForTargetIDref.get(0);
+								if (annotatedFromesForTargetIDref.size() > 1)
+									System.out.println("WARNING: idref is target for multiple Nodes which span over this target!");
+							}
+						}
 
 
-									for (Frame annotatedFrame : annotatedFramesForTarget) {
+						if (annotatedFrame != null) {
+							for (FrameElement origFrameElement : origFrame.getFrameElements()) {
+								resultValues[ValidateResult.idxGoldFrameElementCount]++;
+								resultValues[ValidateResult.idxGoldFrameElementIDrefCount] += origFrameElement.getIdrefs().size();
 
-										for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
-											if (!annotatedFrameElement.getName().equals(Const.dummyRole) && !foundFE) {
-												//for (String origIDref : origFrameElement.getIdrefs()) {
-												if (annotatedFrameElement.getIdrefs().contains(origIDref) && !foundFE) {
-													foundFE = true;
-													resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCountNameIndependent]++;
-												}
-												//}
+								for (FrameElement annotatedFrameElement : annotatedFrame.getFrameElements()) {
+									if (!annotatedFrameElement.getName().equals(Const.dummyRole)) {
+										for (String origIDref : origFrameElement.getIdrefs()) {
+											if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
+												resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCountNameIndependent]++;
 											}
-										}
-
-										// check only for FE-Name...
-										FrameElement annotatedFrameElement = annotatedFrame.getFrameElement(origFrameElement.getName());
-										if (annotatedFrameElement != null && !foundIDref) {
-											resultValues[ValidateResult.idxTruePositiveFrameElementCount]++;
-											//for (String origIDref : origFrameElement.getIdrefs()) {
-											if (annotatedFrameElement.getIdrefs().contains(origIDref) && !foundIDref) {
-												foundIDref = true;
-												resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCount]++;
-												annotatedFrameElement.setCorrect(origIDref);
-											}
-											//}
 										}
 									}
-
-
-								} else {
-									//resultValues[ValidateResult.idxUnclassifiedFrameCount_TargetNotFound]++;
-
-									//for (FrameElement frameElement : origFrame.getFrameElements()) {
-									resultValues[ValidateResult.idxUnclassifiedFrameElementCount_FTargetNotFound]++;
-									resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_FTargetNotFound] += origFrameElement.getIdrefs().size();
-									//}
 								}
+
+// check only for FE-Name...
+								FrameElement annotatedFrameElement = annotatedFrame.getFrameElement(origFrameElement.getName());
+								if (annotatedFrameElement != null) {
+									resultValues[ValidateResult.idxTruePositiveFrameElementCount]++;
+									for (String origIDref : origFrameElement.getIdrefs()) {
+										if (annotatedFrameElement.getIdrefs().contains(origIDref)) {
+											resultValues[ValidateResult.idxTruePositiveFrameElementIDrefCount]++;
+											annotatedFrameElement.setCorrect(origIDref);
+										}
+									}
+								}
+							}
+
+
+						} else {
+							resultValues[ValidateResult.idxUnclassifiedFrameCount_TargetNotFound]++;
+
+							for (FrameElement frameElement : origFrame.getFrameElements()) {
+								resultValues[ValidateResult.idxUnclassifiedFrameElementCount_FTargetNotFound]++;
+								resultValues[ValidateResult.idxUnclassifiedFrameElementIDrefCount_FTargetNotFound] += frameElement.getIdrefs().size();
 							}
 						}
 					}
