@@ -274,12 +274,12 @@ Back-Off-Model
 smoothing-value $= 10^{-6}$
 
 \newpage
-\section{Evaluation des SRL-Klassifikators} %TODO
+\section{Evaluation des SRL-Klassifikators}
 
 Der entwickelte Ansatz der automatischen Rollenannotation wurde nach Abschluss
-der Entwickelung einer Evaluation unterzogen. Diese sollte Aufschluss über die
-Qualität der entwickelten Anwendung geben, so dass ein Vergleich mit ähnlichen
-Systemen vollzogen werden kann. Zur Evaluation wurde eine 5-fach Kreuzvalidierung durchgeführt. Die Evaluation sollte nur Konstituenten einbeziehen, denen eine Rolle zugewiesen wurde bzw. die im Originalkorpus eine Rolle besitzen. Konsituenten, die sowohl im Originalkorpus als auch im annotierten Korpus keine Rolle besitzen, wurden in der Evaluation ignoriert.
+der Implementation einer Evaluation unterzogen. Diese sollte Aufschluss über die
+Qualität des SRL-Klassifkators geben, so dass ein Vergleich mit ähnlichen
+Systemen vollzogen werden kann. Zur Evaluation wurde eine 5-fach Kreuzvalidierung durchgeführt. Die Evaluation sollte nur Konstituenten einbeziehen, denen eine Rolle zugewiesen wurde bzw. die im Originalkorpus eine Rolle besitzen. Konsituenten, die sowohl im Originalkorpus als auch im annotierten Korpus keine Rolle besitzen, wurden in der Evaluation ignoriert, da diese den Großteil der Konstituenten ausmachen.
 
 Die Grundlage der Evaluation stellt der ausgewählte SALSA Korpus 2.0 dar. Da für einen automatisches Lernverfahren eine ausreichend große Datenmenge verfügbar sein muss, wurde der Korpus zunächst dahingehen evaluiert. Abbildung \ref{roleFrequency} zeigt die Verteilung der im SALSA Korpus 2.0 vorkommenden Rollen. Der Verlauf der Kurve entspricht der Zipfschen Verteilung, bei der wenige Rollen sehr häufig annotiert wurden und viele Rollen sehr selten. Aus diesem Grund wurde für die Evaluation ein Teilkorpus extrahiert, der alle Sätze enthält, die eine der Top-10 Rollen innehaben. Der Teilkorpus umfasst rund 14000 Sätze mit rund 22500 Konstituenten mit zugewiesener Rolle.
 
@@ -309,10 +309,9 @@ Die dritte Kenngröße erfasst das Vorkommen der Originalrollen des Satzes unabh
 
 \subsection{Ergebnisse der Evaluation}
 
-Die Ergebniss der 5-fach Kreuzvalidierung sind in Abbildung \ref{evalKreuzvalidierung} dargestellt. Aufgeteilt nach den drei beschriebenen Kenngrößen, wurde die Precision sowie der Recall gemessen und anschließend der F-Measure berechnet. Bei der \textit{exakten Übereinstimmung} konnte ein F-Measure von 0.62 (Precision: 0.51 Recall: 0.81) erreicht werden. Der F-Measure der zweiten Kenngröße \textit{Unabhängig von der Rolle} fiel mit 0.74 noch höher aus. Dies bedeutet, dass einige Konstituenten korrekt als Inhaber einer Rolle identifiziert wurden, aber ihnen die falsche Rolle zugewiesen wurde. Da der F-Measure mit 0.68 die dritte Kenngröße \textit{Unabhängig von der Position} im Vergleich zur ersten Kenngröße ebenfalls größer ist, wurden stellenweise korrekte Rollen innerhalb eines Satzes annotiert, jedoch an die falschen Konstituenten. 
+Die Ergebnisse der 5-fach Kreuzvalidierung sind in Abbildung \ref{evalKreuzvalidierung} dargestellt. Aufgeteilt nach den drei beschriebenen Kenngrößen, wurde die Precision sowie der Recall gemessen und anschließend der F-Measure berechnet. Bei der \textit{exakten Übereinstimmung} konnte ein F-Measure von 0.62 (Precision: 0.51 Recall: 0.81) erreicht werden. Der F-Measure der zweiten Kenngröße \textit{Unabhängig von der Rolle} fiel mit 0.74 noch höher aus. Dies bedeutet, dass einige Konstituenten korrekt als Inhaber einer Rolle identifiziert wurden, aber ihnen die falsche Rolle zugewiesen wurde. Da der F-Measure mit 0.68 die dritte Kenngröße \textit{Unabhängig von der Position} im Vergleich zur ersten Kenngröße ebenfalls größer ist, wurden stellenweise korrekte Rollen innerhalb eines Satzes annotiert, jedoch an die falschen Konstituenten. 
 
-Im Anschluss der Evaluation wurde ausgewertet, wie sehr die getroffenen Annahmen und Einschränkungen das Ergebnis beeinflusst haben. Dabei fiel auf, dass durch die Einschränkung\ldots
-%TODO
+%TODO: Im Anschluss der Evaluation wurde ausgewertet, wie sehr die getroffenen Annahmen und Einschränkungen das Ergebnis beeinflusst haben. Dabei fiel auf, dass durch die Einschränkung\ldots
 
 		\begin{figure}[tb!]
 			\centering
@@ -346,13 +345,13 @@ Ebenso wie SHALMANESER stützten sich auch die Projekte des \textit{CoNLL-2009} 
 			\bottomrule
 			\end{tabular}
 		}
-		\caption{Ergebniss der CoNLL-2009 Shared Task, SRL-only Task. Die Angaben beziehen sich auf den erreichten F-Measure in Prozent. Fett hervorgehoben ist der jeweils beste Wert pro Sprache. \citep{hajivc2009conll}} %TODO: Ich habe ``Semantic Labeled F1'' entfernt, weil es einfach nicht gut passte.
+		\caption{Ergebniss der CoNLL-2009 Shared Task, SRL-only Task. Die Angaben beziehen sich auf den erreichten F-Measure in Prozent. Fett hervorgehoben ist der jeweils beste Wert pro Sprache. \citep{hajivc2009conll}}
 		\label{conll2009}
 	\end{table}
 
 \subsection{Einfluss der genutzten Features}
 
-Zusätzlich zu den bereits gewonnenen Erkenntnissen blieb die Frage zu klären, welchen Einfluss die jeweiligen Features besitzen und welches das bedeutendste Feature ist. Zur Bestimmung des Einflusses wurde der Mittelwert der 5-fach Kreuzvalidierung mit allen Features als Basiswert herangezogen. Anschließend wurde jeweils ein Feature deaktiviert und die 5-fach Kreuzvalidierung erneut durchgeführt. Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure/Precision/Recall im Vergleich zum festgelegten Basiswert an.
+Zusätzlich zu den bereits gewonnenen Erkenntnissen blieb die Frage zu klären, welchen Einfluss die jeweiligen Features besitzen und welches das bedeutendste Feature ist. Zur Bestimmung des Einflusses wurde der Mittelwert der 5-fach Kreuzvalidierung mit allen Features als Basiswert herangezogen. Anschließend wurde jeweils ein Feature samt der komplexen Feature, die dieses enthalten, deaktiviert und die 5-fach Kreuzvalidierung erneut durchgeführt. Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure/Precision/Recall im Vergleich zum festgelegten Basiswert an.
 Der \textit{Pfad} mit 21\% im F-Measure sowie das \textit{Nachbar-Kopf-Lemma} mit 19\% im F-Measure sind in der aktuellen Implementierung die bedeutendsten Features. Bezogen auf die Abnahme in Prozentpunkten im Vergleich zum Basiswert hat die syntaktische Kategorie mit 5\% im F-Measure den wenigsten Einfluss. Der Einfluss der beiden bedeutendsten Features beträgt im Vergleich zu den übrigen Features nahezu das Doppelte.
 
 	\begin{figure}[tb!]
@@ -381,10 +380,8 @@ größerer Abstand.
 Die bisherige Implementation zur automatischen Annotation von Rollen birgt viel Erweiterungs- und Verbesserungspotential, welches aufgrund der zur Verfügung stehenden Zeit nicht umgesetzt werden konnte.
 Eine Verbesserung der aktuellen Implementation wäre eine Änderung des starren Regelwerks zur Bestimmung der Kopf-Konstituenten im Hinblick auf die vielen Sonderfälle, die manuell dem Regelwerk hinzugefügt wurden. Hierbei könnte eine tiefergehende Analyse der Sonderfälle mögliche Abstraktionen von syntaktischen Kategorien aufzeigen, welches eine Minimierung des Regelwerks zur Folge hätte. Das Resultat wäre ein allgemeines, besser nutzbares Regelwerk, welches weiterhin eine hohe Genauigkeit bieten würde.
 Eine weitere mögliche Verbesserung wäre die Nutzung eines Dependenzgraphens, welcher in einem zusätzlichen Vorverarbeitungsschritt erzeugt werden müsste. Der Dependenzgraph würde beispielsweise andere Pfade erzeugen, die eindeutiger für bestimmte Rollen sein könnten. 
-Bezogen auf die bereits gegebenen Konstiuentenbäume wäre auch eine Nutzung von Tree-Kerneln möglich, welches eine Verarbeitung von Teilbäume ermöglicht. Die Bestimmung des Pfads zwischen zwei Konstituenten wäre dann überflüssig oder als zusätzliches Features anzusehen.
-Um später auch mit ungesehenen Targets arbeiten zu können, wäre eine semantische Abstraktion eben jener mittels des GermaNets möglich. GermaNet ist das deutsche Pendant zum englischen WordNet und bietet zahlreiche lexikalisch-semantische Relationen innerhalb des deutschen Grundwortschatzes. Über die Nutzung des GermanNet könnte auch eine Disambiguierung der Frames ermöglicht werden, welche in der aktuellen Implementation übergangen wurden.  
-%TODO: Referenz für GermaNet?? 
-
+Bezogen auf die bereits gegebenen Konstiuentenbäume wäre auch eine Nutzung von Tree-Kerneln möglich, welches eine Verarbeitung von Teilbäumen ermöglicht. Die Bestimmung des Pfads zwischen zwei Konstituenten wäre dann überflüssig oder als zusätzliches Features anzusehen.
+Um später auch mit ungesehenen Targets arbeiten zu können, wäre eine semantische Abstraktion eben jener mittels des GermaNets möglich. GermaNet\citep{Hamp97germanet} ist das deutsche Pendant zum englischen WordNet\citep{Miller1990} und bietet zahlreiche lexikalisch-semantische Relationen innerhalb des deutschen Grundwortschatzes. Über die Nutzung des GermanNet könnte auch eine Disambiguierung der Frames ermöglicht werden, welche in der aktuellen Implementation übergangen wurden.
  
 \newpage
 \bibliography{biblio}
