@@ -94,9 +94,9 @@
 % - warum SRL? Motivation
 % - was gibt es schon? related work
 
-Die Verarbeitung digitaler Texte ist heutzutage von enormer Bedeutung, soll doch laut \cite{gartner} die digitale Datenmenge bis 2016 auf 4.1 Zetabyte steigen. Immer häufiger sind es Sprachverstehen-bezogene Aufgaben, bei denen es gilt, die sematischen Informationen eines Satzes zu extrahieren. Die letzten Bausteine, auf denen die sematischen Information eines Satzes basiert, sind die sogenannten \textit{Rollen}. Dabei gilt es beispielweise die \glqq{}W\glqq{}-Fragen zu klären: \textit{Wer} hat \textit{wen} über \textit{welches Medium} \textit{was} gesagt? Oder: \textit{Wer} hat \textit{welche Meinung} über \textit{wen} und \textit{warum}? Das zweite Beispiel zeigt eines der wichtigsten Anwendungsfälle: die Meinungsforschung. Könnte digitale Aussagen verschiedener Personen bezogen auf ihre Bestandteile genauer analysiert werden, könnten viel exaktere Meinungsbilder erstellt werden. Ebenso könnten Nutzer in Suchmaschinen vollständige Sätze eingeben statt sich auf Stichwörter begrenzen zu müssen. Das von IBM entwickelte Computerprogramm Watson \citep{ibmWatson} wurde eigens dafür entwickelt Antworten auf Fragen natürlicher Sprache zu geben. Das genaue Verständnis der Frage ist hierbei unabdingbar.
+Die automatische Verarbeitung digitaler Texte ist heutzutage von enormer Bedeutung, soll doch laut \cite{gartner} die digitale Datenmenge bis 2016 auf 4.1 Zetabyte steigen. Immer häufiger sind es Sprachverstehen-bezogene Aufgaben, bei denen es gilt, die sematischen Informationen eines Satzes zu extrahieren. Die letzten Bausteine, auf denen die sematischen Information eines Satzes basiert, sind die sogenannten \textit{Rollen}. Dabei gilt es beispielweise die \glqq{}W\glqq{}-Fragen zu klären: \textit{Wer} hat \textit{wen} über \textit{welches Medium} \textit{was} gesagt? Oder: \textit{Wer} hat \textit{welche Meinung} über \textit{wen} und \textit{warum}? Das zweite Beispiel zeigt eines der wichtigsten Anwendungsfälle: die Meinungsforschung. Könnte digitale Aussagen verschiedener Personen bezogen auf ihre Bestandteile genauer analysiert werden, könnten viel exaktere Meinungsbilder erstellt werden. Ebenso könnten Nutzer in Suchmaschinen vollständige Sätze eingeben statt sich auf Stichwörter begrenzen zu müssen. Das von IBM entwickelte Computerprogramm Watson \citep{ibmWatson} wurde eigens dafür entwickelt Antworten auf Fragen natürlicher Sprache zu geben. Das genaue Verständnis der Frage ist hierbei unabdingbar.
 
-Die hier vorliegende Seminararbeitung beschreibt die Entwicklung eines Klassifikators zur automatischen Bestimmung von Rollen. Solche Systeme werden auch als \textit{Semantic Role Labeler} bezeichnet. Zunächst wird der lingusitische Hintergrund von Rollen und übergeordneten Konzepten, sogenannten Frames, erläutert. Anschließend wird die Problemstellung sowie das genutzte Korpus vorgestellt. Gefolgt von der genauen Umsetzung des Klassifikators und den Ergebnissen der durchgeführten Evaluation wird abschließend ein Fazit über das Seminarprojekt gegeben sowie mögliche Optionen zur Weiterentwicklung vorgestellt. 
+Die hier vorliegende Seminararbeit beschreibt die Entwicklung eines Klassifikators zur automatischen Bestimmung von Rollen. Solche Systeme werden auch als \textit{Semantic Role Labeler} bezeichnet.  Zunächst wird der linguistische Hintergrund von Rollen und übergeordneten Konzepten, sogenannten Frames, erläutert. Anschließend wird die Problemstellung sowie das genutzte Korpus vorgestellt. Gefolgt von der genauen Umsetzung des Klassifikators und den Ergebnissen der durchgeführten Evaluation wird abschließend ein Fazit über das Seminarprojekt gegeben sowie mögliche Optionen zur Weiterentwicklung vorgestellt. 
 
 \subsection{Semantische Rollen}
 
@@ -132,12 +132,12 @@ eines Verbs und sagt, dass sie \textit{semantische Rollen} realisieren. So reali
 
 \subsection{Frame Semantik}
 
-Die traditionelle Semantik [TODO: evtl. welche traditionelle Sem.? Referenz? Fillmore, case for case 1986 und Ray S. Jackendoff (1972): Semantics and cognition. Cambridge Mass.] war versucht, eine möglichst abstrakte und
+Die traditionelle Semantik (vgl. \cite{fillmore_case_1968} und \cite{jackendoff_semantics_1985}) war versucht, eine möglichst abstrakte und
 allgemeine, intersprachliche Formulierung von semantischen Rollen zu
 finden - bei der man z. B. nicht von \glqq{}Geber\grqq{} sondern allgemein
 von \glqq{}Agens\grqq{} sprechen würde. Demgegenüber steht die von C.J. Fillmore
 ab den 70er Jahren entwickelte Theorie der Frame-Semantik (FS)
-[\cite{fillmore1985}]. Das Fundament der Theorie ist mit dem traditionellen
+\citep{fillmore1985}. Das Fundament der Theorie ist mit dem traditionellen
 Ansatz in höchstem Maße inkompatibel, für unser Vorhaben reicht es aber, die
 partikuläre Auffassung von semantischen Rollen zu erwähnen, die der
 Frame-semantische Ansatz mit sich bringt.
@@ -147,7 +147,7 @@ Argumentstruktur von Verben formuliert, sondern hinsichtlich der globalen
 Situation (oder des \textit{Frames}), die durch das Prädikat evoziert wird. Aufgrund
 des situationellen Charakters der Frames sind nicht nur Verben sondern auch
 Nomina (\textit{Mord}, \textit{Auge}\footnote{beispielsweise als Indikator für ein Ereignis der Wahrnehmung: \glqq{}Vor seinen Augen zerrissen sie die Bücher.\grqq{}}, \textit{Frau} von jemandem) oder Adjektive (\textit{stolz} auf etwas sein) potentielle
-Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch-annotierten SALSA 2.0 Korpus [\cite{rehbein_adding_2012}] definiert ist:
+Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch-annotierten SALSA 2.0 Korpus \citep{rehbein_adding_2012} definiert ist:
 
 \begin{quote}
 \textbf{Definition:}
@@ -175,8 +175,8 @@ A Reviewer offers his or her assessment of a work of art or performance (e.g. a 
 
 \subsection{Semantic Role Labeling}\label{subsec:introduction_SRL}
 
-Mit Semantic Role Labeling (SRL) ist die automatisierte Erkennung und
-Annotierung von semantischen Rollen innerhalb eines Satzes gemeint. Die primäre
+Semantic Role Labeling (SRL) bezeichnet die [TODO: automatisierte?] Erkennung und
+Annotierung von semantischen Rollen innerhalb eines Satzes. Die primäre
 Aufgabe von SRL ist die genaue Identifizierung der semantischen Beziehung
 zwischen einem Prädikat und seinen assoziierten Elementen und Eigenschaften
 (siehe \cite{SRL2008} für eine allgemeine Darstellung). In Bezug auf eine FS lässt
@@ -185,17 +185,10 @@ Zwischenstufe in der semantischen Abstraktion zwischen der rein lexikalischen
 Bedeutung und den traditionellen prädikatübergreifenden, allgemeingültigen semantischen Rollen dar.
 Die dadurch erreichte \glqq{}mildere\grqq{} Stufe der Abstraktion über die
 Rollen der verschiedenen Verben, Nomina und Adjektive eignet sich besonders gut
-für die Lösung unterschiedlicher Aufgabenstellungen in Bereichen des
-Sprachverstehens [TODO: Leser konnte hiermit nichts anfangen :-( kann man das irgendwie erläutern/konkretisieren?] wie der Informationsextraktion oder Dialogsystemen [TODO: Verweis/Erklärung]. [\cite{gildea}]
+für die Lösung unterschiedlicher Aufgabenstellungen in Bereichen des maschinellen 
+Sprachverstehens.
 
-[TODO kürzen und einbauen(an richtiger Stelle): The relationship between such surface manifestations and
-semantic roles is the subject of linking theory—see \cite{levinrappaport}
-for a synthesis of work in this area. In general, linking theory argues that the syntactic
-realization of arguments of a predicate is predictable from semantics—exactly how this
-relationship works is the subject of much debate. Regardless of the underlying mechanisms
-used to generate syntax from semantics, the relationship between the two suggests
-that it may be possible to learn to recognize semantic relationships from syntactic
-cues, given examples with both types of information.]
+Automatische SRL-Systeme nutzen die Beziehung zwischen lexikalischen und syntaktischen Informationen der natürlichen Sprache, sogenannten Oberflächeninformationen, und den semantischen Rollen. Diese Beziehung ist viel debattiertes Thema der Linking-Theorie. Vereinfacht bringt sie in diversen heterogenen Ansätzen zum Ausdruck, dass sich die Realisierung der Argumente eines Prädikates anhand seiner Semantik voraussagen lässt, siehe \cite{levinrappaport} für einen tieferen Einstieg in die Materie. Im Umkehrschluss scheint es möglich, von Oberflächeninformationen auf die Semantik beziehungsweise die Realisierung semantischer Rollen zu schließen und diese Abhängigkeit mithilfe von Informationen beider Art zu erlernen.\citep{gildea}
 
 Die Aufgabenstellung eines FS-orientierten SRL-Systems lässt sich im Allgemeinen
 wie folgt untergliedern:
@@ -210,7 +203,10 @@ wie folgt untergliedern:
 TODO: [Shalmaneser, gildea \& jurafski, SEMAFOR, LTH, ...]
 
 \section{Problemstellung}
+
 Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} auf einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache adaptieren lässt. Dieser Ansatz besagt, dass mithilfe lexikalischer und syntaktischer Informationen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes getroffen werden können. Die Annahme lässt sich dazu nutzen, ein automatisiertes, statistisches Lernverfahren basierend auf einem zusätzlich mit Rollen annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit ermöglicht.
+
+Für die englische Sprache existieren bereits vielversprechende SRL-Systeme, wie \cite{das_semafor_2010, johansson_lth_2007, gildea}, und mit \cite{erk2006shalmaneser} auch für das Deutsche. Allerdings ist den Autoren diese Arbeit kein System bekannt, das mit nicht-verbalen Prädikaten umgehen kann.
 
 \subsection{Korpus: Salsa 2.0}
 Grundlage dieser Arbeit bildet das SALSA Korpus in der Version 2.0. Das SALSA Korpus ist ein für akademische Zwecke frei zugängliches, framesemantisch annotiertes Korpus der deutschen Sprache. Es basiert auf TIGER\citep{brants_tiger_2002, tiger}, einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags, Lemma-Informationen und syntaktischen Strukturen annotiert wurde.\footnote{Für weitere Informationen siehe \url{http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}.}
