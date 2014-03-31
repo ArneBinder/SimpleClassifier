@@ -31,11 +31,13 @@
 
 
 \begin{center}
+	% BITTE BENOTEN!
+	% \thispagestyle{empty}
 	\pagestyle{fancy} %eigener Seitenstil
 	\fancyhf[C]{\color{red} BITTE BENOTEN!!!}
 	\renewcommand{\headrulewidth}{0pt} %obere Trennlinie
 	\renewcommand{\footrulewidth}{0pt} %untere Trennlinie
-	 
+	
 	\topskip0pt
 	\vspace*{\fill}
 	
@@ -94,7 +96,7 @@
 
 Die Verarbeitung digitaler Texte ist heutzutage von enormer Bedeutung, soll doch laut \cite{gartner} die digitale Datenmenge bis 2016 auf 4.1 Zetabyte steigen. Immer häufiger sind es Sprachverstehen-bezogene Aufgaben, bei denen es gilt, die sematischen Informationen eines Satzes zu extrahieren. Die letzten Bausteine, auf denen die sematischen Information eines Satzes basiert, sind die sogenannten \textit{Rollen}. Dabei gilt es beispielweise die \glqq{}W\glqq{}-Fragen zu klären: \textit{Wer} hat \textit{wen} über \textit{welches Medium} \textit{was} gesagt? Oder: \textit{Wer} hat \textit{welche Meinung} über \textit{wen} und \textit{warum}? Das zweite Beispiel zeigt eines der wichtigsten Anwendungsfälle: die Meinungsforschung. Könnte digitale Aussagen verschiedener Personen bezogen auf ihre Bestandteile genauer analysiert werden, könnten viel exaktere Meinungsbilder erstellt werden. Ebenso könnten Nutzer in Suchmaschinen vollständige Sätze eingeben statt sich auf Stichwörter begrenzen zu müssen. Das von IBM entwickelte Computerprogramm Watson \citep{ibmWatson} wurde eigens dafür entwickelt Antworten auf Fragen natürlicher Sprache zu geben. Das genaue Verständnis der Frage ist hierbei unabdingbar.
 
-Die hier vorliegende Seminararbeitung beschreibt die Entwicklung eines Klassifikators zur automatischen Bestimmung von Rollen. Solche Systeme werden auch als \textit{Semantic Role Labeler} (SRL) bezeichnet. Zunächst wird der lingusitische Hintergrund von Rollen und übergeordneten Konzepten, sogenannten Frames, erläutert. Anschließend wird die Problemstellung sowie das genutzte Korpus vorgestellt. Gefolgt von der genauen Umsetzung des SRL-Klassifikators und den Ergebnissen der durchgeführten Evaluation wird abschließend ein Fazit über das Seminarprojekt gegeben sowie mögliche Optionen zur Weiterentwicklung vorgestellt. 
+Die hier vorliegende Seminararbeitung beschreibt die Entwicklung eines Klassifikators zur automatischen Bestimmung von Rollen. Solche Systeme werden auch als \textit{Semantic Role Labeler} bezeichnet. Zunächst wird der lingusitische Hintergrund von Rollen und übergeordneten Konzepten, sogenannten Frames, erläutert. Anschließend wird die Problemstellung sowie das genutzte Korpus vorgestellt. Gefolgt von der genauen Umsetzung des Klassifikators und den Ergebnissen der durchgeführten Evaluation wird abschließend ein Fazit über das Seminarprojekt gegeben sowie mögliche Optionen zur Weiterentwicklung vorgestellt. 
 
 \subsection{Semantische Rollen}
 
@@ -204,6 +206,7 @@ wie folgt untergliedern:
 \end{enumerate}
 
 \subsection{Related Work} %TODO
+
 TODO: [Shalmaneser, gildea \& jurafski, SEMAFOR, LTH, ...]
 
 \section{Problemstellung}
@@ -346,7 +349,7 @@ Die dritte Kenngröße erfasst das Vorkommen der Originalrollen des Satzes unabh
 
 Die Ergebnisse der 5-fach Kreuzvalidierung sind in Abbildung \ref{evalKreuzvalidierung} dargestellt. Aufgeteilt nach den drei beschriebenen Kenngrößen, wurde die Precision sowie der Recall gemessen und anschließend der F-Measure berechnet. Bei der \textit{exakten Übereinstimmung} konnte ein F-Measure von 0.62 (Precision: 0.51 Recall: 0.81) erreicht werden. Der F-Measure der zweiten Kenngröße \textit{Unabhängig von der Rolle} fiel mit 0.74 noch höher aus. Dies bedeutet, dass einige Konstituenten korrekt als Inhaber einer Rolle identifiziert wurden, aber ihnen die falsche Rolle zugewiesen wurde. Da der F-Measure mit 0.68 die dritte Kenngröße \textit{Unabhängig von der Position} im Vergleich zur ersten Kenngröße ebenfalls größer ist, wurden stellenweise korrekte Rollen innerhalb eines Satzes annotiert, jedoch an die falschen Konstituenten. 
 
-%TODO: Im Anschluss der Evaluation wurde ausgewertet, wie sehr die getroffenen Annahmen und Einschränkungen das Ergebnis beeinflusst haben. Dabei fiel auf, dass durch die Einschränkung\ldots
+%Ausgelassen: Im Anschluss der Evaluation wurde ausgewertet, wie sehr die getroffenen Annahmen und Einschränkungen das Ergebnis beeinflusst haben. Dabei fiel auf, dass durch die Einschränkung\ldots
 
 		\begin{figure}[tb!]
 			\centering
