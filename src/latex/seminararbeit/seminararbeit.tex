@@ -22,16 +22,23 @@
 \usepackage{booktabs}
 
 % Settings
-\hyphenation{TIGER} % do not hyphenize
+\hyphenation{TIGER Er-wei-te-rungs Ver-bes-se-rungs-po-ten-tial} % do not hyphenize
 \bibpunct{[}{]}{,}{a}{}{;}
 
 
 \setcounter{tocdepth}{2}
 \begin{document}
-
 \thispagestyle{empty} 
 
+
 \begin{center}
+	\topskip0pt
+	\vspace*{\fill}
+	Bitte Benoten!
+	\vspace*{\fill}
+
+
+	\newpage
 	\topskip0pt
 	\vspace*{\fill}
 	
@@ -154,7 +161,6 @@ A Reviewer offers his or her assessment of a work of art or performance (e.g. a 
 
 
 \textbf{FEs}
-
 
 \textbf{FE1(Reviewer)}: The person assessing the Evaluee for its merit.
 
@@ -292,7 +298,7 @@ Die Grundlage der Evaluation stellt der ausgewählte SALSA Korpus 2.0 dar. Da f�
 	\begin{figure}[tb!]
 		\centering
 		\includegraphics[scale=0.6]{images/roleFrequency.jpg}
-		\caption{Verteilung der Rollen im SALSA Korpus 2.0.}
+		\caption{Verteilung der Rollen im SALSA Korpus 2.0}
 		\label{roleFrequency}
 	\end{figure}
 
@@ -308,7 +314,7 @@ Die dritte Kenngröße erfasst das Vorkommen der Originalrollen des Satzes unabh
 		\begin{figure}[tb!]
 			\centering
 			\includegraphics{images/evaluation_kenngroeszen.png}
-			\caption{Semantisch-annotierter Beispielsatz mit Beispielen für die drei evaluierten Kenngrößen.}
+			\caption[Visualisierung der Kenngrößen]{Visualisierung der drei Kenngrößen an einem semantisch-annotierten Beispielsatz}
 			\label{evalKenngroeszen}
 		\end{figure}
 
@@ -322,7 +328,7 @@ Die Ergebnisse der 5-fach Kreuzvalidierung sind in Abbildung \ref{evalKreuzvalid
 		\begin{figure}[tb!]
 			\centering
 			\includegraphics[scale=0.5]{images/ergebnisseKreuzvalidierung.png}
-			\caption{Ergebnis der 5-fach Kreuzvalidierung des SRL-Klassifikators bezogen auf die drei Kenngrößen. Dargestellt ist zudem die Standabweichung innerhalb der Kreuzvaliederung.}
+			\caption[Ergebnis der 5-fach Kreuzvalidierung]{Ergebnis der 5-fach Kreuzvalidierung des SRL-Klassifikators bezogen auf die drei Kenngrößen. Dargestellt ist zudem die Standabweichung innerhalb der Kreuzvaliederung.}
 			\label{evalKreuzvalidierung}
 		\end{figure}
 
@@ -351,7 +357,7 @@ Ebenso wie SHALMANESER stützten sich auch die Projekte des \textit{CoNLL-2009} 
 			\bottomrule
 			\end{tabular}
 		}
-		\caption{Ergebniss der CoNLL-2009 Shared Task, SRL-only Task. Die Angaben beziehen sich auf den erreichten F-Measure in Prozent. Fett hervorgehoben ist der jeweils beste Wert pro Sprache. \citep{hajivc2009conll}}
+		\caption[Ergebnisse der CoNLL-2009 Shared Task, SRL-only Task]{Ergebniss der CoNLL-2009 Shared Task, SRL-only Task. Die Angaben beziehen sich auf den erreichten F-Measure in Prozent. Fett hervorgehoben ist der jeweils beste Wert pro Sprache. \citep{hajivc2009conll}}
 		\label{conll2009}
 	\end{table}
 
@@ -363,7 +369,7 @@ Der \textit{Pfad} mit 21\% im F-Measure sowie das \textit{Nachbar-Kopf-Lemma} mi
 	\begin{figure}[tb!]
 		\centering		
 		\includegraphics[scale=0.9]{images/featureImpact_sorted.jpg}
-		\caption{Der Einfluss der syntaktischen (Position, Syntaktische Kategorie, Pfad \& das aus dem Pfad und der syntaktischen Kategorie zusammengesetzte Feature) und lexikalischen Features (Kopf-Lemma \& Nachbar-Kopf-Lemma). Dargestellt ist die Abnahme in Prozentpunkten im Vergleich zum Basiswert mit allen Features, wenn das jeweilige Feature deaktiviert wurde.}
+		\caption[Einfluss der genutzten Features]{Der Einfluss der syntaktischen (Position, Syntaktische Kategorie, Pfad \& das aus dem Pfad und der syntaktischen Kategorie zusammengesetzte Feature) und lexikalischen Features (Kopf-Lemma \& Nachbar-Kopf-Lemma). Dargestellt ist die Abnahme in Prozentpunkten im Vergleich zum Basiswert mit allen Features, wenn das jeweilige Feature deaktiviert wurde.}
 		\label{featureImpact}
 	\end{figure}
 
@@ -383,7 +389,7 @@ größerer Abstand.
 
 \subsection{Mögliche Erweiterungen und Verbesserungen}
 
-Die bisherige Implementation zur automatischen Annotation von Rollen birgt viel Erweiterungs- und Verbesserungspotential, welches aufgrund der zur Verfügung stehenden Zeit nicht umgesetzt werden konnte.
+Die bisherige Implementation zur automatischen Annotation von Rollen birgt viel Erweiterungs"= und Verbesserungspotential, welches aufgrund der zur Verfügung stehenden Zeit nicht umgesetzt werden konnte.
 Eine Verbesserung der aktuellen Implementation wäre eine Änderung des starren Regelwerks zur Bestimmung der Kopf-Konstituenten im Hinblick auf die vielen Sonderfälle, die manuell dem Regelwerk hinzugefügt wurden. Hierbei könnte eine tiefergehende Analyse der Sonderfälle mögliche Abstraktionen von syntaktischen Kategorien aufzeigen, welches eine Minimierung des Regelwerks zur Folge hätte. Das Resultat wäre ein allgemeines, besser nutzbares Regelwerk, welches weiterhin eine hohe Genauigkeit bieten würde.
 Eine weitere mögliche Verbesserung wäre die Nutzung eines Dependenzgraphens, welcher in einem zusätzlichen Vorverarbeitungsschritt erzeugt werden müsste. Der Dependenzgraph würde beispielsweise andere Pfade erzeugen, die eindeutiger für bestimmte Rollen sein könnten. 
 Bezogen auf die bereits gegebenen Konstiuentenbäume wäre auch eine Nutzung von Tree-Kerneln möglich, welches eine Verarbeitung von Teilbäumen ermöglicht. Die Bestimmung des Pfads zwischen zwei Konstituenten wäre dann überflüssig oder als zusätzliches Features anzusehen.
