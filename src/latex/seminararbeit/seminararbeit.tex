@@ -130,7 +130,7 @@ eines Verbs und sagt, dass sie \textit{semantische Rollen} realisieren. So reali
 
 \subsection{Frame Semantik}
 
-Die traditionelle Semantik [TODO: evtl. welche traditionelle Sem.? Referenz?] war versucht, eine möglichst abstrakte und
+Die traditionelle Semantik [TODO: evtl. welche traditionelle Sem.? Referenz? Fillmore, case for case 1986 und Ray S. Jackendoff (1972): Semantics and cognition. Cambridge Mass.] war versucht, eine möglichst abstrakte und
 allgemeine, intersprachliche Formulierung von semantischen Rollen zu
 finden - bei der man z. B. nicht von \glqq{}Geber\grqq{} sondern allgemein
 von \glqq{}Agens\grqq{} sprechen würde. Demgegenüber steht die von C.J. Fillmore
@@ -180,7 +180,7 @@ zwischen einem Prädikat und seinen assoziierten Elementen und Eigenschaften
 (siehe \cite{SRL2008} für eine allgemeine Darstellung). In Bezug auf eine FS lässt
 sich folgendes feststellen. Da FE Frame-spezifisch sind, stellen sie eine
 Zwischenstufe in der semantischen Abstraktion zwischen der rein lexikalischen
-Bedeutung und den traditionellen Verbenübergreifenden [@Enrique: was meinst hier mit Verb..übergr.?] semantischen Rollen dar.
+Bedeutung und den traditionellen prädikatübergreifenden, allgemeingültigen semantischen Rollen dar.
 Die dadurch erreichte \glqq{}mildere\grqq{} Stufe der Abstraktion über die
 Rollen der verschiedenen Verben, Nomina und Adjektive eignet sich besonders gut
 für die Lösung unterschiedlicher Aufgabenstellungen in Bereichen des
@@ -274,7 +274,8 @@ Beiden Phasen ist gemein, dass das jeweils genutzte Korpus geparst und vorverarb
 
 Anschließend werden die Targets vereinfacht. Für Targets im Trainingskorpus, die aus mehreren Konstituenten bestehen, wird vorerst die kleinste Konstituente bestimmt, die alle Target-Konstituenten überdeckt. Bezüglich dieser wird dann das Pfad-Feature und das Target-Lemma-Feature bestimmt.
 
-Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die Werte der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und bilden das Modell. 
+Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die Werte der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und bilden das Modell. Die Trainingsphase ist in Abbildung [...] kompakt verbildlicht. 
+
 
 \subsubsection*{Klassifikation der Konstituenten}\label{subsubsec:classify}
 %keine Abstraktion für ungesehene Targets
