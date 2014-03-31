@@ -33,11 +33,11 @@
 
 \begin{center}
 	% BITTE BENOTEN!
-	% \thispagestyle{empty}
-	\pagestyle{fancy} %eigener Seitenstil
-	\fancyhf[C]{\color{red} BITTE BENOTEN!!!}
-	\renewcommand{\headrulewidth}{0pt} %obere Trennlinie
-	\renewcommand{\footrulewidth}{0pt} %untere Trennlinie
+\thispagestyle{empty}
+% 	\pagestyle{fancy} %eigener Seitenstil
+% 	\fancyhf[C]{\color{red} BITTE BENOTEN!!!}
+% 	\renewcommand{\headrulewidth}{0pt} %obere Trennlinie
+% 	\renewcommand{\footrulewidth}{0pt} %untere Trennlinie
 	
 	\topskip0pt
 	\vspace*{\fill}
@@ -56,7 +56,7 @@
 		Institut für Informatik \& Institut für Linguistik\\
 		Humboldt-Universität zu Berlin\\
 		\vspace{1.5cm}
-		Robert Bärhold \& Arne Binder (benötigt Note) \\
+		Robert Bärhold \& Arne Binder \\
 		31. März 2014 \\
 		\vspace{1cm}
 		
@@ -83,9 +83,9 @@
 
  \newpage
  \tableofcontents
- \vspace{1cm}
+ \vspace{0.5cm}
  \listoffigures
- \vspace{1cm}
+ \vspace{0.5cm}
  \listoftables
 
 \newpage
@@ -103,9 +103,10 @@ Die hier vorliegende Seminararbeit beschreibt die Entwicklung eines Klassifikato
 
 Prädikate zeichnen sich dadurch aus, dass sie die Komplementationsstruktur einer
 übergeordneten syntaktischen Einheit (nämlich des Satzes) bestimmen. Zum
-Beispiel verlangt ein ditransitives Verb wie \glqq{}geben\grqq{} drei weitere Satzkonstituenten mit konkreten syntaktischen Eigenschaften:
+Beispiel verlangt ein ditransitives Verb wie \glqq{}geben\grqq{} drei weitere Satzkonstituenten mit konkreten syntaktischen Eigenschaften, wie es in Abbildung \ref{Konstituentenbaum} dargestellt ist.
 
-\begin{center}
+\begin{figure}
+	\centering
 	\begin{tikzpicture}
 		\Tree [.geben
 				[.Subjekt Paul ]
@@ -113,15 +114,10 @@ Beispiel verlangt ein ditransitives Verb wie \glqq{}geben\grqq{} drei weitere Sa
 				[.Akk-Objekt {die Jacke} ]
 				[.Dativ-Objekt {seiner Freundin} ]
 			]
-			
-		%\Tree [.geben
-		%		[.\textbf{Subjekt} Paul ]
-		%		[.{} gibt ]
-		%		[.\textbf{Akk-Objekt} {die Jacke} ]
-		%		[.\textbf{Dativ-Objekt} {seiner Freundin} ]
-		%	]
 	\end{tikzpicture}
-\end{center}
+	\caption[Einfacher Konsituentenbaum eines Satzes]{Einfacher Konsituentenbaum eines Satzes}
+	\label{Konstituentenbaum}
+\end{figure}
 
 Aber das Bedingtheitsverhältnis zwischen dem Verb und seinen Komplementen 
 endet nicht in der Syntax. Diese sind durch das Prädikat auch hinsichtlich ihrer 
