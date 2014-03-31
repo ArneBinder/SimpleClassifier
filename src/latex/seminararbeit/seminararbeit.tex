@@ -231,24 +231,21 @@ Da einzelne syntaktische Features nur im Bezug zu einem Target existieren und au
 \subsection{Features}
 Die genutzten lexikalischen und syntaktischen Features sind, bis auf das Feature \textit{Nachbar-Kopf-Lemma}, ebenfalls stark an \cite{gildea} orientiert. Sie werden für jede atomare sowie komplexe Konstituente (Phrase) extrahiert.
 
-[TODO: kein voice-feature]
-
-
 \subsubsection*{Syntaktische Kategorie}
 Für komplexe Konstituenten entspricht dieses Feature der phrasalen Kategorie, bei atomaren Konstituenten wird das POS-Tag genutzt.
 \subsubsection*{Pfad}
-Eines der wichtigsten syntaktischen Features wird aus dem Pfad zwischen der aktuell betrachteten Konstituente und der Target-Konstituente innerhalb des Konstituentenbaums gebildet. Er setzt sich aus den verschiedenen Phrasenkategorien der dazwischenliegen komplexen Konstituenten zusammen. Die einzelnen Kategorien werden mit einem Richtungsmarker (absteigend oder aufsteigend im Baum) verknüpft. Um die Anzahl der Werte dieses Features etwas zu minimieren, werden direkte Wiederholungen einer gleichen Phrasenkategorie zusammengefasst und koordinierende Phrasenkategorien nicht berücksichtigt.
+Das syntaktische Feature wird aus dem Pfad zwischen der aktuell betrachteten Konstituente und der Target-Konstituente innerhalb des Konstituentenbaums gebildet. Er setzt sich aus den verschiedenen Phrasenkategorien der dazwischenliegen komplexen Konstituenten zusammen. Die einzelnen Kategorien werden mit einem Richtungsmarker (absteigend oder aufsteigend im Baum) verknüpft. Um die Anzahl der Werte dieses Features zu verringern, werden direkte Wiederholungen einer gleichen Phrasenkategorie zusammengefasst und koordinierende Phrasenkategorien nicht berücksichtigt.
 \subsubsection*{Position}
 Ein weiteres syntaktisches Features ist die Position der aktuell betrachteten Konstituente in Bezug zum Target. Es wird das Kopfelement der Konstituente betrachtet. Dieses kann vor einem atomaren Target (0), vor einem komplexen Target (1), innerhalb eines komplexen Targets (2) und nach einem Target (3) stehen.
 \subsubsection*{Kopf-Lemma}
 Als lexikalisches Feature wird das Kopfelement genutzt, also die atomare Konstituente, die den wichtigsten syntaktisch determinierenden Beitrag innerhalb einer komplexen Konstituente leistet. Außerdem leisten Kopfelemente den zur Problemlösung relevantesten semantischen Beitrag. Es wird die lemmatisierte Form des Wortes genutzt. Für atomare Konstituenten
 wird die Konstituente selbst als Kopfelement gesetzt.
 
-Da im TIGER-Korpus nicht für alle Typen phrasaler Konstituenten ein Kopfelement definiert ist\footnote{Nach Abschluss der Programmentwicklung hat sich herausgestellt, dass eine Konvertierung von TIGER in eine Dependenzgrammatik existiert [\cite{kountz_extraktion_2006}] und somit für den Großteil der Konstituenten eindeutige Kopfelemente gegeben wären.}, wird regelbasiert von der aktuellen Konstituente ausgehend Richtung ihrer Kinder nach einem Kopfelement gesucht, falls es nicht bekannt ist. Dabei werden die jeweiligen grammatikalischen Funktionen der Kind-Konstituenten sowie die Phrasenkategorien ausgewertet.\footnote{Die Label für die grammatische Funktion (Kanten-Label der Baumbank) und die der Phrasenkategorien folgen dem NEGRA-Tagset (siehe http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/negra-corpus.html).} Wenn die Suche auf eine Konstituente trifft, die atomar ist oder für die ein Kopf definiert ist, wird dessen Lemma als Kopfelement bis zum Ursprung der Suche Baum-aufwärts propagiert und dabei für alle Konstituenten auf diesem Pfad gesetzt. Köpfe sind somit immer atomar.
+Da im TIGER-Korpus nicht für alle Typen phrasaler Konstituenten ein Kopfelement definiert ist\footnote{Nach Abschluss der Programmentwicklung hat sich herausgestellt, dass eine Konvertierung von TIGER in eine Dependenzgrammatik existiert [\cite{kountz_extraktion_2006}] in dessen Zuge für den Großteil der Konstituenten eindeutige Kopfelemente gegeben sind.}, wird für Konstituenten ohne definiertes Kopfelement regelbasiert von der aktuellen Konstituente ausgehend Richtung ihrer Kinder nach einem Kopfelement gesucht. Dabei werden die jeweiligen grammatikalischen Funktionen der Kind-Konstituenten sowie die Phrasenkategorien ausgewertet.\footnote{Die Label für die grammatische Funktion (Kanten-Label der Baumbank) und die der Phrasenkategorien folgen dem NEGRA-Tagset (siehe http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/negra-corpus.html).} Wenn die Suche auf eine Konstituente trifft, die atomar ist oder für die ein Kopf definiert ist, wird dessen Lemma als Kopfelement bis zum Ursprung der Suche Baum-aufwärts propagiert und dabei für alle Konstituenten auf diesem Pfad gesetzt. Köpfe sind somit immer atomar.
 \subsubsection*{Target-Lemma}
 Hierzu wird das Lemma des Kopfes der kleinsten Konstituente herangezogen, die alle Teile des Targets überdeckt.
 \subsubsection*{Nachbar-Kopf-Lemma}
-An Hand von Experimenten hat sich herausgestellt, dass der Kopf der kleinsten Konstituente, welche die aktuell betrachtete überdeckt und dessen Kopf außerhalb dieser liegt, relevante Informationen für die SRL-Klassifikation liefert.
+An Hand von Experimenten hat sich herausgestellt, dass der Kopf der kleinsten Konstituente, welche die aktuell betrachtete überdeckt und dessen Kopf außerhalb dieser liegt, relevante Informationen für die SRL-Klassifikation liefert. Zusätzlich zum regulären Kopfelement wurde daher das Nachbar-Kopf-Element berücksichtigt.  
 
 
 
@@ -264,26 +261,49 @@ Folgende Formeln bilden die mathematische Grundlage des Klassifikators. Dabei st
 &\Rightarrow & log(P(r|c))&\approx log\left(\frac{\#(r)}{\#(all)}\right) + \sum_{i=1}^n log\left(\frac{\#(f_i, r)}{\#(r)}\right)\label{mat:norm}\\
 &\Rightarrow & r_c &= \operatorname*{arg\,max}_{r \in R} log(P(r|c))
 \end{align}
-Es sind also die Häufigkeiten $\#(r)$ und $\#(f_i, r)$ zu bestimmen, um die für eine Konstituente wahrscheinlichste Rolle ermitteln zu können.
+Es sind die Häufigkeiten $\#(r)$ und $\#(f_i, r)$ zu bestimmen, um die für eine Konstituente wahrscheinlichste Rolle ermitteln zu können.
 
-Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die logarithmierten Einzelwahrscheinlichkeiten addiert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt und beim klassifizieren im Modell nachgeschlagen. Nur Falls diese für die aktuell zu klassifizierende Konstituente nicht gefunden werden, kommen die Einzelwahrscheinlichkeiten zum Einsatz. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt. Wann genau auf welche Einzelfeatures zurückgegriffen wird, ist im Abschnitt \nameref{subsubsec:classify} genauer erläutert.
+Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die logarithmierten Einzelwahrscheinlichkeiten addiert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt und beim Klassifizieren im Modell nachgeschlagen. Falls diese für die aktuell zu klassifizierende Konstituente nicht gefunden werden, kommen die Einzelwahrscheinlichkeiten zum Einsatz. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt. Wann genau auf welche Einzelfeatures zurückgegriffen wird, ist im Abschnitt \nameref{subsubsec:classify} genauer erläutert.
 
 \subsubsection*{Erstellung des Modells}
 %- keine Frames über mehrere Sätze
 
 Beiden Phasen ist gemein, dass das jeweils genutzte Korpus geparst und vorverarbeitet wird. Dabei werden für alle Konstituenten die Start- und Endpositionen im Satz und die Köpfe wie zuvor beschrieben bestimmt.
 
-Anschließend werden die Targets vereinfacht. Für Targets im Trainingskorpus, die aus mehreren Konstituenten bestehen, wird vorerst die kleinste Konstituente bestimmt, die alle Target-Konstituenten beinhaltet. Bezüglich dieser wird dann das Pfad-Feature und das Target-Lemma-Feature bestimmt.
+Anschließend werden die Targets vereinfacht. Für Targets im Trainingskorpus, die aus mehreren Konstituenten bestehen, wird vorerst die kleinste Konstituente bestimmt, die alle Target-Konstituenten überdeckt. Bezüglich dieser wird dann das Pfad-Feature und das Target-Lemma-Feature bestimmt.
 
-Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und ergeben das Modell. 
+Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die Werte der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und bilden das Modell. 
 
 \subsubsection*{Klassifikation der Konstituenten}\label{subsubsec:classify}
 %keine Abstraktion für ungesehene Targets
-Nachdem das zu annotierende Korpus wie oben erwähnt mit Informationen angereichert wurde, werden die Targets identifiziert. Für jeden Satz werden die Wörter Untersucht, dessen Lemmata im Modell als Target-Lemma-Feature gelistet sind. Da Komplexe Target-Konstituenten beim Training allerdings auf ihre Köpfe abgebildet wurden, stellen alle Konstituenten, deren Kopf ein Target-Lemma ist, eine potentielle Target-Konstituente da. Deshalb wird in Abhängigkeit jeder dieser potentiellen Targets eine Klassifikation durchgeführt.
+Nachdem das zu annotierende Korpus mit Informationen angereichert wurde, werden die Targets identifiziert. Das Lemma jeder atomaren Konstituente eines jeden Satzes wird gegen die im Modell gelisteten Target-Lemmata geprüft. Da Komplexe Target-Konstituenten beim Training allerdings auf ihre Köpfe abgebildet wurden, stellen alle Konstituenten, deren Kopf ein Target-Lemma ist, eine potentielle Target-Konstituente da. Deshalb wird in Abhängigkeit jeder dieser potentiellen Targets eine Klassifikation durchgeführt.
 
 Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feature-Kombinationen gebildet und im Modell gesucht. Wenn diese nicht im Modell gelistet sind, werden sie durch weniger komplexe Feature-Kombinationen und schließlich durch atomare Features ersetzt. Das verwendete Regelwerk ist in Abb [TODO] dargestellt, es handelt sich um eine leicht modifizierte Form des von \cite{gildea} verwendeten. Falls die atomaren Feature-Werte ebenfalls nicht gefunden werden können, wird ein Smoothing mit einem Wert von $log(10^{-6})$ durchgeführt. Jede Konstituente wird mit der Rolle annotiert, für die die berechnete Wahrscheinlichkeit maximal ist.
 
 Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kopf wird schließlich die Target-Konstituente mit der Annotation gewählt, dessen Produkt der Wahrscheinlichkeiten für die annotierten Rollen am höchsten ist.
+
+\begin{center}
+	\begin{tikzpicture}[
+	edge from parent/.style={very thick,draw=black!70,-latex}
+	]
+	\coordinate
+		child { node {head\#synCat\#target} 
+			child {node {head\#target}
+				child {node {head}}
+				child {node {target}}
+			}
+			child {node {target\#synCat}}
+		}
+		child { node {target\#synCat\#path} 
+			child {node {target\#synCat}}
+			child {node {path\#synCat}
+				child {node {path}}
+				child {node {synCat}}
+			}
+		}		
+	;
+	\end{tikzpicture}
+\end{center}
 
 \newpage
 \section{Evaluation des SRL-Klassifikators}
