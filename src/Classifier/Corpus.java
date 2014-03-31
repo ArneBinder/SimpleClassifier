@@ -236,7 +236,7 @@ public class Corpus {
 				// no target word detected?
 				if (bestAnnotationFrame != null) {
 					if (bestAnnotationProb <= threshold + Math.log(sentence.getNonterminals().size() + sentence.getTerminals().size())) {
-						bestAnnotationFrame.deleteFrameElements();
+						//bestAnnotationFrame.deleteFrameElements();
 						//bestAnnotationFrame.setTargetLemmaIDref("");  //evaluate only frames with "good" probability
 					}
 					bestAnnotationFrame.setProbability(bestAnnotationProb);
