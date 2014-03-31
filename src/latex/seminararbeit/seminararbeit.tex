@@ -286,37 +286,45 @@ Nachdem das zu annotierende Korpus mit Informationen angereichert wurde, werden 
 
 Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feature-Kombinationen gebildet und im Modell gesucht. Wenn diese nicht im Modell gelistet sind, werden sie durch weniger komplexe Feature-Kombinationen und schließlich durch atomare Features ersetzt. Das verwendete Regelwerk ist in Abbildung \ref{back_off_model} dargestellt, es handelt sich um eine leicht modifizierte Form des von \cite{gildea} verwendeten. Falls die atomaren Feature-Werte ebenfalls nicht gefunden werden können, wird ein Smoothing mit einem Wert von $log(10^{-6})$ durchgeführt. Jede Konstituente wird mit der Rolle annotiert, für die die berechnete Wahrscheinlichkeit maximal ist.
 
-\begin{figure}
-	\centering
-	\begin{tikzpicture}[
-	edge from parent/.style={very thick,draw=black!70,-latex}
-	]
-	\coordinate
-		child { node {head\#synCat\#target} 
-			child {node {head\#target}
-				child {node {head}}
-				child {node {target}}
-			}
-			child {node {target\#synCat}}
-		}
-		child { node {target\#synCat\#path} 
-			child {node {target\#synCat}}
-			child {node {path\#synCat}
-				child {node {path}}
-				child {node {synCat}}
-			}
-		}		
-	;
-	\end{tikzpicture}
-	\label{back_off_model}
-	\caption{Verwendetes Regelwerk zur Zerlegung der komplexen Features}
-\end{figure}
+	\begin{figure}[tb!]
+		\centering
+		\includegraphics[scale=0.6]{images/backoff.png}
+		\caption[Regelwerk zur Auflösung kombinierter Features]{Regelwerk zur Auflösung kombinierter Features. Von oben ausgehend werden die Features-Kombinationen in ihre Bestandteile aufgelöst. (K=Kopf, NK=Nachbar-Kopf, POS=Position, PT=Pfad, SK=Syntaktische Kategorie, T=Target)}
+		\label{back_off_model}
+	\end{figure}
+
+
+% \begin{figure}
+% 	\centering
+% 	\begin{tikzpicture}[
+% 	edge from parent/.style={very thick,draw=black!70,-latex}
+% 	]
+% 	\coordinate
+% 		child { node {head\#synCat\#target} 
+% 			child {node {head\#target}
+% 				child {node {head}}
+% 				child {node {target}}
+% 			}
+% 			child {node {target\#synCat}}
+% 		}
+% 		child { node {target\#synCat\#path} 
+% 			child {node {target\#synCat}}
+% 			child {node {path\#synCat}
+% 				child {node {path}}
+% 				child {node {synCat}}
+% 			}
+% 		}		
+% 	;
+% 	\end{tikzpicture}
+% 	\label{back_off_model}
+% 	\caption{Verwendetes Regelwerk zur Zerlegung der komplexen Features}
+% \end{figure}
 
 
 Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kopf wird schließlich die Target-Konstituente mit der Annotation gewählt, dessen Produkt der Wahrscheinlichkeiten für die annotierten Rollen am höchsten ist.
 In Abbildung \ref{classify} ist die Klassifikationsphase kompakt dargestellt.
 
-\begin{figure}[tb!]
+	\begin{figure}[tb!]
 		\centering
 		\includegraphics[scale=0.6]{images/ablaufAnnotate.png}
 		\caption{Ablauf der Klassifikationsphase}
