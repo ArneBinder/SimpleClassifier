@@ -251,27 +251,33 @@ An Hand von Experimenten hat sich herausgestellt, dass der Kopf der kleinsten Ko
 Analog zu \cite{gildea} stellt ein Naïve-Bayes-Klassifikator die Grundlage der Implementierung dar. Wie bei statistischen Klassifikationsverfahren üblich, gliedert sich diese in eine Trainingsphase, also die Erstellung des Modells, und eine Klassifikationsphase, in der das eigentliche Semantic Role Labeling stattfindet. Die Vorteile des Naïve-Bayes-Klassifikators liegen in der Einfachheit und Transparenz der Funktionsweise. Die dem trainierten Modell inhärenten Wahrscheinlichkeitsverteilungen liefern meist auch vom Menschen leicht interpretierbare Informationen, welche bei der Entwicklung des Klassifikators und der Auswahl der Features sehr hilfreich waren. 
 
 
+Folgende Formeln bilden die mathematische Grundlage des Klassifikators. Dabei steht $c$ für die zu klassifizierende Konstituente, welche sich durch die Features $f_1$ bis $f_n$ darstellen lässt, und $r$ für die untersuchte Rolle aus der Menge der möglichen Rollen $R$.
+\begin{align}
+& & P(r|c)&=P(r|f_1,...,f_n)\\
+&\Rightarrow & &=\underbrace{P(r)}_{\approx \frac{\#(r)}{\#(all)}}\prod_{i=1}^n \underbrace{P(f_i|r)}_{\substack{=\frac{P(f_i\cap r)}{P(r)}\\\approx\frac{\#(f_i, r)}{\#(r)}}}\\
+&\Rightarrow & log(P(r|c))&\approx log\left(\frac{\#(r)}{\#(all)}\right) + \sum_{i=1}^n log\left(\frac{\#(f_i, r)}{\#(r)}\right)\label{mat:norm}\\
+&\Rightarrow & r_c &= \operatorname*{arg\,max}_{r \in R} log(P(r|c))
+\end{align}
+Es sind also die Häufigkeiten $\#(r)$ und $\#(f_i, r)$ zu bestimmen, um die für eine Konstituente wahrscheinlichste Rolle ermitteln zu können.
 
-%\begin{align}
-%P(r|c)&=P(r|f_1,...,f_n)\\
-%&=\underbrace{P(r)}_{\approx \frac{\#(r)}{\#(all)}}\prod_{i=1}^n \underbrace{P(f_i|r)}_{\substack{=\frac{P(f_i\cap r)}{P(r)}\\\approx\frac{\#(f_i, r)}{\#(r)}}}\\
-%log(P(r|c))&\approx log\left(\frac{\#(r)}{\#(all)}\right) + \sum_{i=1}^n log\left(\frac{\#(f_i, r)}{\#(r)}\right)
-%\end{align}
+Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die logarithmierten Einzelwahrscheinlichkeiten addiert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt und beim klassifizieren im Modell nachgeschlagen. Nur Falls diese für die aktuell zu klassifizierende Konstituente nicht gefunden werden, kommen die Einzelwahrscheinlichkeiten zum Einsatz. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt. Wann genau auf welche Einzelfeatures zurückgegriffen wird, ist im Abschnitt \nameref{subsubsec:classify} genauer erläutert.
 
 \subsubsection*{Erstellung des Modells}
 %- keine Frames über mehrere Sätze
 
-Beiden Phasen ist gemein, dass das jeweils genutzte Korpus geparst und vorverarbeitet werden. Dabei werden für alle Konstituenten die Start- und Endpositionen im Satz und die Köpfe wie zuvor beschrieben bestimmt.
+Beiden Phasen ist gemein, dass das jeweils genutzte Korpus geparst und vorverarbeitet wird. Dabei werden für alle Konstituenten die Start- und Endpositionen im Satz und die Köpfe wie zuvor beschrieben bestimmt.
 
+Anschließend werden die Targets vereinfacht. Für Targets im Trainingskorpus, die aus mehreren Konstituenten bestehen, wird vorerst die kleinste Konstituente bestimmt, die alle Target-Konstituenten beinhaltet. Bezüglich dieser wird dann das Pfad-Feature und das Target-Lemma-Feature bestimmt.
 
-Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die Einzelwahrscheinlichkeiten multipliziert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt[ und beim klassifizieren nachgeschlagen]. Nur Falls diese für die aktuell zu klassifizierende Konstituente im Modell nicht gefunden werden, kommen die Einzelwahrscheinlichkeiten zum Einsatz. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt. Wann genau [durch dieses Back-Off-Modell] auf welche Einzelfeatures zurückgegriffen wird, ist im Abschnitt \nameref{subsubsec:classify} genauer erläutert.
+Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und ergeben das Modell. 
 
 \subsubsection*{Klassifikation der Konstituenten}\label{subsubsec:classify}
 %keine Abstraktion für ungesehene Targets
+Nachdem das zu annotierende Korpus wie oben erwähnt mit Informationen angereichert wurde, werden die Targets identifiziert. Für jeden Satz werden die Wörter Untersucht, dessen Lemmata im Modell als Target-Lemma-Feature gelistet sind. Da Komplexe Target-Konstituenten beim Training allerdings auf ihre Köpfe abgebildet wurden, stellen alle Konstituenten, deren Kopf ein Target-Lemma ist, eine potentielle Target-Konstituente da. Deshalb wird in Abhängigkeit jeder dieser potentiellen Targets eine Klassifikation durchgeführt.
 
-Back-Off-Model
+Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feature-Kombinationen gebildet und im Modell gesucht. Wenn diese nicht im Modell gelistet sind, werden sie durch weniger komplexe Feature-Kombinationen und schließlich durch atomare Features ersetzt. Das verwendete Regelwerk ist in Abb [TODO] dargestellt, es handelt sich um eine leicht modifizierte Form des von \cite{gildea} verwendeten. Falls die atomaren Feature-Werte ebenfalls nicht gefunden werden können, wird ein Smoothing mit einem Wert von $log(10^{-6})$ durchgeführt. Jede Konstituente wird mit der Rolle annotiert, für die die berechnete Wahrscheinlichkeit maximal ist.
 
-smoothing-value $= 10^{-6}$
+Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kopf wird schließlich die Target-Konstituente mit der Annotation gewählt, dessen Produkt der Wahrscheinlichkeiten für die annotierten Rollen am höchsten ist.
 
 \newpage
 \section{Evaluation des SRL-Klassifikators}
