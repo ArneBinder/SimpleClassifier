@@ -19,6 +19,7 @@
 \usepackage[pdfborder={0 0 0}]{hyperref} %links, aber ohne Rahmen
 \usepackage{nameref} %Verweise auf sections
 \usepackage{amsmath}
+\usepackage{booktabs}
 
 % Settings
 \hyphenation{TIGER} % do not hyphenize
@@ -211,7 +212,7 @@ Der Großteil der Frames wurde vom englischsprachigen FrameNet-Projekt\citep{bak
 Die Version 1.0 des SALSA Korpus\citep{burchardt_salsa_2006} enthält Frames dessen Targets ausschließlich Verben sind. Mit der Weiterentwicklung zur Version SALSA 2.0\citep{rehbein_adding_2012} sind außerdem durch Nomen realisierte Prädikate und deren zugehörige Frames annotiert worden. Das SALSA Korpus 2.0 besteht aus circa 24.000 Sätzen. Es enthält rund 20.000 verbale und mehr als 17.000 nominale Instanzen, welche durch 648 verschiedene Targets ausgelöst werden.
 
 \section{Realisierung des SRL-Klassifikators}
-In diesem Abschnitt wird die Realisierung des entwickelten Klassifikators zur automatischen Annotation von semantischen Rollen genauer beschrieben. Hierfür werden zunächst die getroffenen Annahmen dargelegt. Im Anschluss werden die von \cite{gildea} adaptierten sowie zusätzlich verwendete Features erläutert. Abschließend wird die Arbeitsweise des Klassifikators veranschaulicht.
+In diesem Abschnitt wird die Realisierung des entwickelten Klassifikators zur automatischen Annotation von semantischen Rollen genauer beschrieben. Hierfür werden zunächst die getroffenen Annahmen dargelegt. Im Anschluss werden die von \cite{gildea} adaptierten sowie zusätzlich verwendeten Features erläutert. Abschließend wird die Arbeitsweise des Klassifikators veranschaulicht.
 
 \subsection{Annahmen}
 
@@ -271,21 +272,120 @@ Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch rele
 Back-Off-Model
 
 smoothing-value $= 10^{-6}$
-\section{Evaluation des xxxxx} %TODO
+
+\newpage
+\section{Evaluation des SRL-Klassifikators} %TODO
 
 Der entwickelte Ansatz der automatischen Rollenannotation wurde nach Abschluss
 der Entwickelung einer Evaluation unterzogen. Diese sollte Aufschluss über die
 Qualität der entwickelten Anwendung geben, so dass ein Vergleich mit ähnlichen
-Systemen gezogen werden kann.
+Systemen vollzogen werden kann. Zur Evaluation wurde eine 5-fach Kreuzvalidierung durchgeführt. Die Evaluation sollte nur Konstituenten einbeziehen, denen eine Rolle zugewiesen wurde bzw. die im Originalkorpus eine Rolle besitzen. Konsituenten, die sowohl im Originalkorpus als auch im annotierten Korpus keine Rolle besitzen, wurden in der Evaluation ignoriert.
 
-Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure/Precision/Recall an, wenn das jeweilige Feature nicht genutzt wird. Die bedeutendsten Features sind der Pfad und das Nachbar-Kopf-Lemma. [TODO: Grafik übersetzen!]
-\begin{figure}[Einfluss der Features]
-			\includegraphics[scale=1.0]{images/featureImpact_sorted.jpg}
-			\caption{Der Einfluss der Syntaktischen (Position, Syntaktische Kategorie, Pfad \& das aus dem Pfad und der syntaktischen Kategorie zusammengesetzte Feature) und lexikalischen Features (Kopf-Lemma \& Nachbar-Kopf-Lemma)}
-			\label{featureImpact}
-\end{figure}
+Die Grundlage der Evaluation stellt der ausgewählte SALSA Korpus 2.0 dar. Da für einen automatisches Lernverfahren eine ausreichend große Datenmenge verfügbar sein muss, wurde der Korpus zunächst dahingehen evaluiert. Abbildung \ref{roleFrequency} zeigt die Verteilung der im SALSA Korpus 2.0 vorkommenden Rollen. Der Verlauf der Kurve entspricht der Zipfschen Verteilung, bei der wenige Rollen sehr häufig annotiert wurden und viele Rollen sehr selten. Aus diesem Grund wurde für die Evaluation ein Teilkorpus extrahiert, der alle Sätze enthält, die eine der Top-10 Rollen innehaben. Der Teilkorpus umfasst rund 14000 Sätze mit rund 22500 Konstituenten mit zugewiesener Rolle.
+
+	\begin{figure}[tb!]
+		\centering
+		\includegraphics[scale=0.6]{images/roleFrequency.jpg}
+		\caption{Verteilung der Rollen im SALSA Korpus 2.0.}
+		\label{roleFrequency}
+	\end{figure}
 
 
+\subsection{Kenngrößen der Evaluation}
+
+Der implementierte SRL-Klassifikator wurde hinsichtlich dreier Kenngrößen evaluiert. Abbildung \ref{evalKenngroeszen} zeigt einen annotierten Beispielsatz aus dem SALSA Korpus, an dem die drei unterschiedlichen Fälle markiert wurden.
+
+Die erste Kenngröße erfasst Konstituenten, denen die korrekte Rolle zugewiesen wurde. In Abbildung \ref{evalKenngroeszen} ist der Fall der \textit{exakten Übereinstimmung} in Dunkelgrün dargestellt. 
+In einer zweiten Kenngröße wurde jene Konstituenten erfasst, die sowohl im Original als auch in der Annotation eine Rolle zugewiesen wurde, diese jedoch nicht identisch ist. Der Fall \textit{Unabhängig von der Rolle} ist in Abbildung \ref{evalKenngroeszen} Orange markiert. Hier wurde der Konstituente die Rolle Speaker statt der Rolle Message zugewiesen.
+Die dritte Kenngröße erfasst das Vorkommen der Originalrollen des Satzes unabhängig davon, welcher Konstituente die Rolle zugewiesen wurde. Wäre ausschließlich der in Abbildung \ref{evalKenngroeszen} blau markierten Konstituente die Rolle Speaker zugewiesen, wäre die Rolle positiv erfasst worden. Dieser Fall wird im Folgenden auch als \textit{Unabhängig von der Position} bezeichnet.
+
+		\begin{figure}[tb!]
+			\centering
+			\includegraphics{images/evaluation_kenngroeszen.png}
+			\caption{Semantisch-annotierter Beispielsatz mit Beispielen für die drei evaluierten Kenngrößen.}
+			\label{evalKenngroeszen}
+		\end{figure}
+
+
+\subsection{Ergebnisse der Evaluation}
+
+Die Ergebniss der 5-fach Kreuzvalidierung sind in Abbildung \ref{evalKreuzvalidierung} dargestellt. Aufgeteilt nach den drei beschriebenen Kenngrößen, wurde die Precision sowie der Recall gemessen und anschließend der F-Measure berechnet. Bei der \textit{exakten Übereinstimmung} konnte ein F-Measure von 0.62 (Precision: 0.51 Recall: 0.81) erreicht werden. Der F-Measure der zweiten Kenngröße \textit{Unabhängig von der Rolle} fiel mit 0.74 noch höher aus. Dies bedeutet, dass einige Konstituenten korrekt als Inhaber einer Rolle identifiziert wurden, aber ihnen die falsche Rolle zugewiesen wurde. Da der F-Measure mit 0.68 die dritte Kenngröße \textit{Unabhängig von der Position} im Vergleich zur ersten Kenngröße ebenfalls größer ist, wurden stellenweise korrekte Rollen innerhalb eines Satzes annotiert, jedoch an die falschen Konstituenten. 
+
+Im Anschluss der Evaluation wurde ausgewertet, wie sehr die getroffenen Annahmen und Einschränkungen das Ergebnis beeinflusst haben. Dabei fiel auf, dass durch die Einschränkung\ldots
+%TODO
+
+		\begin{figure}[tb!]
+			\centering
+			\includegraphics[scale=0.5]{images/ergebnisseKreuzvalidierung.png}
+			\caption{Ergebniss der 5-fach Kreuzvalidierung des SRL-Klassifikators bezogen auf die drei Kenngrößen. Dargestellt ist zudem die Standabweichung innerhalb der Kreuzvaliederung.}
+			\label{evalKreuzvalidierung}
+		\end{figure}
+
+\subsection{Einordnung der Ergebnisse}
+		
+Der hier entwickelte Ansatz und implementierte SRL-Klassifikator ist das erste und bisher einzige Projekt auf dem SALSA 2.0 Korpus. Dementsprechend gibt es aktuell keine Vergleichsergebnisse anderer Projekte bezüglich der aktuellen Korpusversion.
+
+Ein von \cite{erk2006shalmaneser} entwickeltes Projekt namens SHALMANESER wurde zur automatischen Annotation von Frames und Rollen auf dem SALSA Korpus in der Version 1.0 entwickelt. Der eigentliche Annotationsvorgang ist zweigeteilt. Zuerst findet eine Disambiguierung von Frames statt, bevor die einzelnen Konstituenten bezüglich der gegebenen Frame-Elemente klassifiziert werden. Der während der Klassifikation erreichte F-Measure von 0.600 (Precision: 0.761; Recall: 0.496) ist vergleichbar mit hier erzielten. Leider ist das Vorgehen und die Evaluation unklar.
+
+Ebenso wie SHALMANESER stützten sich auch die Projekte des \textit{CoNLL-2009} Wettbewerbs, welche in \cite{hajivc2009conll} vorgestellt wurden, auf den SALSA Korpus in der Version 1.0. Zusätzlich zum Konstituentenbaum des SALSA Korpus wurde ein Dependendenzgraph mit annotierter Kopf-Konstituente den Projekten zur Verfügung gestellt. Die erreichten Ergebnisse (F-Measure) des Wettbewerbs sind in Tabelle \ref{conll2009} aufgeteilt nach Team und Sprache des jeweiligen Korpus dargestellt. Die für mehrere Sprachen entwickelten Klassifikatoren erreichten auf dem deutschen Korpus einen maximalen F-Measure von 79.71\%. Das schlechteste System erreichte mit einem F-Measure von 59.51\% einen vergleichbaren Wert, wie der hier erstellte SRL-Klassifikator.
+
+	\begin{table}[tb!]
+		\centering
+		\resizebox{\textwidth}{!}{
+			\begin{tabular}{cc|cccccccc}
+			\toprule
+			\textbf{﻿Rank}   &    \textbf{System}   &    \textbf{Average}   &    \textbf{Catalan}   &    \textbf{Chinese}   &    \textbf{Czech}   &    \textbf{English}   &    \textbf{German} & \textbf{Japanese}   &    \textbf{Spanish} \\
+			\midrule
+			 1 &    Zhao   &    80.47   &    \textbf{80.32}   &    77.72   &    85.19   &    85.44   &    75.99   &    \textbf{78.15}   &    \textbf{80.46} \\
+			 2 &    Nugues   &    80.31   &    80.01   &    \textbf{78.60}   &    \textbf{85.41}   &    \textbf{85.63}   &    \textbf{79.71}   &    76.3   &    76.52 \\
+			 3 &    Meza-Ruiz   &    77.46   &    78   &    77.73   &    75.75   &    83.34   &    73.52   &    76   &    77.91 \\
+			 4 &    Baoli Li   &    69.26   &    74.06   &    70.37   &    57.46   &    69.63   &    67.76   &    72.03   &    73.54 \\
+			 5 &    Moreau   &    66.49   &    65.6   &    67.37   &    71.74   &    72.14   &    66.5   &    57.75   &    64.33\\
+			 6 &    Täckström   &    61.27   &    57.11   &    63.41   &    71.05   &    67.64   &    53.42   &    54.74   &    61.51\\
+			 7 &    Lin   &    57.18   &    61.7   &    70.33   &    60.43   &    65.66   &    59.51   &    23.78   &    58.87\\
+			\bottomrule
+			\end{tabular}
+		}
+		\caption{Ergebniss der CoNLL-2009 Shared Task, SRL-only Task. Die Angaben beziehen sich auf den erreichten F-Measure in Prozent. Fett hervorgehoben ist der jeweils beste Wert pro Sprache. \citep{hajivc2009conll}} %TODO: Ich habe ``Semantic Labeled F1'' entfernt, weil es einfach nicht gut passte.
+		\label{conll2009}
+	\end{table}
+
+\subsection{Einfluss der genutzten Features}
+
+Zusätzlich zu den bereits gewonnenen Erkenntnissen blieb die Frage zu klären, welchen Einfluss die jeweiligen Features besitzen und welches das bedeutendste Feature ist. Zur Bestimmung des Einflusses wurde der Mittelwert der 5-fach Kreuzvalidierung mit allen Features als Basiswert herangezogen. Anschließend wurde jeweils ein Feature deaktiviert und die 5-fach Kreuzvalidierung erneut durchgeführt. Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure/Precision/Recall im Vergleich zum festgelegten Basiswert an.
+Der \textit{Pfad} mit 21\% im F-Measure sowie das \textit{Nachbar-Kopf-Lemma} mit 19\% im F-Measure sind in der aktuellen Implementierung die bedeutendsten Features. Bezogen auf die Abnahme in Prozentpunkten im Vergleich zum Basiswert hat die syntaktische Kategorie mit 5\% im F-Measure den wenigsten Einfluss. Der Einfluss der beiden bedeutendsten Features beträgt im Vergleich zu den übrigen Features nahezu das Doppelte.
+
+	\begin{figure}[tb!]
+		\centering		
+		\includegraphics[scale=0.9]{images/featureImpact_sorted.jpg}
+		\caption{Der Einfluss der syntaktischen (Position, Syntaktische Kategorie, Pfad \& das aus dem Pfad und der syntaktischen Kategorie zusammengesetzte Feature) und lexikalischen Features (Kopf-Lemma \& Nachbar-Kopf-Lemma). Dargestellt ist die Abnahme in Prozentpunkten im Vergleich zum Basiswert mit allen Features, wenn das jeweilige Feature deaktiviert wurde.}
+		\label{featureImpact}
+	\end{figure}
+
+\FloatBarrier
+\newpage
+\section{Zusammenfassung}
+
+Zusammenfassend ist festzuhalten, dass eine automatische Rollenbestimmung
+aufgrund von wenigen, rein syntaktischen und lexikalischen Features möglich ist.
+Die von \cite{gildea} beschriebenen Features in Verbindung mit einem Naïve-Bayes-Klassifikator konnten erfolgreich adaptiert werden. Einzig die Adaption des Kopf-Features war aufgrund der fehlenden Annotation im genutzten Korpus und der vielen Sonderfälle im entwickelten Regelwerk nicht problemlos möglich.
+
+Die in der Evaluation erreichten Ergebnisse sind vergleichbar mit den Resultaten
+einer ähnlichen Arbeit auf einer früheren Version des SALSA Korpus. Zu den in
+\cite{hajivc2009conll} vorgestellten und verglichenen Projekten besteht ein
+größerer Abstand.
+
+
+\subsection{Mögliche Erweiterungen und Verbesserungen}
+
+Die bisherige Implementation zur automatischen Annotation von Rollen birgt viel Erweiterungs- und Verbesserungspotential, welches aufgrund der zur Verfügung stehenden Zeit nicht umgesetzt werden konnte.
+Eine Verbesserung der aktuellen Implementation wäre eine Änderung des starren Regelwerks zur Bestimmung der Kopf-Konstituenten im Hinblick auf die vielen Sonderfälle, die manuell dem Regelwerk hinzugefügt wurden. Hierbei könnte eine tiefergehende Analyse der Sonderfälle mögliche Abstraktionen von syntaktischen Kategorien aufzeigen, welches eine Minimierung des Regelwerks zur Folge hätte. Das Resultat wäre ein allgemeines, besser nutzbares Regelwerk, welches weiterhin eine hohe Genauigkeit bieten würde.
+Eine weitere mögliche Verbesserung wäre die Nutzung eines Dependenzgraphens, welcher in einem zusätzlichen Vorverarbeitungsschritt erzeugt werden müsste. Der Dependenzgraph würde beispielsweise andere Pfade erzeugen, die eindeutiger für bestimmte Rollen sein könnten. 
+Bezogen auf die bereits gegebenen Konstiuentenbäume wäre auch eine Nutzung von Tree-Kerneln möglich, welches eine Verarbeitung von Teilbäume ermöglicht. Die Bestimmung des Pfads zwischen zwei Konstituenten wäre dann überflüssig oder als zusätzliches Features anzusehen.
+Um später auch mit ungesehenen Targets arbeiten zu können, wäre eine semantische Abstraktion eben jener mittels des GermaNets möglich. GermaNet ist das deutsche Pendant zum englischen WordNet und bietet zahlreiche lexikalisch-semantische Relationen innerhalb des deutschen Grundwortschatzes. Über die Nutzung des GermanNet könnte auch eine Disambiguierung der Frames ermöglicht werden, welche in der aktuellen Implementation übergangen wurden.  
+%TODO: Referenz für GermaNet?? 
+
+ 
 \newpage
 \bibliography{biblio}
 \bibliographystyle{natdin}
