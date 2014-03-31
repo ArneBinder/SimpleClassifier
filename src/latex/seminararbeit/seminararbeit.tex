@@ -203,9 +203,11 @@ wie folgt untergliedern:
 
 Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} auf einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache adaptieren lässt. Dieser Ansatz besagt, dass mithilfe lexikalischer und syntaktischer Informationen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes getroffen werden können. Die Annahme lässt sich dazu nutzen, ein automatisiertes, statistisches Lernverfahren basierend auf einem zusätzlich mit Rollen annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit ermöglicht.
 
-Für die englische Sprache existieren bereits vielversprechende SRL-Systeme, wie \cite{das_semafor_2010, johansson_lth_2007, gildea}, und mit \cite{erk2006shalmaneser} auch für das Deutsche. Allerdings ist den Autoren dieser Arbeit kein System bekannt, das mit nicht-verbalen Prädikaten umgehen kann.
+Für die englische Sprache existieren bereits vielversprechende SRL-Systeme, wie \cite{das_semafor_2010, johansson_lth_2007, gildea}, und mit \cite{erk2006shalmaneser} auch für das Deutsche. Allerdings ist den Autoren dieser Seminararbeit kein System für die deutsche Sprache bekannt, das mit nicht-verbalen Prädikaten umgehen kann.
+
 
 \subsection{Korpus: Salsa 2.0}
+
 Grundlage dieser Arbeit bildet das SALSA Korpus in der Version 2.0. Das SALSA Korpus ist ein für akademische Zwecke frei zugängliches, framesemantisch annotiertes Korpus der deutschen Sprache. Es basiert auf TIGER\citep{brants_tiger_2002, tiger}, einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags, Lemma-Informationen und syntaktischen Strukturen annotiert wurde.\footnote{Für weitere Informationen siehe \url{http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}.}
 
 SALSA erweitert TIGER um semantische Informationen. Jedem Satz sind ein oder mehrere Frames zugeordnet. Ein Frame besteht aus einem Target, das ist das Prädikat, das den Frame evoziert, und verschiedenen Frame-Elementen, also den Elementen des Satzes, die eine semantische Rolle innerhalb des Frames realisieren. Frame und Frame-Elemente werden innerhalb des Korpus durch einen Namen und eine eindeutige ID charakterisiert, dem Target ist lediglich das zugehörige Lemma zugewiesen. Sowohl das Target als auch die Frame-Elemente können aus mehreren Konstituenten bestehen.
@@ -216,17 +218,19 @@ Der Großteil der Frames wurde vom englischsprachigen FrameNet-Projekt\citep{bak
 Die Version 1.0 des SALSA Korpus\citep{burchardt_salsa_2006} enthält Frames dessen Targets ausschließlich Verben sind. Mit der Weiterentwicklung zur Version SALSA 2.0\citep{rehbein_adding_2012} sind außerdem durch Nomen realisierte Prädikate und deren zugehörige Frames annotiert worden. Das SALSA Korpus 2.0 besteht aus circa 24.000 Sätzen. Es enthält rund 20.000 verbale und mehr als 17.000 nominale Instanzen, welche durch 648 verschiedene Targets ausgelöst werden.
 
 \section{Realisierung des SRL-Klassifikators}
+
 In diesem Abschnitt wird die Realisierung des entwickelten Klassifikators zur automatischen Annotation von semantischen Rollen genauer beschrieben. Hierfür werden zunächst die getroffenen Annahmen dargelegt. Im Anschluss werden die von \cite{gildea} adaptierten sowie zusätzlich verwendeten Features erläutert. Abschließend wird die Arbeitsweise des Klassifikators veranschaulicht.
 
 \subsection{Annahmen}
 
 Analog zu \cite{gildea} wurde die Annahme verfolgt, dass gleiche Rollen auch in verschiedenen Frames ähnlich morphosyntaktisch realisiert werden. Es werden daher nur die im Frame enthaltenen Frame-Elemente als relevante Informationsträger betrachtet - unabhängig vom einbettenden Frame. Eine Disambiguierung der verschiedenen Frames, die durch das selbe Prädikat evoziert werden, ist daher nicht möglich. Bezogen auf die Trainingsdaten entfällt somit eine Abstraktionsebene, so dass die nur sehr spärlich zur Verfügung stehenden Trainingsdaten\footnote{Für den Gesamtkorpus gilt: es gibt pro FE durchschnittlich 100 Instanzen} besser ausgeschöpft werden können.
 
-Im Hinblick auf den in Abschnitt\ref{subsec:introduction_SRL} vorgestellten allgemeinen SRL-Prozess entfällt der erste Schritt. Die Schritte zwei und drei werden im Unterschied zu \cite{gildea} in einem Zug durchgeführt, da ein kompaktes automatisiertes Lernverfahren in der Regel qualitativ besser abschneidet als hintereinandergeschaltete Teilsysteme.
+Im Hinblick auf den in Abschnitt \ref{subsec:introduction_SRL} vorgestellten allgemeinen SRL-Prozess entfällt der erste Schritt. Die Schritte zwei und drei werden im Unterschied zu \cite{gildea} in einem Zug durchgeführt, da ein kompaktes automatisiertes Lernverfahren in der Regel qualitativ besser abschneidet als hintereinandergeschaltete Teilsysteme.
 
 Da einzelne syntaktische Features nur im Bezug zu einem Target existieren und aus Gründen der Komplexität keine Abstraktion auf ungesehene Targets vorgenommen wird, wurde einschränkend festgelegt, dass das Target bekannt sein muss.
 
 \subsection{Features}
+
 Die genutzten lexikalischen und syntaktischen Features sind, bis auf das Feature \textit{Nachbar-Kopf-Lemma}, ebenfalls stark an \cite{gildea} orientiert. Sie werden für jede atomare sowie komplexe Konstituente (Phrase) extrahiert.
 
 \subsubsection*{Syntaktische Kategorie}
@@ -240,22 +244,26 @@ Als lexikalisches Feature wird das Kopfelement genutzt, also die atomare Konstit
 wird die Konstituente selbst als Kopfelement gesetzt.
 
 Da im TIGER-Korpus nicht für alle Typen phrasaler Konstituenten ein Kopfelement definiert ist\footnote{Nach Abschluss der Programmentwicklung hat sich herausgestellt, dass eine Konvertierung von TIGER in eine Dependenzgrammatik existiert [\cite{kountz_extraktion_2006}] in dessen Zuge für den Großteil der Konstituenten eindeutige Kopfelemente gegeben sind.}, wird für Konstituenten ohne definiertes Kopfelement regelbasiert von der aktuellen Konstituente ausgehend Richtung ihrer Kinder nach einem Kopfelement gesucht. Dabei werden die jeweiligen grammatikalischen Funktionen der Kind-Konstituenten sowie die Phrasenkategorien ausgewertet.\footnote{Die Label für die grammatische Funktion (Kanten-Label der Baumbank) und die der Phrasenkategorien folgen dem NEGRA-Tagset (siehe http://www.coli.uni-saarland.de/projects/sfb378/negra-corpus/negra-corpus.html).} Wenn die Suche auf eine Konstituente trifft, die atomar ist oder für die ein Kopf definiert ist, wird dessen Lemma als Kopfelement bis zum Ursprung der Suche Baum-aufwärts propagiert und dabei für alle Konstituenten auf diesem Pfad gesetzt. Köpfe sind somit immer atomar.
+
 \subsubsection*{Target-Lemma}
+
 Hierzu wird das Lemma des Kopfes der kleinsten Konstituente herangezogen, die alle Teile des Targets überdeckt.
+
 \subsubsection*{Nachbar-Kopf-Lemma}
+
 An Hand von Experimenten hat sich herausgestellt, dass der Kopf der kleinsten Konstituente, welche die aktuell betrachtete überdeckt und dessen Kopf außerhalb dieser liegt, relevante Informationen für die SRL-Klassifikation liefert. Zusätzlich zum regulären Kopfelement wurde daher das Nachbar-Kopf-Element berücksichtigt. Abbildung \ref{nextHead} zeigt dieses exemplarisch.  
 
-		\begin{figure}[tb!]
-			\centering
-			\includegraphics{images/nextHead.png}
-			\caption[Das Nachbar-Kopf-Feature]{Das Nachbar-Kopf-Feature für die beiden gelb markierten Konstituenten ist jeweils das Lemma des Wortes \glqq{}sagte\grqq{} (der Kopf der NP \glqq{}Südkoreas Informationsminister\grqq{} ist identisch mit dem Kopf von \glqq{}Informationsminister\grqq{}). }
-			\label{nextHead}
-		\end{figure}
+	\begin{figure}[tb!]
+		\centering
+		\includegraphics{images/nextHead.png}
+		\caption[Das Nachbar-Kopf-Feature]{Das Nachbar-Kopf-Feature für die beiden gelb markierten Konstituenten ist jeweils das Lemma des Wortes \glqq{}sagte\grqq{} (der Kopf der NP \glqq{}Südkoreas Informationsminister\grqq{} ist identisch mit dem Kopf von \glqq{}Informationsminister\grqq{}). }
+		\label{nextHead}
+	\end{figure}
 
 
 \subsection{Arbeitsweise des Klassifikators}
 
-Analog zu \cite{gildea} stellt ein Naïve-Bayes-Klassifikator die Grundlage der Implementierung dar. Wie bei statistischen Klassifikationsverfahren üblich, gliedert sich diese in eine Trainingsphase, also die Erstellung des Modells, und eine Klassifikationsphase, in der das eigentliche Semantic Role Labeling stattfindet. Die Vorteile des Naïve-Bayes-Klassifikators liegen in der Einfachheit und Transparenz der Funktionsweise. Die dem trainierten Modell inhärenten Wahrscheinlichkeitsverteilungen liefern meist auch vom Menschen leicht interpretierbare Informationen, welche bei der Entwicklung des Klassifikators und der Auswahl der Features sehr hilfreich waren. 
+Analog zu \cite{gildea} stellt ein Naïve-Bayes-Klassifikator die Grundlage der Implementierung dar. Wie bei überwachten maschinellen Lernverfahren üblich, gliedert sich diese in eine Trainingsphase, also die Erstellung des Modells, und eine Klassifikationsphase, in der das eigentliche Semantic Role Labeling stattfindet. Die Vorteile des Naïve-Bayes-Klassifikators liegen in der Einfachheit und Transparenz der Funktionsweise. Die dem trainierten Modell inhärenten Wahrscheinlichkeitsverteilungen liefern meist auch vom Menschen leicht interpretierbare Informationen, welche bei der Entwicklung des Klassifikators und der Auswahl der Features sehr hilfreich waren. 
 
 
 Folgende Formeln bilden die mathematische Grundlage des Klassifikators. Dabei steht $c$ für die zu klassifizierende Konstituente, welche sich durch die Features $f_1$ bis $f_n$ darstellen lässt, und $r$ für die untersuchte Rolle aus der Menge der möglichen Rollen $R$.
@@ -270,25 +278,24 @@ Es sind die Häufigkeiten $\#(r)$ und $\#(f_i, r)$ zu bestimmen, um die für ein
 Da allerdings einige Beziehungen zwischen den einzelnen Features semantisch relevant sind, werden nicht immer rein naiv die logarithmierten Einzelwahrscheinlichkeiten addiert, sondern auch die Wahrscheinlichkeiten für bestimmte Feature-Kombinationen ermittelt und beim Klassifizieren im Modell nachgeschlagen. Falls diese für die aktuell zu klassifizierende Konstituente nicht gefunden werden, kommen die Einzelwahrscheinlichkeiten zum Einsatz. So wird erneut der geringen Trainingsdatenmenge entgegengewirkt. Wann genau auf welche Einzelfeatures zurückgegriffen wird, ist im Abschnitt \nameref{subsubsec:classify} genauer erläutert.
 
 \subsubsection*{Erstellung des Modells}
-%- keine Frames über mehrere Sätze
 
 Beiden Phasen ist gemein, dass das jeweils genutzte Korpus geparst und vorverarbeitet wird. Dabei werden für alle Konstituenten die Start- und Endpositionen im Satz und die Köpfe wie zuvor beschrieben bestimmt.
 
-Anschließend werden die Targets vereinfacht. Für Targets im Trainingskorpus, die aus mehreren Konstituenten bestehen, wird vorerst die kleinste Konstituente bestimmt, die alle Target-Konstituenten überdeckt. Bezüglich dieser wird dann das Pfad-Feature und das Target-Lemma-Feature bestimmt.
+Anschließend werden die Targets vereinfacht. Für Targets im Trainingskorpus, die aus mehreren Konstituenten bestehen\footnote{Ein Beispiel für solch ein Target wäre: \textit{auf die lange Bank schieben}.}, wird zunächst die kleinste Konstituente bestimmt, die alle Target-Konstituenten überdeckt. Bezüglich dieser wird dann das Pfad-Feature und das Target-Lemma-Feature bestimmt.
 
-Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die Werte der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und bilden das Modell. Die Trainingsphase ist in Abbildung \ref{training} kompakt verbildlicht. 
+Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die Werte der Rollen durch die Anzahl aller Konstituenten (vgl. Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und bilden das Modell. Die Trainingsphase ist in Abbildung \ref{training} kompakt verbildlicht. 
 
 \begin{figure}[tb!]
 		\centering
-		\includegraphics[scale=0.6]{images/ablaufAnnotate.png}
+		\includegraphics[scale=0.6]{images/ablaufLernen.png}
 		\caption{Ablauf der Trainingsphase}
 		\label{training}
 	\end{figure}
 
 
 \subsubsection*{Klassifikation der Konstituenten}\label{subsubsec:classify}
-%keine Abstraktion für ungesehene Targets
-Nachdem das zu annotierende Korpus mit Informationen angereichert wurde, werden die Targets identifiziert. Das Lemma jeder atomaren Konstituente eines jeden Satzes wird gegen die im Modell gelisteten Target-Lemmata geprüft. Da Komplexe Target-Konstituenten beim Training allerdings auf ihre Köpfe abgebildet wurden, stellen alle Konstituenten, deren Kopf ein Target-Lemma ist, eine potentielle Target-Konstituente da. Deshalb wird in Abhängigkeit jeder dieser potentiellen Targets eine Klassifikation durchgeführt.
+
+Nachdem das zu annotierende Korpus mit Informationen angereichert wurde, werden die Targets identifiziert. Das Lemma jeder atomaren Konstituente eines jeden Satzes wird gegen die im Modell gelisteten Target-Lemmata geprüft. Da komplexe Target-Konstituenten beim Training allerdings auf ihre Köpfe abgebildet werden, stellen alle Konstituenten, deren Kopf ein Target-Lemma ist, eine potentielle Target-Konstituente dad. Deshalb wird in Abhängigkeit jeder dieser potentiellen Targets eine Klassifikation durchgeführt.
 
 Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feature-Kombinationen gebildet und im Modell gesucht. Wenn diese nicht im Modell gelistet sind, werden sie durch weniger komplexe Feature-Kombinationen und schließlich durch atomare Features ersetzt. Das verwendete Regelwerk ist in Abbildung \ref{back_off_model} dargestellt, es handelt sich um eine leicht modifizierte Form des von \cite{gildea} verwendeten. Falls die atomaren Feature-Werte ebenfalls nicht gefunden werden können, wird ein Smoothing mit einem Wert von $log(10^{-6})$ durchgeführt. Jede Konstituente wird mit der Rolle annotiert, für die die berechnete Wahrscheinlichkeit maximal ist.
 
@@ -298,7 +305,6 @@ Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feat
 		\caption[Regelwerk zur Auflösung kombinierter Features]{Regelwerk zur Auflösung kombinierter Features. Von oben ausgehend werden die Features-Kombinationen in ihre Bestandteile aufgelöst. (K=Kopf, NK=Nachbar-Kopf, POS=Position, PT=Pfad, SK=Syntaktische Kategorie, T=Target)}
 		\label{back_off_model}
 	\end{figure}
-
 
 % \begin{figure}
 % 	\centering
@@ -326,8 +332,7 @@ Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feat
 % 	\caption{Verwendetes Regelwerk zur Zerlegung der komplexen Features}
 % \end{figure}
 
-
-Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kopf wird schließlich die Target-Konstituente mit der Annotation gewählt, dessen Produkt der Wahrscheinlichkeiten für die annotierten Rollen am höchsten ist.
+Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kopf wird schließlich die Target-Konstituente samt der berechneten Rollenannotationen gewählt, dessen Produkt der Wahrscheinlichkeiten für die annotierten Rollen am höchsten ist.
 In Abbildung \ref{classify} ist die Klassifikationsphase kompakt dargestellt.
 
 	\begin{figure}[tb!]
@@ -337,7 +342,6 @@ In Abbildung \ref{classify} ist die Klassifikationsphase kompakt dargestellt.
 		\label{classify}
 	\end{figure}
 
-
 \newpage
 \section{Evaluation des SRL-Klassifikators}
 
@@ -346,7 +350,7 @@ der Implementation einer Evaluation unterzogen. Diese sollte Aufschluss über di
 Qualität des SRL-Klassifkators geben, so dass ein Vergleich mit ähnlichen
 Systemen vollzogen werden kann. Zur Evaluation wurde eine 5-fach Kreuzvalidierung durchgeführt. Die Evaluation sollte nur Konstituenten einbeziehen, denen eine Rolle zugewiesen wurde bzw. die im Originalkorpus eine Rolle besitzen. Konsituenten, die sowohl im Originalkorpus als auch im annotierten Korpus keine Rolle besitzen, wurden in der Evaluation ignoriert, da diese den Großteil der Konstituenten ausmachen.
 
-Die Grundlage der Evaluation stellt der ausgewählte SALSA Korpus 2.0 dar. Da für einen automatisches Lernverfahren eine ausreichend große Datenmenge verfügbar sein muss, wurde der Korpus zunächst dahingehen evaluiert. Abbildung \ref{roleFrequency} zeigt die Verteilung der im SALSA Korpus 2.0 vorkommenden Rollen. Der Verlauf der Kurve entspricht der Zipfschen Verteilung, bei der wenige Rollen sehr häufig annotiert wurden und viele Rollen sehr selten. Aus diesem Grund wurde für die Evaluation ein Teilkorpus extrahiert, der alle Sätze enthält, die eine der Top-10 Rollen innehaben. Der Teilkorpus umfasst rund 14000 Sätze mit rund 22500 Konstituenten mit zugewiesener Rolle.
+Die Grundlage der Evaluation stellt der ausgewählte SALSA Korpus 2.0 dar. Da für ein automatisches Lernverfahren eine ausreichend große Datenmenge verfügbar sein muss, wurde der Korpus zunächst dahingehend evaluiert. Abbildung \ref{roleFrequency} zeigt die Verteilung der im SALSA Korpus 2.0 vorkommenden Rollen. Der Verlauf der Kurve entspricht der Zipfschen Verteilung, bei der wenige Rollen sehr häufig annotiert wurden und viele Rollen sehr selten. Aus diesem Grund wurde für die Evaluation ein Teilkorpus extrahiert, der alle Sätze enthält, die eine der Top-10 Rollen innehaben. Der Teilkorpus umfasst rund 14000 Sätze mit rund 22500 Konstituenten mit zugewiesener Rolle.
 
 	\begin{figure}[tb!]
 		\centering
@@ -355,21 +359,20 @@ Die Grundlage der Evaluation stellt der ausgewählte SALSA Korpus 2.0 dar. Da f�
 		\label{roleFrequency}
 	\end{figure}
 
-
 \subsection{Kenngrößen der Evaluation}
 
-Der implementierte SRL-Klassifikator wurde hinsichtlich dreier Kenngrößen evaluiert. Abbildung \ref{evalKenngroeszen} zeigt einen annotierten Beispielsatz aus dem SALSA Korpus, an dem die drei unterschiedlichen Fälle markiert wurden.
+Der implementierte SRL-Klassifikator wurde hinsichtlich dreier Kenngrößen evaluiert. Abbildung \ref{evalKenngroeszen} zeigt einen annotierten Beispielsatz aus dem SALSA Korpus, an dem die drei unterschiedlichen Fälle farblich markiert wurden.
 
-Die erste Kenngröße erfasst Konstituenten, denen die korrekte Rolle zugewiesen wurde. In Abbildung \ref{evalKenngroeszen} ist der Fall der \textit{exakten Übereinstimmung} in Dunkelgrün dargestellt. 
-In einer zweiten Kenngröße wurde jene Konstituenten erfasst, die sowohl im Original als auch in der Annotation eine Rolle zugewiesen wurde, diese jedoch nicht identisch ist. Der Fall \textit{Unabhängig von der Rolle} ist in Abbildung \ref{evalKenngroeszen} Orange markiert. Hier wurde der Konstituente die Rolle Speaker statt der Rolle Message zugewiesen.
+Die erste Kenngröße erfasst Konstituenten, denen die korrekte Rolle zugewiesen wurde. In Abbildung \ref{evalKenngroeszen} ist der Fall der \textit{exakten Übereinstimmung} in dunkelgrün dargestellt. 
+In einer zweiten Kenngröße wurden jene Konstituenten erfasst, denen sowohl im Original als auch in der Annotation eine Rolle zugewiesen wurde, diese jedoch nicht unbedingt identisch sind. Der Fall \textit{Unabhängig von der Rolle} ist in Abbildung \ref{evalKenngroeszen} orange markiert. Hier wurde der Konstituente die Rolle Speaker statt der Rolle Message zugewiesen.
 Die dritte Kenngröße erfasst das Vorkommen der Originalrollen des Satzes unabhängig davon, welcher Konstituente die Rolle zugewiesen wurde. Wäre ausschließlich der in Abbildung \ref{evalKenngroeszen} blau markierten Konstituente die Rolle Speaker zugewiesen, wäre die Rolle positiv erfasst worden. Dieser Fall wird im Folgenden auch als \textit{Unabhängig von der Position} bezeichnet.
 
-		\begin{figure}[tb!]
-			\centering
-			\includegraphics{images/evaluation_kenngroeszen.png}
-			\caption[Visualisierung der Kenngrößen]{Visualisierung der drei Kenngrößen an einem semantisch-annotierten Beispielsatz}
-			\label{evalKenngroeszen}
-		\end{figure}
+	\begin{figure}[tb!]
+		\centering
+		\includegraphics{images/evaluation_kenngroeszen.png}
+		\caption[Visualisierung der Kenngrößen]{Visualisierung der drei Kenngrößen an einem semantisch-annotierten Beispielsatz}
+		\label{evalKenngroeszen}
+	\end{figure}
 
 
 \subsection{Ergebnisse der Evaluation}
@@ -378,20 +381,20 @@ Die Ergebnisse der 5-fach Kreuzvalidierung sind in Abbildung \ref{evalKreuzvalid
 
 %Ausgelassen: Im Anschluss der Evaluation wurde ausgewertet, wie sehr die getroffenen Annahmen und Einschränkungen das Ergebnis beeinflusst haben. Dabei fiel auf, dass durch die Einschränkung\ldots
 
-		\begin{figure}[tb!]
-			\centering
-			\includegraphics[scale=0.5]{images/ergebnisseKreuzvalidierung.png}
-			\caption[Ergebnis der 5-fach Kreuzvalidierung]{Ergebnis der 5-fach Kreuzvalidierung des SRL-Klassifikators bezogen auf die drei Kenngrößen. Dargestellt ist zudem die Standabweichung innerhalb der Kreuzvaliederung.}
-			\label{evalKreuzvalidierung}
-		\end{figure}
-
+	\begin{figure}[tb!]
+		\centering
+		\includegraphics[scale=0.5]{images/ergebnisseKreuzvalidierung.png}
+		\caption[Ergebnis der 5-fach Kreuzvalidierung]{Ergebnis der 5-fach Kreuzvalidierung des SRL-Klassifikators bezogen auf die drei Kenngrößen. Dargestellt ist zudem die Standabweichung innerhalb der Kreuzvalidierung.}
+		\label{evalKreuzvalidierung}
+	\end{figure}
+	
 \subsection{Einordnung der Ergebnisse}
 		
 Der hier entwickelte Ansatz und implementierte SRL-Klassifikator ist das erste und bisher einzige Projekt auf dem SALSA 2.0 Korpus. Dementsprechend gibt es aktuell keine Vergleichsergebnisse anderer Projekte bezüglich der aktuellen Korpusversion.
 
 Ein von \cite{erk2006shalmaneser} entwickeltes Projekt namens SHALMANESER wurde zur automatischen Annotation von Frames und Rollen auf dem SALSA Korpus in der Version 1.0 entwickelt. Der eigentliche Annotationsvorgang ist zweigeteilt. Zuerst findet eine Disambiguierung von Frames statt, bevor die einzelnen Konstituenten bezüglich der gegebenen Frame-Elemente klassifiziert werden. Der während der Klassifikation erreichte F-Measure von 0.600 (Precision: 0.761; Recall: 0.496) ist vergleichbar mit hier erzielten. Leider ist das Vorgehen und die Evaluation unklar.
 
-Ebenso wie SHALMANESER stützten sich auch die Projekte des \textit{CoNLL-2009} Wettbewerbs, welche in \cite{hajivc2009conll} vorgestellt wurden, auf den SALSA Korpus in der Version 1.0. Zusätzlich zum Konstituentenbaum des SALSA Korpus wurde ein Dependendenzgraph mit annotierter Kopf-Konstituente den Projekten zur Verfügung gestellt. Die erreichten Ergebnisse (F-Measure) des Wettbewerbs sind in Tabelle \ref{conll2009} aufgeteilt nach Team und Sprache des jeweiligen Korpus dargestellt. Die für mehrere Sprachen entwickelten Klassifikatoren erreichten auf dem deutschen Korpus einen maximalen F-Measure von 79.71\%. Das schlechteste System erreichte mit einem F-Measure von 59.51\% einen vergleichbaren Wert, wie der hier erstellte SRL-Klassifikator.
+Ebenso wie SHALMANESER stützten sich auch die Projekte des \textit{CoNLL-2009} Wettbewerbs, welche in \cite{hajivc2009conll} vorgestellt werden, auf das SALSA Korpus in der Version 1.0. Zusätzlich zum Konstituentenbaum des SALSA Korpus wurde ein Dependendenzgraph mit annotierter Kopf-Konstituente den Projekten zur Verfügung gestellt. Die erreichten Ergebnisse (F-Measure) des Wettbewerbs sind in Tabelle \ref{conll2009} aufgeteilt nach Team und Sprache des jeweiligen Korpus dargestellt. Die für mehrere Sprachen entwickelten Klassifikatoren erreichten auf dem deutschen Korpus einen maximalen F-Measure von 79.71\%. Das schlechteste System erreichte mit einem F-Measure von 59.51\% einen vergleichbaren Wert, wie der hier erstellte SRL-Klassifikator.
 
 	\begin{table}[tb!]
 		\centering
@@ -410,14 +413,15 @@ Ebenso wie SHALMANESER stützten sich auch die Projekte des \textit{CoNLL-2009} 
 			\bottomrule
 			\end{tabular}
 		}
-		\caption[Ergebnisse der CoNLL-2009 Shared Task, SRL-only Task]{Ergebniss der CoNLL-2009 Shared Task, SRL-only Task. Die Angaben beziehen sich auf den erreichten F-Measure in Prozent. Fett hervorgehoben ist der jeweils beste Wert pro Sprache. \citep{hajivc2009conll}}
+		\caption[Ergebnis der CoNLL-2009 Shared Task, SRL-only Task]{Ergebnis der CoNLL-2009 Shared Task, SRL-only Task. Die Angaben beziehen sich auf den erreichten F-Measure in Prozent. Fett hervorgehoben ist der jeweils beste Wert pro Sprache. \citep{hajivc2009conll}}
 		\label{conll2009}
 	\end{table}
 
 \subsection{Einfluss der genutzten Features}
 
-Zusätzlich zu den bereits gewonnenen Erkenntnissen blieb die Frage zu klären, welchen Einfluss die jeweiligen Features besitzen und welches das bedeutendste Feature ist. Zur Bestimmung des Einflusses wurde der Mittelwert der 5-fach Kreuzvalidierung mit allen Features als Basiswert herangezogen. Anschließend wurde jeweils ein Feature samt der komplexen Feature, die dieses enthalten, deaktiviert und die 5-fach Kreuzvalidierung erneut durchgeführt. Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure/Precision/Recall im Vergleich zum festgelegten Basiswert an.
-Der \textit{Pfad} mit 21\% im F-Measure sowie das \textit{Nachbar-Kopf-Lemma} mit 19\% im F-Measure sind in der aktuellen Implementierung die bedeutendsten Features. Bezogen auf die Abnahme in Prozentpunkten im Vergleich zum Basiswert hat die syntaktische Kategorie mit 5\% im F-Measure den wenigsten Einfluss. Der Einfluss der beiden bedeutendsten Features beträgt im Vergleich zu den übrigen Features nahezu das Doppelte.
+Zusätzlich zu den bereits gewonnenen Erkenntnissen blieb die Frage zu klären, welchen Einfluss die jeweiligen Features besitzen und welches das bedeutendste Feature ist. Zur Bestimmung des Einflusses wurde der Mittelwert der 5-fach Kreuzvalidierung mit allen Features als Basiswert herangezogen. Anschließend wurde jeweils ein Feature samt der komplexen Features, die dieses enthalten, deaktiviert und die 5-fach Kreuzvalidierung erneut durchgeführt. Abbildung \ref{featureImpact} verdeutlicht den Einfluss der verschiedenen Features. Die Werte geben die Abnahme der Prozentpunkte von F-Measure, Precision und Recall vom festgelegten Basiswert an.
+
+Der \textit{Pfad} mit 21\% im F-Measure sowie das \textit{Nachbar-Kopf-Lemma} mit 19\% im F-Measure sind in der aktuellen Implementierung die bedeutendsten Features. Bezogen auf die Abnahme in Prozentpunkten vom Basiswert hat die syntaktische Kategorie mit 5\% im F-Measure den wenigsten Einfluss. Der Einfluss der beiden bedeutendsten Features beträgt im Vergleich zu den übrigen Features nahezu das Doppelte.
 
 	\begin{figure}[tb!]
 		\centering		
@@ -426,27 +430,24 @@ Der \textit{Pfad} mit 21\% im F-Measure sowie das \textit{Nachbar-Kopf-Lemma} mi
 		\label{featureImpact}
 	\end{figure}
 
-\FloatBarrier
 \newpage
 \section{Zusammenfassung}
 
 Zusammenfassend ist festzuhalten, dass eine automatische Rollenbestimmung
 aufgrund von wenigen, rein syntaktischen und lexikalischen Features möglich ist.
-Die von \cite{gildea} beschriebenen Features in Verbindung mit einem Naïve-Bayes-Klassifikator konnten erfolgreich adaptiert werden. Einzig die Adaption des Kopf-Features war aufgrund der fehlenden Annotation im genutzten Korpus und der vielen Sonderfälle im entwickelten Regelwerk nicht problemlos möglich.
+Die von \cite{gildea} beschriebenen Features in Verbindung mit einem Naïve-Bayes-Klassifikator konnten erfolgreich adaptiert werden. Einzig die Adaption des Kopf-Features war aufgrund der unzureichenden Annotation im verwendeten Korpus und der vielen Sonderfälle im entwickelten Regelwerk nicht problemlos möglich.
 
 Die in der Evaluation erreichten Ergebnisse sind vergleichbar mit den Resultaten
 einer ähnlichen Arbeit auf einer früheren Version des SALSA Korpus. Zu den in
-\cite{hajivc2009conll} vorgestellten und verglichenen Projekten besteht ein
-größerer Abstand.
-
+\cite{hajivc2009conll} vorgestellten Projekten besteht ein größerer Abstand.
 
 \subsection{Mögliche Erweiterungen und Verbesserungen}
 
-Die bisherige Implementation zur automatischen Annotation von Rollen birgt viel Erweiterungs"= und Verbesserungspotential, welches aufgrund der zur Verfügung stehenden Zeit nicht umgesetzt werden konnte.
+Die bisherige Implementation des SRL-Klassifikators birgt viel Erweiterungs"= und Verbesserungspotential, welches aufgrund der zur Verfügung stehenden Zeit nicht umgesetzt werden konnte.
 Eine Verbesserung der aktuellen Implementation wäre eine Änderung des starren Regelwerks zur Bestimmung der Kopf-Konstituenten im Hinblick auf die vielen Sonderfälle, die manuell dem Regelwerk hinzugefügt wurden. Hierbei könnte eine tiefergehende Analyse der Sonderfälle mögliche Abstraktionen von syntaktischen Kategorien aufzeigen, welches eine Minimierung des Regelwerks zur Folge hätte. Das Resultat wäre ein allgemeines, besser nutzbares Regelwerk, welches weiterhin eine hohe Genauigkeit bieten würde.
 Eine weitere mögliche Verbesserung wäre die Nutzung eines Dependenzgraphens, welcher in einem zusätzlichen Vorverarbeitungsschritt erzeugt werden müsste. Der Dependenzgraph würde beispielsweise andere Pfade erzeugen, die eindeutiger für bestimmte Rollen sein könnten. 
 Bezogen auf die bereits gegebenen Konstiuentenbäume wäre auch eine Nutzung von Tree-Kerneln möglich, welches eine Verarbeitung von Teilbäumen ermöglicht. Die Bestimmung des Pfads zwischen zwei Konstituenten wäre dann überflüssig oder als zusätzliches Features anzusehen.
-Um später auch mit ungesehenen Targets arbeiten zu können, wäre eine semantische Abstraktion eben jener mittels des GermaNets möglich. GermaNet\citep{Hamp97germanet} ist das deutsche Pendant zum englischen WordNet\citep{Miller1990} und bietet zahlreiche lexikalisch-semantische Relationen innerhalb des deutschen Grundwortschatzes. Über die Nutzung des GermanNet könnte auch eine Disambiguierung der Frames ermöglicht werden, welche in der aktuellen Implementation übergangen wurden.
+Um später auch mit ungesehenen Targets arbeiten zu können, wäre eine semantische Abstraktion eben jener mittels des GermaNets\citep{Hamp97germanet} möglich. GermaNet ist das deutsche Pendant zum englischen WordNet\citep{Miller1990} und bietet zahlreiche lexikalisch-semantische Relationen innerhalb des deutschen Grundwortschatzes. Über die Nutzung des GermanNet könnte auch eine Disambiguierung der Frames ermöglicht werden, welche in der aktuellen Implementation übergangen wurden.
  
 \newpage
 \bibliography{biblio}
