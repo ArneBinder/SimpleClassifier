@@ -23,7 +23,7 @@ public class ExtractionValidator {
 		}
 		if (args[0].equals("-cross")) {
 			if (args.length < 4) {
-				throw new IllegalArgumentException("3 arguments needed: -cross <originalCorpus> <resultFolder> <type:[single,(number)]>");
+				throw new IllegalArgumentException("4 arguments needed: -cross <originalCorpus> <resultFolder> <type:[single,(number)]>");
 			}
 			File originalCorpusFile = new File(args[1]);
 			File resultFolder = new File(args[2]);
@@ -43,9 +43,10 @@ public class ExtractionValidator {
 				crossValidationCount = Integer.parseInt(args[3]);
 			}
 
-
-			extractionValidator.performCrossValidation(ClassifierNB.readCorpusData(originalCorpusFile), crossValidationCount, resultFolder);
-
+			if(args.length > 5 && args[4].equals("-threshold"))
+				extractionValidator.performCrossValidation(ClassifierNB.readCorpusData(originalCorpusFile), crossValidationCount, resultFolder, Integer.parseInt(args[4]));
+			else
+				extractionValidator.performCrossValidation(ClassifierNB.readCorpusData(originalCorpusFile), crossValidationCount, resultFolder, Double.NEGATIVE_INFINITY);
 
 			System.out.println("--- End ---");
 			System.out.println((((System.currentTimeMillis() - startTime) / 1000) / 60) + "min" + (((System.currentTimeMillis() - startTime) / 1000) % 60) + "sec");
@@ -64,6 +65,9 @@ public class ExtractionValidator {
 			if (args.length < 5) {
 				System.out.println("not enough arguments: -featureTypes <corpusFileName> <validateOutFolder> <crossFoldCount> <validationStatisticOutFileName> [<featureTypeFileName>]*");
 			} else {
+				double threshold = Double.NEGATIVE_INFINITY;
+				if(args.length > 6 && args[4].equals("-threshold"))
+					threshold = Integer.parseInt(args[6]);
 				Corpus corpus = ClassifierNB.readCorpusData(new File(args[1]));
 				File valOut = new File(args[2]);
 				int crossFoldCount = Integer.parseInt(args[3]);
@@ -77,7 +81,7 @@ public class ExtractionValidator {
 				if (args.length < 6) {
 					out.write(ValidateResult.getCaption() + "\n");
 					out.close();
-					validateResult = extractionValidator.performCrossValidation(corpus, crossFoldCount, valOut);
+					validateResult = extractionValidator.performCrossValidation(corpus, crossFoldCount, valOut, threshold);
 					out = new BufferedWriter(new FileWriter(fileOut, true));
 					//validateResult.normalize(crossFoldCount);
 					out.write(validateResult + "\n");
@@ -102,7 +106,7 @@ public class ExtractionValidator {
 						System.out.println();
 						System.out.println("Read featureTypes from File: " + featureFiles[i].getName());
 						FeatureTypes.readFeatureTypesFromFile(featureFiles[i]);
-						validateResult = extractionValidator.performCrossValidation(corpus, crossFoldCount, valOut);
+						validateResult = extractionValidator.performCrossValidation(corpus, crossFoldCount, valOut, threshold);
 						//validateResult.normalize(crossFoldCount);
 						out = new BufferedWriter(new FileWriter(fileOut, true));
 						out.write(featureFiles[i].getName() + Const.splitOutValStats + validateResult + "\n");
@@ -114,12 +118,13 @@ public class ExtractionValidator {
 			System.out.println("validation: " + args[0] + " unknown");
 	}
 
-	public ValidateResult performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder) throws Exceptions.SRLException, IOException, InterruptedException {
+	public ValidateResult performCrossValidation(Corpus originalCorpus, int crossValidationCount, File resultFolder, double threshold) throws Exceptions.SRLException, IOException, InterruptedException {
 		System.out.println("--- Start cross validation ---");
 		System.out.println("--- - FoldCount: " + crossValidationCount);
 
 		ValidateResult result = new ValidateResult();
 		long startTime = System.currentTimeMillis();
+		originalCorpus.setThreshold(threshold);
 		Corpus[] splittedCorpora = Corpus.splitCorpus(originalCorpus, crossValidationCount);
 
 		String folderName = new Date().toString().replace(":", "-");

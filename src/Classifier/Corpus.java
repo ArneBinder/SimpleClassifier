@@ -19,7 +19,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * Created by Arne on 09.12.13.
  */
 public class Corpus {
-	private static double threshold = -400.0 - Math.log(35); //25: ca durchschnittliche Anzahl Konstituenten pro Satz
+	private double threshold = -400.0 - Math.log(35); //25: ca durchschnittliche Anzahl Konstituenten pro Satz
 
 	private List<Sentence> sentences;
 	private FeatureExtractor featureExtractor;
@@ -33,12 +33,18 @@ public class Corpus {
 		sentences = new LinkedList<Sentence>();
 	}
 
+	public Corpus(double threshold) {
+		featureExtractor = new FeatureExtractor();
+		sentences = new LinkedList<Sentence>();
+		this.threshold = threshold;
+	}
+
 	public static Corpus[] splitCorpus(Corpus corpus, int splitCount) {
 		Corpus[] splittedCorpora = new Corpus[splitCount];
 
 		// initialize all corpora
 		for (int i = 0; i < splittedCorpora.length; i++) {
-			splittedCorpora[i] = new Corpus();
+			splittedCorpora[i] = new Corpus(corpus.getThreshold());
 		}
 
 		int counter = 0;
@@ -48,6 +54,14 @@ public class Corpus {
 		}
 
 		return splittedCorpora;
+	}
+
+	public double getThreshold() {
+		return threshold;
+	}
+
+	public void setThreshold(double threshold) {
+		this.threshold = threshold;
 	}
 
 	public int getSentenceCount() {
@@ -236,7 +250,7 @@ public class Corpus {
 				// no target word detected?
 				if (bestAnnotationFrame != null) {
 					if (bestAnnotationProb <= threshold + Math.log(sentence.getNonterminals().size() + sentence.getTerminals().size())) {
-						//bestAnnotationFrame.deleteFrameElements();
+						bestAnnotationFrame.deleteFrameElements();
 						//bestAnnotationFrame.setTargetLemmaIDref("");  //evaluate only frames with "good" probability
 					}
 					bestAnnotationFrame.setProbability(bestAnnotationProb);
