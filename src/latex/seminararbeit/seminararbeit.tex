@@ -20,6 +20,7 @@
 \usepackage{nameref} %Verweise auf sections
 \usepackage{amsmath}
 \usepackage{booktabs}
+\usepackage{forest}
 
 % Settings
 \hyphenation{TIGER Er-wei-te-rungs Ver-bes-se-rungs-po-ten-tial} % do not hyphenize
@@ -94,7 +95,7 @@
 % - warum SRL? Motivation
 % - was gibt es schon? related work
 
-Die automatische Verarbeitung digitaler Texte ist heutzutage von enormer Bedeutung, soll doch laut \cite{gartner} die digitale Datenmenge bis 2016 auf 4.1 Zetabyte steigen. Immer häufiger sind es Sprachverstehen-bezogene Aufgaben, bei denen es gilt, die sematischen Informationen eines Satzes zu extrahieren. Die letzten Bausteine, auf denen die sematischen Information eines Satzes basiert, sind die sogenannten \textit{Rollen}. Dabei gilt es beispielweise die \glqq{}W\glqq{}-Fragen zu klären: \textit{Wer} hat \textit{wen} über \textit{welches Medium} \textit{was} gesagt? Oder: \textit{Wer} hat \textit{welche Meinung} über \textit{wen} und \textit{warum}? Das zweite Beispiel zeigt eines der wichtigsten Anwendungsfälle: die Meinungsforschung. Könnte digitale Aussagen verschiedener Personen bezogen auf ihre Bestandteile genauer analysiert werden, könnten viel exaktere Meinungsbilder erstellt werden. Ebenso könnten Nutzer in Suchmaschinen vollständige Sätze eingeben statt sich auf Stichwörter begrenzen zu müssen. Das von IBM entwickelte Computerprogramm Watson \citep{ibmWatson} wurde eigens dafür entwickelt Antworten auf Fragen natürlicher Sprache zu geben. Das genaue Verständnis der Frage ist hierbei unabdingbar.
+Die automatische Verarbeitung digitaler Texte ist heutzutage von enormer Bedeutung, soll doch laut \cite{gartner} die digitale Datenmenge bis 2016 auf 4.1 Zetabyte steigen. Immer häufiger sind es Sprachverstehen-bezogene Aufgaben, bei denen es gilt, die semantischen Informationen eines Satzes zu extrahieren. Die letzten Bausteine, auf denen die semantischen Informationen eines Satzes basieren, sind die sogenannten \textit{Rollen}. Dabei gilt es beispielweise die \glqq{}W\grqq{}-Fragen zu klären: \textit{Wer} hat \textit{wem} über \textit{welches Medium} \textit{was} gesagt? Oder: \textit{Wer} hat \textit{welche Meinung} über \textit{wen} und \textit{warum}? Das zweite Beispiel zeigt eines der wichtigsten Anwendungsfälle: die Meinungsforschung. Könnten digitale Aussagen verschiedener Personen bezogen auf ihre Bestandteile genauer analysiert werden, könnten viel exaktere Meinungsbilder erstellt werden. Ebenso könnten Nutzer in Suchmaschinen vollständige Sätze eingeben statt sich auf Stichwörter begrenzen zu müssen. Das von IBM entwickelte Computerprogramm Watson \citep{ibmWatson} wurde eigens dafür entwickelt Antworten auf Fragen natürlicher Sprache zu geben. Das genaue Verständnis der Frage ist hierbei unabdingbar.
 
 Die hier vorliegende Seminararbeit beschreibt die Entwicklung eines Klassifikators zur automatischen Bestimmung von Rollen. Solche Systeme werden auch als \textit{Semantic Role Labeler} bezeichnet.  Zunächst wird der linguistische Hintergrund von Rollen und übergeordneten Konzepten, sogenannten Frames, erläutert. Anschließend wird die Problemstellung sowie das genutzte Korpus vorgestellt. Gefolgt von der genauen Umsetzung des Klassifikators und den Ergebnissen der durchgeführten Evaluation wird abschließend ein Fazit über das Seminarprojekt gegeben sowie mögliche Optionen zur Weiterentwicklung vorgestellt. 
 
@@ -138,7 +139,7 @@ finden - bei der man z. B. nicht von \glqq{}Geber\grqq{} sondern allgemein
 von \glqq{}Agens\grqq{} sprechen würde. Demgegenüber steht die von C.J. Fillmore
 ab den 70er Jahren entwickelte Theorie der Frame-Semantik (FS)
 \citep{fillmore1985}. Das Fundament der Theorie ist mit dem traditionellen
-Ansatz in höchstem Maße inkompatibel, für unser Vorhaben reicht es aber, die
+Ansatz in höchstem Maße inkompatibel, für das hiesige Vorhaben reicht es aber, die
 partikuläre Auffassung von semantischen Rollen zu erwähnen, die der
 Frame-semantische Ansatz mit sich bringt.
 
@@ -146,7 +147,7 @@ Rollen bzw. Frame-Elemente (FE) in Termini der FS werden nicht in Bezug auf die
 Argumentstruktur von Verben formuliert, sondern hinsichtlich der globalen
 Situation (oder des \textit{Frames}), die durch das Prädikat evoziert wird. Aufgrund
 des situationellen Charakters der Frames sind nicht nur Verben sondern auch
-Nomina (\textit{Mord}, \textit{Auge}\footnote{beispielsweise als Indikator für ein Ereignis der Wahrnehmung: \glqq{}Vor seinen Augen zerrissen sie die Bücher.\grqq{}}, \textit{Frau} von jemandem) oder Adjektive (\textit{stolz} auf etwas sein) potentielle
+Nomina (\textit{Mord}, \textit{Auge}\footnote{Beispielsweise als Indikator für ein Ereignis der Wahrnehmung: \glqq{}Vor seinen Augen zerrissen sie die Bücher.\grqq{}}, \textit{Frau} von jemandem) oder Adjektive (\textit{stolz} auf etwas sein) potentielle
 Frame-einführende Elemente, und in diesem Sinne auch Prädikate. Nachfolgend ist der Frame \glqq{}Kritik1-salsa\grqq{} dargestellt, so wie er im framesemantisch-annotierten SALSA 2.0 Korpus \citep{rehbein_adding_2012} definiert ist:
 
 \begin{quote}
@@ -175,12 +176,12 @@ A Reviewer offers his or her assessment of a work of art or performance (e.g. a 
 
 \subsection{Semantic Role Labeling}\label{subsec:introduction_SRL}
 
-Semantic Role Labeling (SRL) bezeichnet die [TODO: automatisierte?] Erkennung und
+Semantic Role Labeling (SRL) bezeichnet die (automatisierte) Erkennung und
 Annotierung von semantischen Rollen innerhalb eines Satzes. Die primäre
 Aufgabe von SRL ist die genaue Identifizierung der semantischen Beziehung
 zwischen einem Prädikat und seinen assoziierten Elementen und Eigenschaften
 (siehe \cite{SRL2008} für eine allgemeine Darstellung). In Bezug auf eine FS lässt
-sich folgendes feststellen. Da FE Frame-spezifisch sind, stellen sie eine
+sich Folgendes feststellen: Da FE Frame-spezifisch sind, stellen sie eine
 Zwischenstufe in der semantischen Abstraktion zwischen der rein lexikalischen
 Bedeutung und den traditionellen prädikatübergreifenden, allgemeingültigen semantischen Rollen dar.
 Die dadurch erreichte \glqq{}mildere\grqq{} Stufe der Abstraktion über die
@@ -188,7 +189,7 @@ Rollen der verschiedenen Verben, Nomina und Adjektive eignet sich besonders gut
 für die Lösung unterschiedlicher Aufgabenstellungen in Bereichen des maschinellen 
 Sprachverstehens.
 
-Automatische SRL-Systeme nutzen die Beziehung zwischen lexikalischen und syntaktischen Informationen der natürlichen Sprache, sogenannten Oberflächeninformationen, und den semantischen Rollen. Diese Beziehung ist viel debattiertes Thema der Linking-Theorie. Vereinfacht bringt sie in diversen heterogenen Ansätzen zum Ausdruck, dass sich die Realisierung der Argumente eines Prädikates anhand seiner Semantik voraussagen lässt, siehe \cite{levinrappaport} für einen tieferen Einstieg in die Materie. Im Umkehrschluss scheint es möglich, von Oberflächeninformationen auf die Semantik beziehungsweise die Realisierung semantischer Rollen zu schließen und diese Abhängigkeit mithilfe von Informationen beider Art zu erlernen.\citep{gildea}
+Automatische SRL-Systeme nutzen die Beziehung zwischen lexikalischen und syntaktischen Informationen der natürlichen Sprache, sogenannten Oberflächeninformationen, und den semantischen Rollen. Diese Beziehung ist ein viel debattiertes Thema der Linking-Theorie. Vereinfacht bringt sie in diversen heterogenen Ansätzen zum Ausdruck, dass sich die Realisierung der Argumente eines Prädikates anhand seiner Semantik voraussagen lässt, siehe \cite{levinrappaport} für einen tieferen Einstieg in die Materie. Im Umkehrschluss scheint es möglich, von Oberflächeninformationen auf die Semantik beziehungsweise die Realisierung semantischer Rollen zu schließen und diese Abhängigkeit mithilfe von Informationen beider Art zu erlernen.\citep{gildea}
 
 Die Aufgabenstellung eines FS-orientierten SRL-Systems lässt sich im Allgemeinen
 wie folgt untergliedern:
@@ -198,15 +199,11 @@ wie folgt untergliedern:
 \item Schließlich erfolgt die Klassifizierung der einzelnen Frame-Elemente.
 \end{enumerate}
 
-\subsection{Related Work} %TODO
-
-TODO: [Shalmaneser, gildea \& jurafski, SEMAFOR, LTH, ...]
-
 \section{Problemstellung}
 
 Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} auf einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache adaptieren lässt. Dieser Ansatz besagt, dass mithilfe lexikalischer und syntaktischer Informationen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes getroffen werden können. Die Annahme lässt sich dazu nutzen, ein automatisiertes, statistisches Lernverfahren basierend auf einem zusätzlich mit Rollen annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit ermöglicht.
 
-Für die englische Sprache existieren bereits vielversprechende SRL-Systeme, wie \cite{das_semafor_2010, johansson_lth_2007, gildea}, und mit \cite{erk2006shalmaneser} auch für das Deutsche. Allerdings ist den Autoren diese Arbeit kein System bekannt, das mit nicht-verbalen Prädikaten umgehen kann.
+Für die englische Sprache existieren bereits vielversprechende SRL-Systeme, wie \cite{das_semafor_2010, johansson_lth_2007, gildea}, und mit \cite{erk2006shalmaneser} auch für das Deutsche. Allerdings ist den Autoren dieser Arbeit kein System bekannt, das mit nicht-verbalen Prädikaten umgehen kann.
 
 \subsection{Korpus: Salsa 2.0}
 Grundlage dieser Arbeit bildet das SALSA Korpus in der Version 2.0. Das SALSA Korpus ist ein für akademische Zwecke frei zugängliches, framesemantisch annotiertes Korpus der deutschen Sprache. Es basiert auf TIGER\citep{brants_tiger_2002, tiger}, einer Baumbank aus deutschen Zeitungsartikeln, welche semi-automatisch mit POS-Tags, Lemma-Informationen und syntaktischen Strukturen annotiert wurde.\footnote{Für weitere Informationen siehe \url{http://www.ims.uni-stuttgart.de/forschung/ressourcen/korpora/tiger.html}.}
@@ -273,18 +270,24 @@ Beiden Phasen ist gemein, dass das jeweils genutzte Korpus geparst und vorverarb
 
 Anschließend werden die Targets vereinfacht. Für Targets im Trainingskorpus, die aus mehreren Konstituenten bestehen, wird vorerst die kleinste Konstituente bestimmt, die alle Target-Konstituenten überdeckt. Bezüglich dieser wird dann das Pfad-Feature und das Target-Lemma-Feature bestimmt.
 
-Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die Werte der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und bilden das Modell. Die Trainingsphase ist in Abbildung [...] kompakt verbildlicht. 
+Es werden die verwendeten Feature-Kombinationen gebildet und alle benötigten Häufigkeiten gezählt. Die Werte für die Kombination aus Feature und Rolle werden durch die Häufigkeiten der entsprechenden Rollen normiert, die Werte der Rollen durch die Anzahl aller Konstituenten (vergleiche Formel \eqref{mat:norm}). Für Konstituenten ohne Rolle wird eine Dummy-Rolle eingeführt. Alle normierten Werte werden logarithmiert und bilden das Modell. Die Trainingsphase ist in Abbildung \ref{training} kompakt verbildlicht. 
+
+\begin{figure}[tb!]
+		\centering
+		\includegraphics[scale=0.6]{images/ablaufAnnotate.png}
+		\caption{Ablauf der Trainingsphase}
+		\label{training}
+	\end{figure}
 
 
 \subsubsection*{Klassifikation der Konstituenten}\label{subsubsec:classify}
 %keine Abstraktion für ungesehene Targets
 Nachdem das zu annotierende Korpus mit Informationen angereichert wurde, werden die Targets identifiziert. Das Lemma jeder atomaren Konstituente eines jeden Satzes wird gegen die im Modell gelisteten Target-Lemmata geprüft. Da Komplexe Target-Konstituenten beim Training allerdings auf ihre Köpfe abgebildet wurden, stellen alle Konstituenten, deren Kopf ein Target-Lemma ist, eine potentielle Target-Konstituente da. Deshalb wird in Abhängigkeit jeder dieser potentiellen Targets eine Klassifikation durchgeführt.
 
-Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feature-Kombinationen gebildet und im Modell gesucht. Wenn diese nicht im Modell gelistet sind, werden sie durch weniger komplexe Feature-Kombinationen und schließlich durch atomare Features ersetzt. Das verwendete Regelwerk ist in Abb [TODO] dargestellt, es handelt sich um eine leicht modifizierte Form des von \cite{gildea} verwendeten. Falls die atomaren Feature-Werte ebenfalls nicht gefunden werden können, wird ein Smoothing mit einem Wert von $log(10^{-6})$ durchgeführt. Jede Konstituente wird mit der Rolle annotiert, für die die berechnete Wahrscheinlichkeit maximal ist.
+Für jede Konstituente werden die Features extrahiert. Dann werden komplexe Feature-Kombinationen gebildet und im Modell gesucht. Wenn diese nicht im Modell gelistet sind, werden sie durch weniger komplexe Feature-Kombinationen und schließlich durch atomare Features ersetzt. Das verwendete Regelwerk ist in Abbildung \ref{back_off_model} dargestellt, es handelt sich um eine leicht modifizierte Form des von \cite{gildea} verwendeten. Falls die atomaren Feature-Werte ebenfalls nicht gefunden werden können, wird ein Smoothing mit einem Wert von $log(10^{-6})$ durchgeführt. Jede Konstituente wird mit der Rolle annotiert, für die die berechnete Wahrscheinlichkeit maximal ist.
 
-Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kopf wird schließlich die Target-Konstituente mit der Annotation gewählt, dessen Produkt der Wahrscheinlichkeiten für die annotierten Rollen am höchsten ist.
-
-\begin{center}
+\begin{figure}
+	\centering
 	\begin{tikzpicture}[
 	edge from parent/.style={very thick,draw=black!70,-latex}
 	]
@@ -305,7 +308,21 @@ Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kop
 		}		
 	;
 	\end{tikzpicture}
-\end{center}
+	\label{back_off_model}
+	\caption{Verwendetes Regelwerk zur Zerlegung der komplexen Features}
+\end{figure}
+
+
+Aus der Menge potentieller Target-Konstituenten für einen bestimmten Target-Kopf wird schließlich die Target-Konstituente mit der Annotation gewählt, dessen Produkt der Wahrscheinlichkeiten für die annotierten Rollen am höchsten ist.
+In Abbildung \ref{classify} ist die Klassifikationsphase kompakt dargestellt.
+
+\begin{figure}[tb!]
+		\centering
+		\includegraphics[scale=0.6]{images/ablaufAnnotate.png}
+		\caption{Ablauf der Klassifikationsphase}
+		\label{classify}
+	\end{figure}
+
 
 \newpage
 \section{Evaluation des SRL-Klassifikators}
