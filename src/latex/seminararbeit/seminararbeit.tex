@@ -28,17 +28,14 @@
 
 \setcounter{tocdepth}{2}
 \begin{document}
-\thispagestyle{empty} 
 
 
 \begin{center}
-	\topskip0pt
-	\vspace*{\fill}
-	Bitte Benoten!
-	\vspace*{\fill}
-
-
-	\newpage
+	\pagestyle{fancy} %eigener Seitenstil
+	\fancyhf[C]{\color{red} BITTE BENOTEN!!!}
+	\renewcommand{\headrulewidth}{0pt} %obere Trennlinie
+	\renewcommand{\footrulewidth}{0pt} %untere Trennlinie
+	 
 	\topskip0pt
 	\vspace*{\fill}
 	
@@ -57,7 +54,7 @@
 		Humboldt-Universität zu Berlin\\
 		\vspace{1.5cm}
 		Robert Bärhold \& Arne Binder \\
-		31. März 2014 \\ %TODO
+		31. März 2014 \\
 		\vspace{1cm}
 		
 		\begin{table}[h]
@@ -71,7 +68,6 @@
 			\end{tabular}
 		\end{table}	
 	\end{Large}
-	\vspace*{\fill}
 \end{center}
 
 
@@ -93,9 +89,13 @@
 \pagenumbering{arabic}
 
 \section{Einleitung}
-- warum SRL? Motivation
-- was gibt es schon? related work
-[Shalmaneser, gildea \& jurafski, SEMAFOR, LTH, ...]
+% - warum SRL? Motivation
+% - was gibt es schon? related work
+
+Die Verarbeitung digitaler Texte ist heutzutage von enormer Bedeutung, soll doch laut \cite{gartner} die digitale Datenmenge bis 2016 auf 4.1 Zetabyte steigen. Immer häufiger sind es Sprachverstehen-bezogene Aufgaben, bei denen es gilt, die sematischen Informationen eines Satzes zu extrahieren. Die letzten Bausteine, auf denen die sematischen Information eines Satzes basiert, sind die sogenannten \textit{Rollen}. Dabei gilt es beispielweise die \glqq{}W\glqq{}-Fragen zu klären: \textit{Wer} hat \textit{wen} über \textit{welches Medium} \textit{was} gesagt? Oder: \textit{Wer} hat \textit{welche Meinung} über \textit{wen} und \textit{warum}? Das zweite Beispiel zeigt eines der wichtigsten Anwendungsfälle: die Meinungsforschung. Könnte digitale Aussagen verschiedener Personen bezogen auf ihre Bestandteile genauer analysiert werden, könnten viel exaktere Meinungsbilder erstellt werden. Ebenso könnten Nutzer in Suchmaschinen vollständige Sätze eingeben statt sich auf Stichwörter begrenzen zu müssen. Das von IBM entwickelte Computerprogramm Watson \citep{ibmWatson} wurde eigens dafür entwickelt Antworten auf Fragen natürlicher Sprache zu geben. Das genaue Verständnis der Frage ist hierbei unabdingbar.
+
+Die hier vorliegende Seminararbeitung beschreibt die Entwicklung eines Klassifikators zur automatischen Bestimmung von Rollen. Solche Systeme werden auch als \textit{Semantic Role Labeler} (SRL) bezeichnet. Zunächst wird der lingusitische Hintergrund von Rollen und übergeordneten Konzepten, sogenannten Frames, erläutert. Anschließend wird die Problemstellung sowie das genutzte Korpus vorgestellt. Gefolgt von der genauen Umsetzung des SRL-Klassifikators und den Ergebnissen der durchgeführten Evaluation wird abschließend ein Fazit über das Seminarprojekt gegeben sowie mögliche Optionen zur Weiterentwicklung vorgestellt. 
+
 \subsection{Semantische Rollen}
 
 Prädikate zeichnen sich dadurch aus, dass sie die Komplementationsstruktur einer
@@ -203,6 +203,8 @@ wie folgt untergliedern:
 \item Schließlich erfolgt die Klassifizierung der einzelnen Frame-Elemente.
 \end{enumerate}
 
+\subsection{Related Work} %TODO
+TODO: [Shalmaneser, gildea \& jurafski, SEMAFOR, LTH, ...]
 
 \section{Problemstellung}
 Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} auf einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache adaptieren lässt. Dieser Ansatz besagt, dass mithilfe lexikalischer und syntaktischer Informationen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes getroffen werden können. Die Annahme lässt sich dazu nutzen, ein automatisiertes, statistisches Lernverfahren basierend auf einem zusätzlich mit Rollen annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit ermöglicht.
