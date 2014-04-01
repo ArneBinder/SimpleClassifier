@@ -105,7 +105,7 @@ Prädikate zeichnen sich dadurch aus, dass sie die Komplementationsstruktur eine
 übergeordneten syntaktischen Einheit (nämlich des Satzes) bestimmen. Zum
 Beispiel verlangt ein ditransitives Verb wie \glqq{}geben\grqq{} drei weitere Satzkonstituenten mit konkreten syntaktischen Eigenschaften, wie es in Abbildung \ref{Konstituentenbaum} dargestellt ist.
 
-\begin{figure}
+\begin{figure}[b]
 	\centering
 	\begin{tikzpicture}
 		\Tree [.geben
@@ -115,7 +115,7 @@ Beispiel verlangt ein ditransitives Verb wie \glqq{}geben\grqq{} drei weitere Sa
 				[.Dativ-Objekt {seiner Freundin} ]
 			]
 	\end{tikzpicture}
-	\caption[Einfacher Konsituentenbaum eines Satzes]{Einfacher Konsituentenbaum eines Satzes}
+	\caption[Einfacher Konsituentenbaum]{Einfacher Konsituentenbaum eines Satzes}
 	\label{Konstituentenbaum}
 \end{figure}
 
@@ -195,6 +195,7 @@ wie folgt untergliedern:
 \item Schließlich erfolgt die Klassifizierung der einzelnen Frame-Elemente.
 \end{enumerate}
 
+\newpage
 \section{Problemstellung}
 
 Im Zuge dieser Arbeit soll die Frage geklärt werden, ob sich der Ansatz von \cite{gildea} auf einer Baumbank, das heißt einem Phrasen-annotierten Textkorpus, der deutschen Sprache adaptieren lässt. Dieser Ansatz besagt, dass mithilfe lexikalischer und syntaktischer Informationen verlässliche Annahmen über die Realisierung von semantischen Rollen durch Konstituenten eines Satzes getroffen werden können. Die Annahme lässt sich dazu nutzen, ein automatisiertes, statistisches Lernverfahren basierend auf einem zusätzlich mit Rollen annotierten Korpus zu entwickeln, welches die automatische Bestimmung der in einem deutschen Satz realisierten semantischen Rollen mit akzeptabler Genauigkeit ermöglicht.
@@ -252,7 +253,7 @@ An Hand von Experimenten hat sich herausgestellt, dass der Kopf der kleinsten Ko
 	\begin{figure}[tb!]
 		\centering
 		\includegraphics{images/nextHead.png}
-		\caption[Das Nachbar-Kopf-Feature]{Das Nachbar-Kopf-Feature für die beiden gelb markierten Konstituenten ist jeweils das Lemma des Wortes \glqq{}sagte\grqq{} (der Kopf der NP \glqq{}Südkoreas Informationsminister\grqq{} ist identisch mit dem Kopf von \glqq{}Informationsminister\grqq{}). }
+		\caption[Das Nachbar-Kopf-Feature]{Das Nachbar-Kopf-Feature für die beiden gelb markierten Konstituenten ist jeweils das Lemma des Wortes \glqq{}sagte\grqq{} (der Kopf der NP \glqq{}Südkoreas Informationsminister\grqq{} ist identisch mit dem Kopf von \glqq{}Informationsminister\grqq{}). Die Originalabbildung wurde mit SALTO\citep{burchardt06salto} erstellt und angepasst.}
 		\label{nextHead}
 	\end{figure}
 
@@ -366,7 +367,7 @@ Die dritte Kenngröße erfasst das Vorkommen der Originalrollen des Satzes unabh
 	\begin{figure}[tb!]
 		\centering
 		\includegraphics{images/evaluation_kenngroeszen.png}
-		\caption[Visualisierung der Kenngrößen]{Visualisierung der drei Kenngrößen an einem semantisch-annotierten Beispielsatz}
+		\caption[Visualisierung der Kenngrößen]{Visualisierung der drei Kenngrößen an einem semantisch-annotierten Beispielsatz (Die Originalabbildung wurde mit SALTO\citep{burchardt06salto} erstellt und angepasst)}
 		\label{evalKenngroeszen}
 	\end{figure}
 
